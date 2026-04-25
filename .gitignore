@@ -4,6 +4,7 @@ node_modules/
 # Code Counter
 
 .VSCodeCounter/*
+.VSCodeCounter
 
 # Logs
 logs/
