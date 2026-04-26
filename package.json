@@ -12,9 +12,14 @@
   "license": "ISC",
   "packageManager": "pnpm@10.30.0",
   "dependencies": {
+    "@prisma/adapter-neon": "^7.8.0",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "@types/express": "^5.0.6",
     "argon2": "^0.44.0",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "prisma": "^7.8.0",
     "tsx": "^4.21.0",
     "zod": "^4.3.6"
   },
@@ -22,5 +27,8 @@
     "overrides": {
       "path-to-regexp": "8.4.0"
     }
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0"
   }
 }

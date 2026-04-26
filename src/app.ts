@@ -1,7 +1,10 @@
-import express from "express";
+import express, { type Express } from "express";
+import { initDB } from "./config/db.config";
 
-export const app = express();
+export const app: Express = express();
 
-app.get("/", (req, res) => {
+initDB();
+
+app.get("/api", (req, res) => {
   res.send("hello from 3000");
 });

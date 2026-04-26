@@ -42,3 +42,4 @@ Thumbs.db
 # Optional: temporary files
 *.tmp
 tasks.todo
+/generated/prisma
