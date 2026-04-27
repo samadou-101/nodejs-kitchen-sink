@@ -1,12 +1,22 @@
 import express, { type Express } from "express";
 import { initDB } from "./config/db.config";
 import { initRedis } from "./config/redis.config";
+import apiRouter from "./api/auth/auth.routes";
+import cookieParser from "cookie-parser";
 
 export const app: Express = express();
 
 initDB();
 initRedis();
 
+app.use(cookieParser());
+app.use(express.json());
 app.get("/api", (req, res) => {
   res.send("hello from 3000");
+});
+
+app.use("/api", apiRouter);
+
+app.use((req, res) => {
+  res.send(400).json("Error");
 });
