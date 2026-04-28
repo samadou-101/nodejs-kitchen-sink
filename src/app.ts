@@ -12,12 +12,12 @@ initRedis();
 
 app.use(cookieParser());
 app.use(express.json());
-app.get("/api", checkAuth, (req, res) => {
-  res.send("hello from 3000");
-});
+// app.get("/api/hello", checkAuth, (req, res) => {
+//   res.send("hello from 3000");
+// });
 
 app.use("/api", apiRouter);
 
 app.use((req, res) => {
-  res.send(400).json("Error");
+  res.status(400).json({ message: "Final mmiddleware error" });
 });

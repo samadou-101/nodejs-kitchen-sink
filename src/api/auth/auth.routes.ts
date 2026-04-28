@@ -5,5 +5,6 @@ const apiRouter: Router = express.Router();
 
 apiRouter.post("/auth/password/register", passwordAuthHandler);
 apiRouter.post("/auth/password/login", passwordAuthHandler);
+apiRouter.post("/auth/password/refresh", passwordAuthHandler);
 
 export default apiRouter;
