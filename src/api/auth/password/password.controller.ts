@@ -1,6 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { generateTokens, hashPassword, verifyPassword } from "../auth.utils";
+import {
+  generatePasswordResetToken,
+  generateTokens,
+  hashPassword,
+  verifyPassword,
+} from "../auth.utils";
 import { prisma } from "@/config/db.config";
 import { Prisma } from "@/generated/prisma/client";
 
@@ -18,7 +23,12 @@ export async function passwordAuthHandler(req: Request, res: Response) {
     await refreshTokens(req, res);
     return;
   }
+  if (req.path === "/auth/password/reset" && req.method === "POST") {
+    sendPasswordResetToken(req, res);
+    return;
+  }
 }
+
 export async function checkAuth(
   req: Request,
   res: Response,
@@ -124,3 +134,13 @@ async function refreshTokens(req: Request, res: Response) {
     res.status(401).send("Unauthorized!");
   }
 }
+
+async function sendPasswordResetToken(req: Request, res: Response) {
+  console.log("hitting reset url");
+  const token = generatePasswordResetToken();
+  const passwordResetURL = `http://localhost:3000/api/auth/password/reset?confim=${token}`;
+  res.status(200).json({ resetURL: passwordResetURL });
+  return;
+}
+
+async function confirmPasswordReset(req: Request, res: Response) {}

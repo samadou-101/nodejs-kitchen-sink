@@ -13,8 +13,29 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  name     String
-  password String
+  id                  Int                 @id @default(autoincrement())
+  email               String              @unique
+  name                String
+  password            String
+  sessions            Session[]
+  passwordResetTokens PasswodRsetTokens[]
+}
+
+model Session {
+  id         String   @id
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+  created_at DateTime @default(now())
+  expires_at DateTime
+  revoked    Boolean  @default(false)
+}
+
+model PasswodRsetTokens {
+  id         String    @id
+  userId     Int
+  token_hash String
+  created_at DateTime  @default(now())
+  expires_at DateTime
+  used_at    DateTime?
+  user       User      @relation(fields: [userId], references: [id])
 }

@@ -1,5 +1,6 @@
 import * as argon2 from "argon2";
 import jwt, { type SignOptions } from "jsonwebtoken";
+import crypto from "crypto";
 
 export async function hashPassword(password: string) {
   const hashedPassword = await argon2.hash(password);
@@ -39,4 +40,9 @@ export async function verifyPassword(
 ) {
   const isValid = await argon2.verify(dbHashedPassword, password);
   return isValid;
+}
+
+export function generatePasswordResetToken() {
+  const token = crypto.randomBytes(32).toString("hex");
+  return token;
 }
