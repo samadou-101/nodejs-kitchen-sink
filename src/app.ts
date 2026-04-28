@@ -3,6 +3,7 @@ import { initDB } from "./config/db.config";
 import { initRedis } from "./config/redis.config";
 import apiRouter from "./api/auth/auth.routes";
 import cookieParser from "cookie-parser";
+import { checkAuth } from "./api/auth/password/password.controller";
 
 export const app: Express = express();
 
@@ -11,7 +12,7 @@ initRedis();
 
 app.use(cookieParser());
 app.use(express.json());
-app.get("/api", (req, res) => {
+app.get("/api", checkAuth, (req, res) => {
   res.send("hello from 3000");
 });
 

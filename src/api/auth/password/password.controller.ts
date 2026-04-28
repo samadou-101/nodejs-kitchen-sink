@@ -1,4 +1,5 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import { generateTokens, hashPassword, verifyPassword } from "../auth.utils";
 import { prisma } from "@/config/db.config";
 import { Prisma } from "@/generated/prisma/client";
@@ -11,7 +12,25 @@ export async function passwordAuthHandler(req: Request, res: Response) {
     loginUser(req, res);
   }
 }
-
+export async function checkAuth(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const accessToken = req.cookies.at;
+  // console.log(accessToken);
+  try {
+    const verifiedAccessToken = jwt.verify(
+      accessToken,
+      process.env.ACCESS_TOKEN_SECRET,
+    );
+    console.log("access token verfication + ", verifiedAccessToken);
+    next();
+  } catch (error) {
+    res.status(401).send("Unauthorized");
+    return;
+  }
+}
 async function regsiterUser(req: Request, res: Response) {
   const { name, email, password } = req.body;
   console.log(req.cookies);
