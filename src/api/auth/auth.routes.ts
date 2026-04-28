@@ -7,5 +7,6 @@ apiRouter.post("/auth/password/register", passwordAuthHandler);
 apiRouter.post("/auth/password/login", passwordAuthHandler);
 apiRouter.post("/auth/password/refresh", passwordAuthHandler);
 apiRouter.post("/auth/password/reset", passwordAuthHandler);
+apiRouter.post("/auth/password/new", passwordAuthHandler);
 
 export default apiRouter;

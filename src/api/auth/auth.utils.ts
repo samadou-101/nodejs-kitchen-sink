@@ -42,7 +42,8 @@ export async function verifyPassword(
   return isValid;
 }
 
-export function generatePasswordResetToken() {
-  const token = crypto.randomBytes(32).toString("hex");
-  return token;
+export async function generatePasswordResetToken() {
+  const rawToken = crypto.randomBytes(32).toString("hex");
+  const hashedToken = await argon2.hash(rawToken);
+  return { rawToken, hashedToken };
 }

@@ -46,3 +46,13 @@ export { Prisma }
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model Session
+ * 
+ */
+export type Session = Prisma.SessionModel
+/**
+ * Model PasswodResetTokens
+ * 
+ */
+export type PasswodResetTokens = Prisma.PasswodResetTokensModel

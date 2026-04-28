@@ -8,6 +8,7 @@ import {
 } from "../auth.utils";
 import { prisma } from "@/config/db.config";
 import { Prisma } from "@/generated/prisma/client";
+import * as argon2 from "argon2";
 
 export async function passwordAuthHandler(req: Request, res: Response) {
   if (req.path === "/auth/password/register" && req.method === "POST") {
@@ -25,6 +26,10 @@ export async function passwordAuthHandler(req: Request, res: Response) {
   }
   if (req.path === "/auth/password/reset" && req.method === "POST") {
     sendPasswordResetToken(req, res);
+    return;
+  }
+  if (req.path === "/auth/password/new" && req.method === "POST") {
+    await confirmPasswordReset(req, res);
     return;
   }
 }
@@ -136,11 +141,97 @@ async function refreshTokens(req: Request, res: Response) {
 }
 
 async function sendPasswordResetToken(req: Request, res: Response) {
-  console.log("hitting reset url");
-  const token = generatePasswordResetToken();
-  const passwordResetURL = `http://localhost:3000/api/auth/password/reset?confim=${token}`;
-  res.status(200).json({ resetURL: passwordResetURL });
+  const { email } = req.body ?? {};
+  if (!email) {
+    return res.status(400).json({ message: "Email is required" });
+  }
+  const { rawToken, hashedToken } = await generatePasswordResetToken();
+  const passwordResetURL = `http://localhost:3000/api/auth/password/reset?confim=${rawToken}`;
+  try {
+    const userData = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (!userData) {
+      res.status(500).send("Something Went Wrong!");
+      return;
+    }
+    await prisma.passwodResetTokens.create({
+      data: {
+        token_hash: hashedToken,
+        userId: userData.id,
+        expires_at: new Date(Date.now() + 60 * 1000),
+      },
+    });
+    res.status(200).json({
+      resetURL: passwordResetURL,
+      token: rawToken,
+      newPassword: {
+        url: "http://localhost:3000/api/auth/password/new",
+        body: {
+          resetToken: "the reset token you received from the reset url",
+          email: "your email",
+          newPassword: "your new password",
+        },
+      },
+    });
+    return;
+  } catch (error) {}
+  res.status(500).json("Something Went Wrong!");
   return;
 }
 
-async function confirmPasswordReset(req: Request, res: Response) {}
+async function confirmPasswordReset(req: Request, res: Response) {
+  const { email, resetToken, newPassword } = req.body ?? {};
+  console.log(resetToken + " " + email + " " + newPassword);
+  try {
+    const userData = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!userData) {
+      res.status(409).send("invalid Credentials");
+      return;
+    }
+
+    const tokenResetData = await prisma.passwodResetTokens.findFirst({
+      where: { userId: userData.id, used_at: null },
+    });
+
+    if (!tokenResetData) {
+      console.log("hit, no token");
+      res.status(401).send("Unaothorized");
+      return;
+    }
+
+    const validTokenHash = await argon2.verify(
+      tokenResetData?.token_hash,
+      resetToken,
+    );
+
+    if (!validTokenHash) {
+      console.log("hit, token not valid");
+      res.status(401).send("Unaothorized");
+      return;
+    }
+    if (tokenResetData.expires_at < new Date()) {
+      console.log("reset token expired");
+      res.status(401).send("Token Expired");
+      return;
+    }
+    const newHashedPassword = await argon2.hash(newPassword);
+    await prisma.user.update({
+      where: { email },
+      data: { password: newHashedPassword },
+    });
+    await prisma.passwodResetTokens.update({
+      where: {
+        id: tokenResetData.id,
+      },
+      data: { used_at: new Date(Date.now()) },
+    });
+    res.status(201).send("Your password is updated successfully!");
+    return;
+  } catch (error: any) {
+    res.status(500).send(error.message);
+  }
+}
