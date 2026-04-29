@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+
 import jwt from "jsonwebtoken";
 import {
   generatePasswordResetToken,
@@ -9,6 +10,7 @@ import {
 import { prisma } from "@/config/db.config";
 import { Prisma } from "@/generated/prisma/client";
 import * as argon2 from "argon2";
+import type { SessionData } from "./auth.types";
 
 export async function passwordAuthHandler(req: Request, res: Response) {
   if (req.path === "/auth/password/register" && req.method === "POST") {
@@ -71,6 +73,7 @@ async function regsiterUser(req: Request, res: Response) {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       path: "/api/auth/password/refresh",
     });
+
     res.status(201).send({ name: user.name, email: user.email });
     console.log("checking register function");
     return;
@@ -235,3 +238,5 @@ async function confirmPasswordReset(req: Request, res: Response) {
     res.status(500).send(error.message);
   }
 }
+
+async function cacheUserSession(sessionData: SessionData) {}
