@@ -49,12 +49,6 @@ export async function regsiterUserJWT(req: Request, res: Response) {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       path: "/api/auth/password/refresh",
     });
-    const sessionData = await createSession(user.id);
-    if (sessionData !== null) {
-      await cacheUserSession(sessionData);
-      await cacheUserSession(sessionData);
-    }
-
     res.status(201).send({ name: user.name, email: user.email });
     return;
   } catch (error: any) {
@@ -216,36 +210,5 @@ export async function confirmPasswordReset(req: Request, res: Response) {
     return;
   } catch (error: any) {
     res.status(500).send(error.message);
-  }
-}
-
-async function createSession(userId: number): Promise<SessionData | null> {
-  try {
-    const session = await prisma.session.create({
-      data: {
-        userId,
-        expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24),
-      },
-    });
-    const sessionData: SessionData = {
-      sessionId: session.id,
-      userId,
-      expires_at: session.expires_at,
-    };
-    return sessionData;
-  } catch (error: any) {
-    console.log("Error creation the session", error.message);
-    return null;
-  }
-}
-
-async function cacheUserSession(sessionData: SessionData) {
-  const sessionKey = `session:${sessionData.sessionId}`;
-  try {
-    await redisClient.set(sessionKey, JSON.stringify(sessionData), {
-      expiration: { type: "EX", value: 60 * 60 * 24 },
-    });
-  } catch (error: any) {
-    console.log("Failed to cache session", error.meessage);
   }
 }

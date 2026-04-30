@@ -6,8 +6,10 @@ import {
   regsiterUserJWT,
   sendPasswordResetToken,
 } from "./jwt.service";
+import { loginUserSession, registerUserSession } from "./session.service";
 
 export async function passwordAuthHandler(req: Request, res: Response) {
+  // ========================= JWT BASED AUTH ======================= //
   if (
     req.path === "/auth/password/register?type=jwt" &&
     req.method === "POST"
@@ -30,6 +32,27 @@ export async function passwordAuthHandler(req: Request, res: Response) {
   }
   if (req.path === "/auth/password/new" && req.method === "POST") {
     await confirmPasswordReset(req, res);
+    return;
+  }
+
+  // ========================= SESSION BAESD AUTH ======================= //
+  if (
+    req.path === "/auth/password/register" &&
+    req.method === "POST" &&
+    req.query.type === "session"
+  ) {
+    console.log("register session url hit");
+    await registerUserSession(req, res);
+    return;
+  }
+
+  if (
+    req.path === "/auth/password/login" &&
+    req.method === "POST" &&
+    req.query.type === "session"
+  ) {
+    console.log("register session url hit");
+    await loginUserSession(req, res);
     return;
   }
 }

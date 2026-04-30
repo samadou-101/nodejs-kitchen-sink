@@ -1,5 +1,7 @@
 export type SessionData = {
   sessionId: string;
   userId: number;
-  expires_at: Date;
+  createdAT: string;
+  expires_at: string;
+  lastSeenAt: string;
 };
