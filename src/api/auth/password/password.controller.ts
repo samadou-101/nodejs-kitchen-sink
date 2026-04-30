@@ -8,19 +8,16 @@ import {
 } from "./jwt.service";
 
 export async function passwordAuthHandler(req: Request, res: Response) {
-  if (
-    req.path === "/auth/password/register?type=jwt" &&
-    req.method === "POST"
-  ) {
+  if (req.path === "/auth/password/register" && req.method === "POST") {
     await regsiterUserJWT(req, res);
     return;
   }
-  if (req.path === "/auth/password/login?type=jwt" && req.method === "POST") {
+  if (req.path === "/auth/password/login" && req.method === "POST") {
     console.log("passing login");
     await loginUserJWT(req, res);
     return;
   }
-  if (req.path === "/auth/password/refresh?type=jwt" && req.method === "POST") {
+  if (req.path === "/auth/password/refresh" && req.method === "POST") {
     await refreshTokensJWT(req, res);
     return;
   }
