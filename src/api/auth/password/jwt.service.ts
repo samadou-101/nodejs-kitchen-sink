@@ -12,7 +12,7 @@ import * as argon2 from "argon2";
 import type { SessionData } from "./auth.types";
 import { redisClient } from "@/config/redis.config";
 
-export async function checkAuth(
+export async function checkAuthJWT(
   req: Request,
   res: Response,
   next: NextFunction,
