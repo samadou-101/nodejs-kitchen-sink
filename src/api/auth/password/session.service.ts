@@ -1,18 +1,37 @@
-import type { Request, Response } from "express";
-import { hashPassword, verifyPassword } from "../auth.utils";
+import type { NextFunction, Request, Response } from "express";
+import { hashPassword, isExpired, verifyPassword } from "../auth.utils";
 import { prisma } from "@/config/db.config";
 import { Prisma } from "@/generated/prisma/client";
 import type { SessionData } from "./auth.types";
 import { redisClient } from "@/config/redis.config";
 
-export async function checkAuthSession(req: Request, res: Response) {
-  const sid = req.cookies.sid ?? null;
-  if (!sid) {
-    res.status(401).send("Unauthorized");
-    return;
+export async function checkAuthSession(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  console.log("testing session");
+  try {
+    const sid = req.cookies.sid ?? null;
+    if (!sid) {
+      res.status(401).send("Invalid Session");
+      return;
+    }
+    const cachedSession = await checkCachedSession(sid);
+    if (cachedSession) {
+      return next();
+    }
+
+    const session = await getUseSessionFromDB(sid);
+    if (!session) {
+      res.status(401).send("Unauthorized");
+      return;
+    }
+
+    return next();
+  } catch (error: any) {
+    res.status(500).send(`Something Went Wrong: " ${error.message}`);
   }
-  const session = await revalidateSession(sid);
-  res.send(session);
 }
 
 export async function registerUserSession(req: Request, res: Response) {
@@ -113,7 +132,21 @@ export async function cacheUserSession(sessionData: SessionData) {
   }
 }
 
-export async function revalidateSession(sid: string) {
+export async function revokeSession(sid: string) {
+  try {
+    await redisClient.del(`session:${sid}`);
+    await prisma.session.delete({
+      where: {
+        id: sid,
+      },
+    });
+    return true;
+  } catch (error: any) {
+    return false;
+  }
+}
+
+export async function checkCachedSession(sid: string): Promise<boolean> {
   const EXTEND_THRESHOLD_MS = 3 * 24 * 60 * 60 * 1000; // 3 days
   const EXTENSION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
@@ -150,28 +183,25 @@ export async function revalidateSession(sid: string) {
     1,
     Math.floor((new Date(session.expires_at).getTime() - Date.now()) / 1000),
   );
-
-  await redisClient.set(key, JSON.stringify(session));
-  await redisClient.expire(key, newTtlSeconds);
-
-  return session;
-}
-export async function revokeSession(sid: string) {
   try {
-    await redisClient.del(`session:${sid}`);
-    await prisma.session.delete({
-      where: {
-        id: sid,
-      },
-    });
+    await redisClient.set(key, JSON.stringify(session));
+    await redisClient.expire(key, newTtlSeconds);
     return true;
   } catch (error: any) {
+    console.log("Error Updating the session", error.message);
     return false;
   }
 }
 
-export async function checkSession(sid: string) {}
-
-function isExpired(expiresAt: string) {
-  return Date.now() > new Date(expiresAt).getTime();
+export async function getUseSessionFromDB(sid: string) {
+  try {
+    const session = await prisma.session.findUnique({
+      where: {
+        id: sid,
+      },
+    });
+    return session;
+  } catch (error) {
+    console.log("Error fetching the user session");
+  }
 }

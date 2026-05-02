@@ -47,3 +47,7 @@ export async function generatePasswordResetToken() {
   const hashedToken = await argon2.hash(rawToken);
   return { rawToken, hashedToken };
 }
+
+export function isExpired(expiresAt: string) {
+  return Date.now() > new Date(expiresAt).getTime();
+}
