@@ -53,7 +53,21 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   User: 'User',
   Session: 'Session',
-  PasswodResetTokens: 'PasswodResetTokens'
+  PasswordResetToken: 'PasswordResetToken',
+  Customer: 'Customer',
+  ProductCategory: 'ProductCategory',
+  Product: 'Product',
+  Inventory: 'Inventory',
+  OrderStatus: 'OrderStatus',
+  Order: 'Order',
+  OrderItem: 'OrderItem',
+  OrderPayment: 'OrderPayment',
+  Employee: 'Employee',
+  EmployeeRole: 'EmployeeRole',
+  EmployeeRoleAssignment: 'EmployeeRoleAssignment',
+  EmployeePaymentType: 'EmployeePaymentType',
+  EmployeePayment: 'EmployeePayment',
+  EmployeePaymentPerOrderRate: 'EmployeePaymentPerOrderRate'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -85,24 +99,175 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 export const SessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  created_at: 'created_at',
-  expires_at: 'expires_at',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
   revoked: 'revoked'
 } as const
 
 export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
 
 
-export const PasswodResetTokensScalarFieldEnum = {
+export const PasswordResetTokenScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
-  token_hash: 'token_hash',
-  created_at: 'created_at',
-  expires_at: 'expires_at',
-  used_at: 'used_at'
+  tokenHash: 'tokenHash',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt'
 } as const
 
-export type PasswodResetTokensScalarFieldEnum = (typeof PasswodResetTokensScalarFieldEnum)[keyof typeof PasswodResetTokensScalarFieldEnum]
+export type PasswordResetTokenScalarFieldEnum = (typeof PasswordResetTokenScalarFieldEnum)[keyof typeof PasswordResetTokenScalarFieldEnum]
+
+
+export const CustomerScalarFieldEnum = {
+  customerId: 'customerId',
+  userId: 'userId',
+  name: 'name',
+  phone: 'phone',
+  address: 'address',
+  email: 'email',
+  registrationDate: 'registrationDate',
+  status: 'status',
+  clientId: 'clientId',
+  ordersCount: 'ordersCount'
+} as const
+
+export type CustomerScalarFieldEnum = (typeof CustomerScalarFieldEnum)[keyof typeof CustomerScalarFieldEnum]
+
+
+export const ProductCategoryScalarFieldEnum = {
+  categoryId: 'categoryId',
+  name: 'name',
+  description: 'description'
+} as const
+
+export type ProductCategoryScalarFieldEnum = (typeof ProductCategoryScalarFieldEnum)[keyof typeof ProductCategoryScalarFieldEnum]
+
+
+export const ProductScalarFieldEnum = {
+  productId: 'productId',
+  name: 'name',
+  description: 'description',
+  price: 'price',
+  categoryId: 'categoryId'
+} as const
+
+export type ProductScalarFieldEnum = (typeof ProductScalarFieldEnum)[keyof typeof ProductScalarFieldEnum]
+
+
+export const InventoryScalarFieldEnum = {
+  inventoryId: 'inventoryId',
+  productId: 'productId',
+  quantityAvailable: 'quantityAvailable',
+  lastUpdated: 'lastUpdated'
+} as const
+
+export type InventoryScalarFieldEnum = (typeof InventoryScalarFieldEnum)[keyof typeof InventoryScalarFieldEnum]
+
+
+export const OrderStatusScalarFieldEnum = {
+  orderStatusId: 'orderStatusId',
+  name: 'name',
+  description: 'description'
+} as const
+
+export type OrderStatusScalarFieldEnum = (typeof OrderStatusScalarFieldEnum)[keyof typeof OrderStatusScalarFieldEnum]
+
+
+export const OrderScalarFieldEnum = {
+  orderId: 'orderId',
+  customerId: 'customerId',
+  orderDate: 'orderDate',
+  orderStatusId: 'orderStatusId',
+  employeeId: 'employeeId',
+  notes: 'notes'
+} as const
+
+export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
+
+
+export const OrderItemScalarFieldEnum = {
+  orderItemId: 'orderItemId',
+  orderId: 'orderId',
+  productId: 'productId',
+  quantity: 'quantity',
+  price: 'price'
+} as const
+
+export type OrderItemScalarFieldEnum = (typeof OrderItemScalarFieldEnum)[keyof typeof OrderItemScalarFieldEnum]
+
+
+export const OrderPaymentScalarFieldEnum = {
+  paymentId: 'paymentId',
+  orderId: 'orderId',
+  amount: 'amount',
+  paymentDate: 'paymentDate',
+  notes: 'notes'
+} as const
+
+export type OrderPaymentScalarFieldEnum = (typeof OrderPaymentScalarFieldEnum)[keyof typeof OrderPaymentScalarFieldEnum]
+
+
+export const EmployeeScalarFieldEnum = {
+  employeeId: 'employeeId',
+  userId: 'userId',
+  name: 'name',
+  phoneNumber: 'phoneNumber',
+  isActive: 'isActive',
+  paymentTypeId: 'paymentTypeId'
+} as const
+
+export type EmployeeScalarFieldEnum = (typeof EmployeeScalarFieldEnum)[keyof typeof EmployeeScalarFieldEnum]
+
+
+export const EmployeeRoleScalarFieldEnum = {
+  roleId: 'roleId',
+  name: 'name',
+  description: 'description'
+} as const
+
+export type EmployeeRoleScalarFieldEnum = (typeof EmployeeRoleScalarFieldEnum)[keyof typeof EmployeeRoleScalarFieldEnum]
+
+
+export const EmployeeRoleAssignmentScalarFieldEnum = {
+  employeeId: 'employeeId',
+  roleId: 'roleId',
+  assignedAt: 'assignedAt'
+} as const
+
+export type EmployeeRoleAssignmentScalarFieldEnum = (typeof EmployeeRoleAssignmentScalarFieldEnum)[keyof typeof EmployeeRoleAssignmentScalarFieldEnum]
+
+
+export const EmployeePaymentTypeScalarFieldEnum = {
+  paymentTypeId: 'paymentTypeId',
+  name: 'name',
+  description: 'description'
+} as const
+
+export type EmployeePaymentTypeScalarFieldEnum = (typeof EmployeePaymentTypeScalarFieldEnum)[keyof typeof EmployeePaymentTypeScalarFieldEnum]
+
+
+export const EmployeePaymentScalarFieldEnum = {
+  employeePaymentId: 'employeePaymentId',
+  employeeId: 'employeeId',
+  amount: 'amount',
+  paymentPeriod: 'paymentPeriod',
+  paymentDate: 'paymentDate',
+  notes: 'notes'
+} as const
+
+export type EmployeePaymentScalarFieldEnum = (typeof EmployeePaymentScalarFieldEnum)[keyof typeof EmployeePaymentScalarFieldEnum]
+
+
+export const EmployeePaymentPerOrderRateScalarFieldEnum = {
+  rateId: 'rateId',
+  employeeId: 'employeeId',
+  amount: 'amount',
+  effectiveFrom: 'effectiveFrom',
+  effectiveTo: 'effectiveTo'
+} as const
+
+export type EmployeePaymentPerOrderRateScalarFieldEnum = (typeof EmployeePaymentPerOrderRateScalarFieldEnum)[keyof typeof EmployeePaymentPerOrderRateScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -28,7 +28,77 @@ export type User = Prisma.UserModel
  */
 export type Session = Prisma.SessionModel
 /**
- * Model PasswodResetTokens
+ * Model PasswordResetToken
  * 
  */
-export type PasswodResetTokens = Prisma.PasswodResetTokensModel
+export type PasswordResetToken = Prisma.PasswordResetTokenModel
+/**
+ * Model Customer
+ * 
+ */
+export type Customer = Prisma.CustomerModel
+/**
+ * Model ProductCategory
+ * 
+ */
+export type ProductCategory = Prisma.ProductCategoryModel
+/**
+ * Model Product
+ * 
+ */
+export type Product = Prisma.ProductModel
+/**
+ * Model Inventory
+ * 
+ */
+export type Inventory = Prisma.InventoryModel
+/**
+ * Model OrderStatus
+ * 
+ */
+export type OrderStatus = Prisma.OrderStatusModel
+/**
+ * Model Order
+ * 
+ */
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderItem
+ * 
+ */
+export type OrderItem = Prisma.OrderItemModel
+/**
+ * Model OrderPayment
+ * 
+ */
+export type OrderPayment = Prisma.OrderPaymentModel
+/**
+ * Model Employee
+ * 
+ */
+export type Employee = Prisma.EmployeeModel
+/**
+ * Model EmployeeRole
+ * 
+ */
+export type EmployeeRole = Prisma.EmployeeRoleModel
+/**
+ * Model EmployeeRoleAssignment
+ * 
+ */
+export type EmployeeRoleAssignment = Prisma.EmployeeRoleAssignmentModel
+/**
+ * Model EmployeePaymentType
+ * 
+ */
+export type EmployeePaymentType = Prisma.EmployeePaymentTypeModel
+/**
+ * Model EmployeePayment
+ * 
+ */
+export type EmployeePayment = Prisma.EmployeePaymentModel
+/**
+ * Model EmployeePaymentPerOrderRate
+ * 
+ */
+export type EmployeePaymentPerOrderRate = Prisma.EmployeePaymentPerOrderRateModel

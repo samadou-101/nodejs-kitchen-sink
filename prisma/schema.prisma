@@ -12,30 +12,213 @@ datasource db {
   provider = "postgresql"
 }
 
+//////////////////////
+// 🔐 AUTH SYSTEM (NKS)
+//////////////////////
+
 model User {
   id                  Int                  @id @default(autoincrement())
   email               String               @unique
   name                String
   password            String
   sessions            Session[]
-  passwordResetTokens PasswodResetTokens[]
+  passwordResetTokens PasswordResetToken[]
+
+  // ecommerce relation
+  employee Employee?
+  customer Customer?
 }
 
 model Session {
-  id         String   @id @default(uuid())
-  user       User     @relation(fields: [userId], references: [id])
-  userId     Int
-  created_at DateTime @default(now())
-  expires_at DateTime
-  revoked    Boolean  @default(false)
+  id        String   @id @default(uuid())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  revoked   Boolean  @default(false)
 }
 
-model PasswodResetTokens {
-  id         String    @id @default(uuid())
-  userId     Int
-  token_hash String
-  created_at DateTime  @default(now())
-  expires_at DateTime
-  used_at    DateTime?
-  user       User      @relation(fields: [userId], references: [id])
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  userId    Int
+  tokenHash String
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+//////////////////////
+// 🧾 ECOMMERCE CORE
+//////////////////////
+
+model Customer {
+  customerId Int   @id @default(autoincrement())
+  userId     Int?  @unique
+  user       User? @relation(fields: [userId], references: [id])
+
+  name             String
+  phone            String
+  address          String
+  email            String?  @unique
+  registrationDate DateTime @default(now())
+  status           String
+  clientId         String?
+  ordersCount      Int      @default(0)
+
+  orders Order[]
+}
+
+model ProductCategory {
+  categoryId  Int       @id @default(autoincrement())
+  name        String
+  description String?
+  products    Product[]
+}
+
+model Product {
+  productId   Int     @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal
+
+  categoryId Int
+  category   ProductCategory @relation(fields: [categoryId], references: [categoryId])
+
+  inventory  Inventory?
+  orderItems OrderItem[]
+}
+
+model Inventory {
+  inventoryId Int     @id @default(autoincrement())
+  productId   Int     @unique
+  product     Product @relation(fields: [productId], references: [productId])
+
+  quantityAvailable Int
+  lastUpdated       DateTime @updatedAt
+}
+
+model OrderStatus {
+  orderStatusId Int     @id @default(autoincrement())
+  name          String
+  description   String?
+
+  orders Order[]
+}
+
+model Order {
+  orderId Int @id @default(autoincrement())
+
+  customerId Int
+  customer   Customer @relation(fields: [customerId], references: [customerId])
+
+  orderDate DateTime @default(now())
+
+  orderStatusId Int
+  status        OrderStatus @relation(fields: [orderStatusId], references: [orderStatusId])
+
+  employeeId Int?
+  employee   Employee? @relation(fields: [employeeId], references: [employeeId])
+
+  notes String?
+
+  orderItems OrderItem[]
+  payments   OrderPayment[]
+}
+
+model OrderItem {
+  orderItemId Int @id @default(autoincrement())
+
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [orderId])
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [productId])
+
+  quantity Int
+  price    Decimal
+}
+
+model OrderPayment {
+  paymentId Int   @id @default(autoincrement())
+  orderId   Int
+  order     Order @relation(fields: [orderId], references: [orderId])
+
+  amount      Decimal
+  paymentDate DateTime @default(now())
+  notes       String?
+}
+
+//////////////////////
+// 👨‍💼 EMPLOYEE SYSTEM
+//////////////////////
+
+model Employee {
+  employeeId Int @id @default(autoincrement())
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String
+  phoneNumber String?
+  isActive    Boolean @default(true)
+
+  paymentTypeId Int                 @default(1)
+  paymentType   EmployeePaymentType @relation(fields: [paymentTypeId], references: [paymentTypeId])
+
+  roles         EmployeeRoleAssignment[]
+  ordersHandled Order[]
+  payments      EmployeePayment[]
+  rates         EmployeePaymentPerOrderRate[]
+}
+
+model EmployeeRole {
+  roleId      Int     @id @default(autoincrement())
+  name        String
+  description String?
+
+  employees EmployeeRoleAssignment[]
+}
+
+model EmployeeRoleAssignment {
+  employeeId Int
+  roleId     Int
+  assignedAt DateTime @default(now())
+
+  employee Employee     @relation(fields: [employeeId], references: [employeeId])
+  role     EmployeeRole @relation(fields: [roleId], references: [roleId])
+
+  @@id([employeeId, roleId])
+}
+
+model EmployeePaymentType {
+  paymentTypeId Int     @id @default(autoincrement())
+  name          String
+  description   String?
+
+  employees Employee[]
+}
+
+model EmployeePayment {
+  employeePaymentId Int @id @default(autoincrement())
+  employeeId        Int
+
+  employee Employee @relation(fields: [employeeId], references: [employeeId])
+
+  amount        Decimal
+  paymentPeriod String?
+  paymentDate   DateTime @default(now())
+  notes         String?
+}
+
+model EmployeePaymentPerOrderRate {
+  rateId     Int @id @default(autoincrement())
+  employeeId Int
+
+  employee Employee @relation(fields: [employeeId], references: [employeeId])
+
+  amount        Decimal
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
 }

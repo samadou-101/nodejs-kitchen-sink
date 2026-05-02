@@ -14,7 +14,9 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use("/api", apiRouter);
-app.post("/api/test-session", checkAuthSession);
+app.post("/api/test-session", checkAuthSession, (req, res) => {
+  res.status(200).send("welcome");
+});
 
 app.use((req, res) => {
   res.status(400).json({ message: "Final mmiddleware error" });

@@ -31,6 +31,7 @@ export async function checkAuthSession(
     return next();
   } catch (error: any) {
     res.status(500).send(`Something Went Wrong: " ${error.message}`);
+    return;
   }
 }
 
@@ -103,14 +104,14 @@ export async function createSession(
     const session = await prisma.session.create({
       data: {
         userId,
-        expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
       },
     });
     const sessionData: SessionData = {
       sessionId: session.id,
       userId,
-      expires_at: session.expires_at.toISOString(),
-      createdAT: session.created_at.toISOString(),
+      expires_at: session.expiresAt.toISOString(),
+      createdAT: session.expiresAt.toISOString(),
       lastSeenAt: new Date().toISOString(),
     };
 
