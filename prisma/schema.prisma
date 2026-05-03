@@ -81,7 +81,7 @@ model Product {
   productId   Int     @id @default(autoincrement())
   name        String
   description String?
-  price       Decimal
+  price       Int
 
   categoryId Int
   category   ProductCategory @relation(fields: [categoryId], references: [categoryId])

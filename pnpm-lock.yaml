@@ -19,7 +19,7 @@ importers:
         version: 7.8.0
       '@prisma/client':
         specifier: ^7.8.0
-        version: 7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))
+        version: 7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.3))(typescript@6.0.3)
       '@types/express':
         specifier: ^5.0.6
         version: 5.0.6
@@ -43,10 +43,10 @@ importers:
         version: 9.0.3
       prisma:
         specifier: ^7.8.0
-        version: 7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        version: 7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.3)
       prisma-erd-generator:
         specifier: ^2.4.2
-        version: 2.4.2(@prisma/client@7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)))(@types/react@19.2.14)(puppeteer@24.42.0)(tsx@4.21.0)
+        version: 2.4.2(@prisma/client@7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.3))(typescript@6.0.3))(@types/react@19.2.14)(puppeteer@24.42.0(typescript@6.0.3))(tsx@4.21.0)
       redis:
         specifier: ^5.12.1
         version: 5.12.1
@@ -59,7 +59,7 @@ importers:
     devDependencies:
       '@mermaid-js/mermaid-cli':
         specifier: ^11.14.0
-        version: 11.14.0(@types/react@19.2.14)(puppeteer@24.42.0)(tsx@4.21.0)
+        version: 11.14.0(@types/react@19.2.14)(puppeteer@24.42.0(typescript@6.0.3))(tsx@4.21.0)
       '@types/cookie-parser':
         specifier: ^1.4.10
         version: 1.4.10(@types/express@5.0.6)
@@ -69,6 +69,9 @@ importers:
       '@types/node':
         specifier: ^25.6.0
         version: 25.6.0
+      typescript:
+        specifier: ^6.0.3
+        version: 6.0.3
 
 packages:
 
@@ -2452,6 +2455,11 @@ packages:
   typed-query-selector@2.12.2:
     resolution: {integrity: sha512-EOPFbyIub4ngnEdqi2yOcNeDLaX/0jcE1JoAXQDDMIthap7FoN795lc/SHfIq2d416VufXpM8z/lD+WRm2gfOQ==}
 
+  typescript@6.0.3:
+    resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   ufo@1.6.4:
     resolution: {integrity: sha512-JFNbkD1Svwe0KvGi8GOeLcP4kAWQ609twvCdcHxq1oSL8svv39ZuSvajcD8B+5D0eL4+s1Is2D/O6KN3qcTeRA==}
 
@@ -2780,7 +2788,7 @@ snapshots:
       elkjs: 0.9.3
       mermaid: 11.14.0
 
-  '@mermaid-js/mermaid-cli@11.14.0(@types/react@19.2.14)(puppeteer@24.42.0)(tsx@4.21.0)':
+  '@mermaid-js/mermaid-cli@11.14.0(@types/react@19.2.14)(puppeteer@24.42.0(typescript@6.0.3))(tsx@4.21.0)':
     dependencies:
       '@mermaid-js/layout-elk': 0.2.1(mermaid@11.14.0)
       '@mermaid-js/mermaid-zenuml': 0.2.2(@types/react@19.2.14)(mermaid@11.14.0)(tsx@4.21.0)
@@ -2788,7 +2796,7 @@ snapshots:
       commander: 13.1.0
       import-meta-resolve: 4.2.0
       mermaid: 11.14.0
-      puppeteer: 24.42.0
+      puppeteer: 24.42.0(typescript@6.0.3)
     transitivePeerDependencies:
       - '@babel/core'
       - '@babel/template'
@@ -2844,11 +2852,12 @@ snapshots:
 
   '@prisma/client-runtime-utils@7.8.0': {}
 
-  '@prisma/client@7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))':
+  '@prisma/client@7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.3))(typescript@6.0.3)':
     dependencies:
       '@prisma/client-runtime-utils': 7.8.0
     optionalDependencies:
-      prisma: 7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      prisma: 7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.3)
+      typescript: 6.0.3
 
   '@prisma/config@7.8.0':
     dependencies:
@@ -2863,7 +2872,7 @@ snapshots:
 
   '@prisma/debug@7.8.0': {}
 
-  '@prisma/dev@0.24.3':
+  '@prisma/dev@0.24.3(typescript@6.0.3)':
     dependencies:
       '@electric-sql/pglite': 0.4.1
       '@electric-sql/pglite-socket': 0.1.1(@electric-sql/pglite@0.4.1)
@@ -2880,7 +2889,7 @@ snapshots:
       proper-lockfile: 4.1.2
       remeda: 2.33.4
       std-env: 3.10.0
-      valibot: 1.2.0
+      valibot: 1.2.0(typescript@6.0.3)
       zeptomatch: 2.1.0
     transitivePeerDependencies:
       - typescript
@@ -3548,12 +3557,14 @@ snapshots:
     dependencies:
       layout-base: 2.0.1
 
-  cosmiconfig@9.0.1:
+  cosmiconfig@9.0.1(typescript@6.0.3):
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.1
       js-yaml: 4.1.1
       parse-json: 5.2.0
+    optionalDependencies:
+      typescript: 6.0.3
 
   cross-env@10.1.0:
     dependencies:
@@ -4563,10 +4574,10 @@ snapshots:
 
   postgres@3.4.7: {}
 
-  prisma-erd-generator@2.4.2(@prisma/client@7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)))(@types/react@19.2.14)(puppeteer@24.42.0)(tsx@4.21.0):
+  prisma-erd-generator@2.4.2(@prisma/client@7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.3))(typescript@6.0.3))(@types/react@19.2.14)(puppeteer@24.42.0(typescript@6.0.3))(tsx@4.21.0):
     dependencies:
-      '@mermaid-js/mermaid-cli': 11.14.0(@types/react@19.2.14)(puppeteer@24.42.0)(tsx@4.21.0)
-      '@prisma/client': 7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))
+      '@mermaid-js/mermaid-cli': 11.14.0(@types/react@19.2.14)(puppeteer@24.42.0(typescript@6.0.3))(tsx@4.21.0)
+      '@prisma/client': 7.8.0(prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.3))(typescript@6.0.3)
       '@prisma/generator-helper': 7.8.0
       dotenv: 16.6.1
     transitivePeerDependencies:
@@ -4577,14 +4588,16 @@ snapshots:
       - tsx
       - yaml
 
-  prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
+  prisma@7.8.0(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(typescript@6.0.3):
     dependencies:
       '@prisma/config': 7.8.0
-      '@prisma/dev': 0.24.3
+      '@prisma/dev': 0.24.3(typescript@6.0.3)
       '@prisma/engines': 7.8.0
       '@prisma/studio-core': 0.27.3(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       mysql2: 3.15.3
       postgres: 3.4.7
+    optionalDependencies:
+      typescript: 6.0.3
     transitivePeerDependencies:
       - '@types/react'
       - '@types/react-dom'
@@ -4646,11 +4659,11 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  puppeteer@24.42.0:
+  puppeteer@24.42.0(typescript@6.0.3):
     dependencies:
       '@puppeteer/browsers': 2.13.0
       chromium-bidi: 14.0.0(devtools-protocol@0.0.1595872)
-      cosmiconfig: 9.0.1
+      cosmiconfig: 9.0.1(typescript@6.0.3)
       devtools-protocol: 0.0.1595872
       puppeteer-core: 24.42.0
       typed-query-selector: 2.12.2
@@ -5063,6 +5076,8 @@ snapshots:
 
   typed-query-selector@2.12.2: {}
 
+  typescript@6.0.3: {}
+
   ufo@1.6.4: {}
 
   undici-types@7.19.2: {}
@@ -5077,7 +5092,9 @@ snapshots:
 
   uuid@11.1.1: {}
 
-  valibot@1.2.0: {}
+  valibot@1.2.0(typescript@6.0.3):
+    optionalDependencies:
+      typescript: 6.0.3
 
   vary@1.1.2: {}
 

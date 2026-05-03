@@ -37,6 +37,7 @@
     "@mermaid-js/mermaid-cli": "^11.14.0",
     "@types/cookie-parser": "^1.4.10",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^25.6.0"
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3"
   }
 }

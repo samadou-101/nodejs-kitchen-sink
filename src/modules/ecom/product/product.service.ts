@@ -7,11 +7,7 @@ import {
 import type { ProductData } from "./product.types";
 
 export async function createProduct(data: ProductData) {
-  try {
-    return await insertProduct(data);
-  } catch (error) {
-    throw new Error("Failed to create product", { cause: error });
-  }
+  return await insertProduct(data);
 }
 
 export async function updateProduct(data: ProductData) {

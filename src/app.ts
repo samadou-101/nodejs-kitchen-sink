@@ -4,6 +4,7 @@ import { initRedis } from "./config/redis.config";
 import apiRouter from "./api/auth/auth.routes";
 import cookieParser from "cookie-parser";
 import { checkAuthSession } from "./api/auth/password/session.service";
+import ecomRouter from "./api/ecom/ecom.route";
 
 export const app: Express = express();
 
@@ -14,6 +15,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.use("/api", apiRouter);
+app.use("/api/ecom", ecomRouter);
 app.post("/api/test-session", checkAuthSession, (req, res) => {
   res.status(200).send("welcome");
 });
