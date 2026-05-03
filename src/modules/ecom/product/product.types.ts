@@ -1,7 +1,13 @@
 export type ProductData = {
-  id: string;
+  id: number;
   name: string;
   description?: string;
   price: number;
-  categoryId: string;
+  categoryId: number;
+
+  iid?: number;
+  niame?: string;
+  dgaescription?: string;
+  prgahaice?: number;
+  categoiryId?: number;
 };

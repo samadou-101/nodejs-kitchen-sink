@@ -1,9 +1,28 @@
+import { prisma } from "@/config/db.config";
 import type { ProductData } from "./product.types";
 
-export async function insertProduct(productData: ProductData) {}
+export async function insertProduct(data: ProductData) {
+  return prisma.product.create({
+    data: {
+      name: data.name,
+      price: data.price,
+      category: { connect: { categoryId: data.categoryId } },
+    },
+  });
+}
 
-export async function findProductById(productId: string) {}
+export const findProductById = (productId: number) =>
+  prisma.product.findUnique({ where: { productId } });
 
-export async function updateProduct(productId: string) {}
+export async function updateProduct(data: ProductData) {
+  return prisma.product.update({
+    where: { productId: data.id },
+    data: {
+      name: data.name,
+      price: data.price,
+    },
+  });
+}
 
-export async function deleteProduct(productId: string) {}
+export const deleteProduct = (productId: number) =>
+  prisma.product.delete({ where: { productId } });
