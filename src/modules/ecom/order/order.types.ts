@@ -1,3 +1,8 @@
+import { prisma } from "@/config/db.config";
+import { PrismaClient, Prisma } from "@/generated/prisma/client";
+
+export type DbClient = PrismaClient | Prisma.TransactionClient;
+
 export type OrderData = {
   orderId: number;
   customer: {
@@ -28,3 +33,5 @@ export type OrderDTO = {
   orderStatusId: number;
   notes: string | null;
 };
+
+export type InventoryAction = "increase" | "decrease";

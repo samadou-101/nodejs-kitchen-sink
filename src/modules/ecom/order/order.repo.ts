@@ -1,141 +1,168 @@
 import { prisma } from "@/config/db.config";
-import type { OrderData, OrderItem } from "./order.types";
+import type { DbClient } from "./order.types";
 
-export async function insertOrder(orderData: OrderData) {
-  return await prisma.order.create({
+const getClient = (tx?: DbClient) => tx || prisma;
+
+export const orderRepo = {
+  insertOrder: (
+    tx: DbClient,
     data: {
-      orderDate: new Date(Date.now()),
-      status: {
-        connect: {
-          orderStatusId: 1,
-        },
-      },
-      customer: {
-        create: {
-          name: orderData.customer.name,
-          email: orderData.customer.email,
-          phone: orderData.customer.phone,
-          address: orderData.customer.address,
-        },
-      },
+      customer: { name: string; email: string; phone: string; address: string };
     },
-  });
-}
-
-export async function findOrderById(orderId: number) {
-  return await prisma.order.findFirst({
-    where: {
-      orderId,
-    },
-  });
-}
-
-export async function updateOrder(orderData: OrderData) {
-  const existingOrder = await prisma.order.findUnique({
-    where: { orderId: orderData.orderId },
-    select: { customerId: true },
-  });
-
-  if (!existingOrder) {
-    throw new Error(`Order with id ${orderData.orderId} not found`);
-  }
-
-  const updatedOrder = await prisma.order.update({
-    where: { orderId: orderData.orderId },
-    data: {
-      status: {
-        connect: { orderStatusId: orderData.orderStatusId },
+  ) =>
+    getClient(tx).order.create({
+      data: {
+        orderDate: new Date(),
+        status: { connect: { orderStatusId: 1 } },
+        customer: { create: data.customer },
       },
-      notes: orderData.notes,
-      employee: orderData.employeeId
-        ? { connect: { employeeId: orderData.employeeId } }
-        : { disconnect: true },
-      customer: {
-        update: {
-          name: orderData.customer.name,
-          email: orderData.customer.email,
-          phone: orderData.customer.phone,
-          address: orderData.customer.address,
-        },
-      },
-    },
-  });
+    }),
 
-  if (orderData.orderItems && orderData.orderItems.length > 0) {
-    await updateOrderItems(orderData.orderId, orderData.orderItems);
-  }
+  findOrderById: (tx: DbClient) => (orderId: number) =>
+    getClient(tx).order.findUnique({ where: { orderId } }),
 
-  return updatedOrder;
-}
+  findOrderWithCustomer: (tx: DbClient) => (orderId: number) =>
+    getClient(tx).order.findUnique({
+      where: { orderId },
+      select: { customerId: true },
+    }),
 
-export async function updateOrderItems(
-  orderId: number,
-  orderItems: OrderItem[],
-) {
-  const existingItems = await prisma.orderItem.findMany({
-    where: { orderId },
-    select: { orderItemId: true, productId: true },
-  });
+  findInventoryByProductIds: (tx: DbClient) => (productIds: number[]) =>
+    getClient(tx).inventory.findMany({
+      where: { productId: { in: productIds } },
+      select: { productId: true, quantityAvailable: true },
+    }),
 
-  const existingItemMap = new Map(
-    existingItems.map((item) => [item.productId, item.orderItemId]),
-  );
+  decrementInventoryBatch:
+    (tx: DbClient) => (items: { productId: number; quantity: number }[]) =>
+      Promise.all(
+        items.map((item) =>
+          getClient(tx).inventory.updateMany({
+            where: {
+              productId: item.productId,
+              quantityAvailable: { gte: item.quantity },
+            },
+            data: { quantityAvailable: { decrement: item.quantity } },
+          }),
+        ),
+      ),
 
-  const incomingProductIds = new Set(
-    orderItems.filter((item) => item.orderItemId).map((item) => item.productId),
-  );
-
-  const itemsToDelete = existingItems.filter(
-    (item) => !incomingProductIds.has(item.productId),
-  );
-
-  if (itemsToDelete.length > 0) {
-    const idsToDelete = itemsToDelete.map((item) => item.orderItemId);
-    await prisma.orderItem.deleteMany({
-      where: { orderItemId: { in: idsToDelete } },
-    });
-  }
-
-  for (const item of orderItems) {
-    if (item.orderItemId) {
-      const existingId = existingItemMap.get(item.productId);
-      if (existingId) {
-        await prisma.orderItem.update({
-          where: { orderItemId: item.orderItemId },
-          data: {
-            quantity: item.quantity,
-            price: item.price,
-          },
-        });
-      } else {
-        await prisma.orderItem.create({
-          data: {
-            orderId,
-            productId: item.productId,
-            quantity: item.quantity,
-            price: item.price,
-          },
-        });
-      }
-    } else {
-      await prisma.orderItem.create({
-        data: {
+  createOrderItemsBatch:
+    (tx: DbClient) =>
+    (
+      orderId: number,
+      items: {
+        productId: number;
+        quantity: number;
+        price: number;
+      }[],
+    ) =>
+      getClient(tx).orderItem.createMany({
+        data: items.map((item) => ({
           orderId,
           productId: item.productId,
           quantity: item.quantity,
           price: item.price,
+        })),
+      }),
+
+  replaceOrderItems:
+    (tx: DbClient) =>
+    async (
+      orderId: number,
+      items: {
+        productId: number;
+        quantity: number;
+        price: number;
+      }[],
+    ) => {
+      const client = getClient(tx);
+      await client.orderItem.deleteMany({ where: { orderId } });
+      await client.orderItem.createMany({
+        data: items.map((item) => ({
+          orderId,
+          productId: item.productId,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+      });
+    },
+
+  deleteOrder: (tx: DbClient) => (orderId: number) =>
+    getClient(tx).order.delete({ where: { orderId } }),
+
+  updateOrder:
+    (tx: DbClient) =>
+    async (
+      orderId: number,
+      data: {
+        statusId: number;
+        notes: string | null;
+        employeeId: number | null;
+        customerId: number;
+        customer: {
+          name: string;
+          email: string;
+          phone: string;
+          address: string;
+        };
+      },
+    ) => {
+      const client = getClient(tx);
+      await client.customer.update({
+        where: { customerId: data.customerId },
+        data: {
+          name: data.customer.name,
+          email: data.customer.email,
+          phone: data.customer.phone,
+          address: data.customer.address,
         },
       });
-    }
-  }
-}
+      return client.order.update({
+        where: { orderId },
+        data: {
+          orderStatusId: data.statusId,
+          notes: data.notes,
+          employeeId: data.employeeId,
+        },
+      });
+    },
 
-export async function deleteOrder(orderId: number) {
-  await prisma.orderItem.deleteMany({
-    where: { orderId },
-  });
+  setOrderStatus: (tx: DbClient) => (orderId: number, statusId: number) =>
+    getClient(tx).order.update({
+      where: { orderId },
+      data: { orderStatusId: statusId },
+    }),
 
-  await prisma.order.delete({
-    where: { orderId },
-  });
-}
+  assignEmployee: (tx: DbClient) => (orderId: number, employeeId: number) =>
+    getClient(tx).order.update({ where: { orderId }, data: { employeeId } }),
+
+  unassignEmployee: (tx: DbClient) => (orderId: number) =>
+    getClient(tx).order.update({
+      where: { orderId },
+      data: { employeeId: null },
+    }),
+
+  incrementInventory: (tx: DbClient) => (productId: number, amount: number) =>
+    getClient(tx).inventory.updateMany({
+      where: { productId },
+      data: { quantityAvailable: { increment: amount } },
+    }),
+};
+
+export const bind = (tx: DbClient) => ({
+  insertOrder: (data: Parameters<typeof orderRepo.insertOrder>[1]) =>
+    orderRepo.insertOrder(tx, data),
+  findOrderById: orderRepo.findOrderById(tx),
+  findOrderWithCustomer: orderRepo.findOrderWithCustomer(tx),
+  findInventoryByProductIds: orderRepo.findInventoryByProductIds(tx),
+  decrementInventoryBatch: orderRepo.decrementInventoryBatch(tx),
+  createOrderItemsBatch: orderRepo.createOrderItemsBatch(tx),
+  replaceOrderItems: orderRepo.replaceOrderItems(tx),
+  deleteOrder: orderRepo.deleteOrder(tx),
+  updateOrder: orderRepo.updateOrder(tx),
+  setOrderStatus: orderRepo.setOrderStatus(tx),
+  assignEmployee: orderRepo.assignEmployee(tx),
+  unassignEmployee: orderRepo.unassignEmployee(tx),
+  incrementInventory: orderRepo.incrementInventory(tx),
+});
