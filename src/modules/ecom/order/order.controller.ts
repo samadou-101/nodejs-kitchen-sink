@@ -1,14 +1,25 @@
 import type { Request, Response } from "express";
-import { placeOrder } from "./order.service";
+import {
+  placeOrder,
+  getOrderById,
+  updateOrder,
+  deleteOrderById,
+  updateOrderStatus,
+  assignOrderToEmployee,
+  unassignEmployeeFromOrder,
+} from "./order.service";
 import type { OrderData, OrderDTO } from "./order.types";
+import { handleError } from "./order.utils";
 
-export async function orderHnadler(req: Request, res: Response) {
+export async function orderHandler(req: Request, res: Response) {
+  const id = req.params.id as string | undefined;
+
   if (req.path === "/order/create" && req.method === "POST") {
     const orderData = req.body as OrderData;
     try {
       const order = await placeOrder(orderData);
       if (!order) {
-        res.status(404).send("Failed crating order");
+        res.status(400).json({ message: "Failed creating order" });
         return;
       }
       const orderResponse: OrderDTO = {
@@ -18,30 +29,115 @@ export async function orderHnadler(req: Request, res: Response) {
         orderDate: order.orderDate,
         orderStatusId: order.orderStatusId,
       };
-      res.status(201).send(orderResponse);
+      res.status(201).json(orderResponse);
     } catch (error) {
-      console.log(error);
-      res.status(500).send("Internal server error");
+      handleError(res, error);
+    }
+    return;
+  }
+
+  if (id && req.method === "GET") {
+    try {
+      const orderId = parseInt(id, 10);
+      if (isNaN(orderId)) {
+        res.status(400).json({ message: "Invalid order ID" });
+        return;
+      }
+      const order = await getOrderById(orderId);
+      if (!order) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+      }
+      res.status(200).json(order);
+    } catch (error) {
+      handleError(res, error);
+    }
+    return;
+  }
+
+  if (id && req.method === "PATCH") {
+    try {
+      const orderId = parseInt(id, 10);
+      if (isNaN(orderId)) {
+        res.status(400).json({ message: "Invalid order ID" });
+        return;
+      }
+      const orderData = req.body as OrderData;
+      orderData.orderId = orderId;
+      const updated = await updateOrder(orderData);
+      res.status(200).json(updated);
+    } catch (error) {
+      handleError(res, error);
+    }
+    return;
+  }
+
+  if (id && req.method === "DELETE") {
+    try {
+      const orderId = parseInt(id, 10);
+      if (isNaN(orderId)) {
+        res.status(400).json({ message: "Invalid order ID" });
+        return;
+      }
+      await deleteOrderById(orderId);
+      res.status(204).send();
+    } catch (error) {
+      handleError(res, error);
+    }
+    return;
+  }
+
+  if (req.path.startsWith("/order/") && req.method === "PATCH") {
+    const statusMatch = req.path.match(/^\/order\/(\d+)\/status$/);
+    if (statusMatch) {
+      try {
+        const orderId = parseInt(statusMatch[1]!, 10);
+        const { statusId } = req.body as { statusId: number };
+        if (isNaN(orderId) || !statusId) {
+          res.status(400).json({ message: "Invalid order ID or status ID" });
+          return;
+        }
+        const updated = await updateOrderStatus(orderId, statusId);
+        res.status(200).json(updated);
+      } catch (error) {
+        handleError(res, error);
+      }
+      return;
+    }
+
+    const employeeMatch = req.path.match(/^\/order\/(\d+)\/employee$/);
+    if (employeeMatch) {
+      try {
+        const orderId = parseInt(employeeMatch[1]!, 10);
+        const { employeeId } = req.body as { employeeId: number };
+        if (isNaN(orderId)) {
+          res.status(400).json({ message: "Invalid order ID" });
+          return;
+        }
+        const updated = await assignOrderToEmployee(orderId, employeeId);
+        res.status(200).json(updated);
+      } catch (error) {
+        handleError(res, error);
+      }
+      return;
+    }
+
+    const unassignMatch = req.path.match(/^\/order\/(\d+)\/employee\/remove$/);
+    if (unassignMatch) {
+      try {
+        const orderId = parseInt(unassignMatch[1]!, 10);
+        if (isNaN(orderId)) {
+          res.status(400).json({ message: "Invalid order ID" });
+          return;
+        }
+        const updated = await unassignEmployeeFromOrder(orderId);
+        res.status(200).json(updated);
+      } catch (error) {
+        handleError(res, error);
+      }
+      return;
     }
   }
 
-  if (req.path === "/order" && req.params.id && req.method === "GET") {
-  }
-
-  if (req.path.startsWith("/order") && req.params.id && req.method === "GET") {
-  }
-
-  if (
-    req.path.startsWith("/order") &&
-    req.params.id &&
-    req.method === "PATCH"
-  ) {
-  }
-
-  if (
-    req.path.startsWith("/order") &&
-    req.params.id &&
-    req.method === "DELETE"
-  ) {
-  }
+  res.status(404).json({ message: "Route not found" });
 }
