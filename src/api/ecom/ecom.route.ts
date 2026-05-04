@@ -5,7 +5,8 @@ const ecomRouter: Router = express.Router();
 
 ecomRouter.post("/product/create", productHandler);
 ecomRouter.post("/product/update", productHandler);
-ecomRouter.post("/product/remove", productHandler);
 ecomRouter.get("/product/:id", productHandler);
+ecomRouter.get("/products", productHandler);
+ecomRouter.delete("/product/:id", productHandler);
 
 export default ecomRouter;

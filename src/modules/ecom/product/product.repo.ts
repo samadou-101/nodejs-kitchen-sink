@@ -27,3 +27,7 @@ export async function updateProduct(data: ProductData) {
 
 export const deleteProduct = (productId: number) =>
   prisma.product.delete({ where: { productId } });
+
+export async function findAllProducts() {
+  return prisma.product.findMany();
+}

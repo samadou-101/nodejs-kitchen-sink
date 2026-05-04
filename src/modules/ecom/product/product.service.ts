@@ -3,6 +3,7 @@ import {
   findProductById as findProductByIdRepo,
   insertProduct,
   updateProduct as updateProductRepo,
+  findAllProducts as findAllProductsRepo,
 } from "./product.repo";
 import type { ProductData } from "./product.types";
 
@@ -32,4 +33,8 @@ export async function getProductById(id: number) {
   } catch (error) {
     throw new Error("Failed to fetch product", { cause: error });
   }
+}
+
+export async function getAllProducts() {
+  return await findAllProductsRepo();
 }
