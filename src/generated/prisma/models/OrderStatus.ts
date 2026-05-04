@@ -241,6 +241,7 @@ export type OrderStatusScalarWhereWithAggregatesInput = {
 }
 
 export type OrderStatusCreateInput = {
+  orderStatusId?: number
   name: string
   description?: string | null
   orders?: Prisma.OrderCreateNestedManyWithoutStatusInput
@@ -254,6 +255,7 @@ export type OrderStatusUncheckedCreateInput = {
 }
 
 export type OrderStatusUpdateInput = {
+  orderStatusId?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orders?: Prisma.OrderUpdateManyWithoutStatusNestedInput
@@ -273,6 +275,7 @@ export type OrderStatusCreateManyInput = {
 }
 
 export type OrderStatusUpdateManyMutationInput = {
+  orderStatusId?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -329,6 +332,7 @@ export type OrderStatusUpdateOneRequiredWithoutOrdersNestedInput = {
 }
 
 export type OrderStatusCreateWithoutOrdersInput = {
+  orderStatusId?: number
   name: string
   description?: string | null
 }
@@ -356,6 +360,7 @@ export type OrderStatusUpdateToOneWithWhereWithoutOrdersInput = {
 }
 
 export type OrderStatusUpdateWithoutOrdersInput = {
+  orderStatusId?: Prisma.IntFieldUpdateOperationsInput | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }

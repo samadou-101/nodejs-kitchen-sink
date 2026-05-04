@@ -63,7 +63,6 @@ model Customer {
   address          String
   email            String?  @unique
   registrationDate DateTime @default(now())
-  status           String
   clientId         String?
   ordersCount      Int      @default(0)
 
@@ -100,7 +99,7 @@ model Inventory {
 }
 
 model OrderStatus {
-  orderStatusId Int     @id @default(autoincrement())
+  orderStatusId Int     @id @default(1)
   name          String
   description   String?
 
