@@ -4,4 +4,5 @@ export type ProductData = {
   description?: string;
   price: number;
   categoryId: number;
+  initialStock?: number;
 };
