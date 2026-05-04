@@ -36,57 +36,6 @@ export async function orderHandler(req: Request, res: Response) {
     return;
   }
 
-  if (id && req.method === "GET") {
-    try {
-      const orderId = parseInt(id, 10);
-      if (isNaN(orderId)) {
-        res.status(400).json({ message: "Invalid order ID" });
-        return;
-      }
-      const order = await getOrderById(orderId);
-      if (!order) {
-        res.status(404).json({ message: "Order not found" });
-        return;
-      }
-      res.status(200).json(order);
-    } catch (error) {
-      handleError(res, error);
-    }
-    return;
-  }
-
-  if (id && req.method === "PATCH") {
-    try {
-      const orderId = parseInt(id, 10);
-      if (isNaN(orderId)) {
-        res.status(400).json({ message: "Invalid order ID" });
-        return;
-      }
-      const orderData = req.body as OrderData;
-      orderData.orderId = orderId;
-      const updated = await updateOrder(orderData);
-      res.status(200).json(updated);
-    } catch (error) {
-      handleError(res, error);
-    }
-    return;
-  }
-
-  if (id && req.method === "DELETE") {
-    try {
-      const orderId = parseInt(id, 10);
-      if (isNaN(orderId)) {
-        res.status(400).json({ message: "Invalid order ID" });
-        return;
-      }
-      await deleteOrderById(orderId);
-      res.status(204).send();
-    } catch (error) {
-      handleError(res, error);
-    }
-    return;
-  }
-
   if (req.path.startsWith("/order/") && req.method === "PATCH") {
     const statusMatch = req.path.match(/^\/order\/(\d+)\/status$/);
     if (statusMatch) {
@@ -137,6 +86,57 @@ export async function orderHandler(req: Request, res: Response) {
       }
       return;
     }
+  }
+
+  if (id && req.method === "GET") {
+    try {
+      const orderId = parseInt(id, 10);
+      if (isNaN(orderId)) {
+        res.status(400).json({ message: "Invalid order ID" });
+        return;
+      }
+      const order = await getOrderById(orderId);
+      if (!order) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+      }
+      res.status(200).json(order);
+    } catch (error) {
+      handleError(res, error);
+    }
+    return;
+  }
+
+  if (id && req.method === "PATCH") {
+    try {
+      const orderId = parseInt(id, 10);
+      if (isNaN(orderId)) {
+        res.status(400).json({ message: "Invalid order ID" });
+        return;
+      }
+      const orderData = req.body as OrderData;
+      orderData.orderId = orderId;
+      const updated = await updateOrder(orderData);
+      res.status(200).json(updated);
+    } catch (error) {
+      handleError(res, error);
+    }
+    return;
+  }
+
+  if (id && req.method === "DELETE") {
+    try {
+      const orderId = parseInt(id, 10);
+      if (isNaN(orderId)) {
+        res.status(400).json({ message: "Invalid order ID" });
+        return;
+      }
+      await deleteOrderById(orderId);
+      res.status(204).send();
+    } catch (error) {
+      handleError(res, error);
+    }
+    return;
   }
 
   res.status(404).json({ message: "Route not found" });

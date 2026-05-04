@@ -11,8 +11,11 @@ async function checkAndDecrementInventory(
   orderItems: OrderItem[],
   db: ReturnType<typeof bind>,
 ) {
+  console.log("[checkAndDecrementInventory] Checking inventory for items:", orderItems);
   const productIds = orderItems.map((i) => i.productId);
+  console.log("[checkAndDecrementInventory] Product IDs:", productIds);
   const inventory = await db.findInventoryByProductIds(productIds);
+  console.log("[checkAndDecrementInventory] Found inventory:", inventory);
   const inventoryMap = new Map(
     inventory.map((i) => [i.productId, i.quantityAvailable]),
   );
@@ -38,6 +41,7 @@ async function checkAndDecrementInventory(
   }
 
   if (insufficient.length > 0) {
+    console.log("[checkAndDecrementInventory] Insufficient stock:", insufficient);
     const first = insufficient[0]!;
     throw new InsufficientStockError(
       first.productId,
@@ -46,7 +50,9 @@ async function checkAndDecrementInventory(
     );
   }
 
+  console.log("[checkAndDecrementInventory] Decrementing:", toDecrement);
   const results = await db.decrementInventoryBatch(toDecrement);
+  console.log("[checkAndDecrementInventory] Decrement results:", results);
   for (let i = 0; i < results.length; i++) {
     if (results[i]!.count === 0) {
       const item = toDecrement[i]!;
@@ -120,39 +126,54 @@ export async function unassignEmployeeFromOrder(orderId: number) {
 }
 
 export async function updateOrderStatus(orderId: number, statusId: number) {
-  return await prisma.$transaction(async (tx) => {
-    const db = bind(tx);
+  console.log("[updateOrderStatus] Starting:", { orderId, statusId });
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const db = bind(tx);
+      console.log("[updateOrderStatus] Fetching order:", orderId);
 
-    const order = await db.findOrderById(orderId);
-    if (!order) {
-      throw new OrderNotFoundError(orderId);
-    }
-
-    const previousStatusId = order.orderStatusId;
-    const isConfirming = previousStatusId !== 2 && statusId === 2;
-    const isCancellingConfirmed = previousStatusId === 2 && statusId === 3;
-
-    if (isConfirming) {
-      const orderItems = await db.findOrderItemsByOrderId(orderId);
-      if (orderItems.length > 0) {
-        await checkAndDecrementInventory(
-          orderItems.map((i) => ({ productId: i.productId, quantity: i.quantity, price: 0 })),
-          db,
-        );
+      const order = await db.findOrderById(orderId);
+      if (!order) {
+        console.log("[updateOrderStatus] Order not found:", orderId);
+        throw new OrderNotFoundError(orderId);
       }
-    }
 
-    if (isCancellingConfirmed) {
-      const orderItems = await db.findOrderItemsByOrderId(orderId);
-      if (orderItems.length > 0) {
-        await db.incrementInventoryBatch(
-          orderItems.map((i) => ({ productId: i.productId, quantity: i.quantity })),
-        );
+      const previousStatusId = order.orderStatusId;
+      console.log("[updateOrderStatus] Previous status:", previousStatusId);
+      const isConfirming = previousStatusId !== 2 && statusId === 2;
+      const isCancellingConfirmed = previousStatusId === 2 && statusId === 3;
+      console.log("[updateOrderStatus] isConfirming:", isConfirming, "isCancellingConfirmed:", isCancellingConfirmed);
+
+      if (isConfirming) {
+        console.log("[updateOrderStatus] Processing confirmation...");
+        const orderItems = await db.findOrderItemsByOrderId(orderId);
+        console.log("[updateOrderStatus] Order items:", orderItems);
+        if (orderItems.length > 0) {
+          await checkAndDecrementInventory(
+            orderItems.map((i) => ({ productId: i.productId, quantity: i.quantity, price: 0 })),
+            db,
+          );
+        }
       }
-    }
 
-    return db.setOrderStatus(orderId, statusId);
-  });
+      if (isCancellingConfirmed) {
+        console.log("[updateOrderStatus] Processing cancellation...");
+        const orderItems = await db.findOrderItemsByOrderId(orderId);
+        console.log("[updateOrderStatus] Order items to restore:", orderItems);
+        if (orderItems.length > 0) {
+          await db.incrementInventoryBatch(
+            orderItems.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+          );
+        }
+      }
+
+      console.log("[updateOrderStatus] Setting status to:", statusId);
+      return db.setOrderStatus(orderId, statusId);
+    });
+  } catch (error) {
+    console.error("[updateOrderStatus] Error:", error);
+    throw error;
+  }
 }
 
 export async function updateInventory(

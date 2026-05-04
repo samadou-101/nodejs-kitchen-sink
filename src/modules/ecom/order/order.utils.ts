@@ -6,6 +6,7 @@ import {
 } from "./order.errors";
 
 export function handleError(res: Response, error: unknown) {
+  console.error("[handleError] Error caught:", error);
   if (error instanceof OrderNotFoundError) {
     res.status(404).json({ message: error.message });
     return;

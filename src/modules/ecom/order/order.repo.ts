@@ -100,7 +100,7 @@ export const orderRepo = {
         notes: string | null;
         employeeId: number | null;
         customerId: number;
-        customer: {
+        customer?: {
           name: string;
           email: string;
           phone: string;
@@ -109,15 +109,17 @@ export const orderRepo = {
       },
     ) => {
       const client = getClient(tx);
-      await client.customer.update({
-        where: { customerId: data.customerId },
-        data: {
-          name: data.customer.name,
-          email: data.customer.email,
-          phone: data.customer.phone,
-          address: data.customer.address,
-        },
-      });
+      if (data.customer) {
+        await client.customer.update({
+          where: { customerId: data.customerId },
+          data: {
+            name: data.customer.name,
+            email: data.customer.email,
+            phone: data.customer.phone,
+            address: data.customer.address,
+          },
+        });
+      }
       return client.order.update({
         where: { orderId },
         data: {
