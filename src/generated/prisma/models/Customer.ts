@@ -277,19 +277,19 @@ export type CustomerOrderByWithRelationInput = {
 export type CustomerWhereUniqueInput = Prisma.AtLeast<{
   customerId?: number
   userId?: number
-  email?: string
   AND?: Prisma.CustomerWhereInput | Prisma.CustomerWhereInput[]
   OR?: Prisma.CustomerWhereInput[]
   NOT?: Prisma.CustomerWhereInput | Prisma.CustomerWhereInput[]
   name?: Prisma.StringFilter<"Customer"> | string
   phone?: Prisma.StringFilter<"Customer"> | string
   address?: Prisma.StringFilter<"Customer"> | string
+  email?: Prisma.StringNullableFilter<"Customer"> | string | null
   registrationDate?: Prisma.DateTimeFilter<"Customer"> | Date | string
   clientId?: Prisma.StringNullableFilter<"Customer"> | string | null
   ordersCount?: Prisma.IntFilter<"Customer"> | number
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   orders?: Prisma.OrderListRelationFilter
-}, "customerId" | "userId" | "email">
+}, "customerId" | "userId">
 
 export type CustomerOrderByWithAggregationInput = {
   customerId?: Prisma.SortOrder

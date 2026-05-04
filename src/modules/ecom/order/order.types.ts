@@ -10,11 +10,15 @@ export type OrderData = {
     productId: number;
     price: number;
     quantity: number;
-  };
+  }[];
   orderDate: Date;
   orderStatusId: number;
   employeeId: number | null;
   notes: string | null;
+};
+
+export type OrderItem = OrderData["orderItems"][number] & {
+  orderItemId?: number;
 };
 
 export type OrderDTO = {

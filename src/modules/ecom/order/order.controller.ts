@@ -11,11 +11,12 @@ export async function orderHnadler(req: Request, res: Response) {
         res.status(404).send("Failed crating order");
         return;
       }
-      const orderResponse: Omit<OrderDTO, "orderStatusId"> = {
+      const orderResponse: OrderDTO = {
         orderId: order.orderId,
         customerId: order.customerId,
         notes: order.notes,
         orderDate: order.orderDate,
+        orderStatusId: order.orderStatusId,
       };
       res.status(201).send(orderResponse);
     } catch (error) {
