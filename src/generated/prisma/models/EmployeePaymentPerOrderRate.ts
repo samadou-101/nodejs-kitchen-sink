@@ -29,19 +29,19 @@ export type AggregateEmployeePaymentPerOrderRate = {
 export type EmployeePaymentPerOrderRateAvgAggregateOutputType = {
   rateId: number | null
   employeeId: number | null
-  amount: runtime.Decimal | null
+  amount: number | null
 }
 
 export type EmployeePaymentPerOrderRateSumAggregateOutputType = {
   rateId: number | null
   employeeId: number | null
-  amount: runtime.Decimal | null
+  amount: number | null
 }
 
 export type EmployeePaymentPerOrderRateMinAggregateOutputType = {
   rateId: number | null
   employeeId: number | null
-  amount: runtime.Decimal | null
+  amount: number | null
   effectiveFrom: Date | null
   effectiveTo: Date | null
 }
@@ -49,7 +49,7 @@ export type EmployeePaymentPerOrderRateMinAggregateOutputType = {
 export type EmployeePaymentPerOrderRateMaxAggregateOutputType = {
   rateId: number | null
   employeeId: number | null
-  amount: runtime.Decimal | null
+  amount: number | null
   effectiveFrom: Date | null
   effectiveTo: Date | null
 }
@@ -190,7 +190,7 @@ export type EmployeePaymentPerOrderRateGroupByArgs<ExtArgs extends runtime.Types
 export type EmployeePaymentPerOrderRateGroupByOutputType = {
   rateId: number
   employeeId: number
-  amount: runtime.Decimal
+  amount: number
   effectiveFrom: Date
   effectiveTo: Date | null
   _count: EmployeePaymentPerOrderRateCountAggregateOutputType | null
@@ -221,7 +221,7 @@ export type EmployeePaymentPerOrderRateWhereInput = {
   NOT?: Prisma.EmployeePaymentPerOrderRateWhereInput | Prisma.EmployeePaymentPerOrderRateWhereInput[]
   rateId?: Prisma.IntFilter<"EmployeePaymentPerOrderRate"> | number
   employeeId?: Prisma.IntFilter<"EmployeePaymentPerOrderRate"> | number
-  amount?: Prisma.DecimalFilter<"EmployeePaymentPerOrderRate"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFilter<"EmployeePaymentPerOrderRate"> | number
   effectiveFrom?: Prisma.DateTimeFilter<"EmployeePaymentPerOrderRate"> | Date | string
   effectiveTo?: Prisma.DateTimeNullableFilter<"EmployeePaymentPerOrderRate"> | Date | string | null
   employee?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
@@ -242,7 +242,7 @@ export type EmployeePaymentPerOrderRateWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.EmployeePaymentPerOrderRateWhereInput[]
   NOT?: Prisma.EmployeePaymentPerOrderRateWhereInput | Prisma.EmployeePaymentPerOrderRateWhereInput[]
   employeeId?: Prisma.IntFilter<"EmployeePaymentPerOrderRate"> | number
-  amount?: Prisma.DecimalFilter<"EmployeePaymentPerOrderRate"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFilter<"EmployeePaymentPerOrderRate"> | number
   effectiveFrom?: Prisma.DateTimeFilter<"EmployeePaymentPerOrderRate"> | Date | string
   effectiveTo?: Prisma.DateTimeNullableFilter<"EmployeePaymentPerOrderRate"> | Date | string | null
   employee?: Prisma.XOR<Prisma.EmployeeScalarRelationFilter, Prisma.EmployeeWhereInput>
@@ -267,13 +267,13 @@ export type EmployeePaymentPerOrderRateScalarWhereWithAggregatesInput = {
   NOT?: Prisma.EmployeePaymentPerOrderRateScalarWhereWithAggregatesInput | Prisma.EmployeePaymentPerOrderRateScalarWhereWithAggregatesInput[]
   rateId?: Prisma.IntWithAggregatesFilter<"EmployeePaymentPerOrderRate"> | number
   employeeId?: Prisma.IntWithAggregatesFilter<"EmployeePaymentPerOrderRate"> | number
-  amount?: Prisma.DecimalWithAggregatesFilter<"EmployeePaymentPerOrderRate"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntWithAggregatesFilter<"EmployeePaymentPerOrderRate"> | number
   effectiveFrom?: Prisma.DateTimeWithAggregatesFilter<"EmployeePaymentPerOrderRate"> | Date | string
   effectiveTo?: Prisma.DateTimeNullableWithAggregatesFilter<"EmployeePaymentPerOrderRate"> | Date | string | null
 }
 
 export type EmployeePaymentPerOrderRateCreateInput = {
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: number
   effectiveFrom: Date | string
   effectiveTo?: Date | string | null
   employee: Prisma.EmployeeCreateNestedOneWithoutRatesInput
@@ -282,13 +282,13 @@ export type EmployeePaymentPerOrderRateCreateInput = {
 export type EmployeePaymentPerOrderRateUncheckedCreateInput = {
   rateId?: number
   employeeId: number
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: number
   effectiveFrom: Date | string
   effectiveTo?: Date | string | null
 }
 
 export type EmployeePaymentPerOrderRateUpdateInput = {
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   effectiveTo?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   employee?: Prisma.EmployeeUpdateOneRequiredWithoutRatesNestedInput
@@ -297,7 +297,7 @@ export type EmployeePaymentPerOrderRateUpdateInput = {
 export type EmployeePaymentPerOrderRateUncheckedUpdateInput = {
   rateId?: Prisma.IntFieldUpdateOperationsInput | number
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   effectiveTo?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -305,13 +305,13 @@ export type EmployeePaymentPerOrderRateUncheckedUpdateInput = {
 export type EmployeePaymentPerOrderRateCreateManyInput = {
   rateId?: number
   employeeId: number
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: number
   effectiveFrom: Date | string
   effectiveTo?: Date | string | null
 }
 
 export type EmployeePaymentPerOrderRateUpdateManyMutationInput = {
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   effectiveTo?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -319,7 +319,7 @@ export type EmployeePaymentPerOrderRateUpdateManyMutationInput = {
 export type EmployeePaymentPerOrderRateUncheckedUpdateManyInput = {
   rateId?: Prisma.IntFieldUpdateOperationsInput | number
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   effectiveTo?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -413,14 +413,14 @@ export type EmployeePaymentPerOrderRateUncheckedUpdateManyWithoutEmployeeNestedI
 }
 
 export type EmployeePaymentPerOrderRateCreateWithoutEmployeeInput = {
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: number
   effectiveFrom: Date | string
   effectiveTo?: Date | string | null
 }
 
 export type EmployeePaymentPerOrderRateUncheckedCreateWithoutEmployeeInput = {
   rateId?: number
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: number
   effectiveFrom: Date | string
   effectiveTo?: Date | string | null
 }
@@ -457,34 +457,34 @@ export type EmployeePaymentPerOrderRateScalarWhereInput = {
   NOT?: Prisma.EmployeePaymentPerOrderRateScalarWhereInput | Prisma.EmployeePaymentPerOrderRateScalarWhereInput[]
   rateId?: Prisma.IntFilter<"EmployeePaymentPerOrderRate"> | number
   employeeId?: Prisma.IntFilter<"EmployeePaymentPerOrderRate"> | number
-  amount?: Prisma.DecimalFilter<"EmployeePaymentPerOrderRate"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFilter<"EmployeePaymentPerOrderRate"> | number
   effectiveFrom?: Prisma.DateTimeFilter<"EmployeePaymentPerOrderRate"> | Date | string
   effectiveTo?: Prisma.DateTimeNullableFilter<"EmployeePaymentPerOrderRate"> | Date | string | null
 }
 
 export type EmployeePaymentPerOrderRateCreateManyEmployeeInput = {
   rateId?: number
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: number
   effectiveFrom: Date | string
   effectiveTo?: Date | string | null
 }
 
 export type EmployeePaymentPerOrderRateUpdateWithoutEmployeeInput = {
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   effectiveTo?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type EmployeePaymentPerOrderRateUncheckedUpdateWithoutEmployeeInput = {
   rateId?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   effectiveTo?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type EmployeePaymentPerOrderRateUncheckedUpdateManyWithoutEmployeeInput = {
   rateId?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   effectiveFrom?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   effectiveTo?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -545,7 +545,7 @@ export type $EmployeePaymentPerOrderRatePayload<ExtArgs extends runtime.Types.Ex
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     rateId: number
     employeeId: number
-    amount: runtime.Decimal
+    amount: number
     effectiveFrom: Date
     effectiveTo: Date | null
   }, ExtArgs["result"]["employeePaymentPerOrderRate"]>
@@ -974,7 +974,7 @@ export interface Prisma__EmployeePaymentPerOrderRateClient<T, Null = never, ExtA
 export interface EmployeePaymentPerOrderRateFieldRefs {
   readonly rateId: Prisma.FieldRef<"EmployeePaymentPerOrderRate", 'Int'>
   readonly employeeId: Prisma.FieldRef<"EmployeePaymentPerOrderRate", 'Int'>
-  readonly amount: Prisma.FieldRef<"EmployeePaymentPerOrderRate", 'Decimal'>
+  readonly amount: Prisma.FieldRef<"EmployeePaymentPerOrderRate", 'Int'>
   readonly effectiveFrom: Prisma.FieldRef<"EmployeePaymentPerOrderRate", 'DateTime'>
   readonly effectiveTo: Prisma.FieldRef<"EmployeePaymentPerOrderRate", 'DateTime'>
 }

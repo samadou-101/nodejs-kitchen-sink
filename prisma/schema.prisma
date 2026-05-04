@@ -136,7 +136,7 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [productId])
 
   quantity Int
-  price    Decimal
+  price    Int
 }
 
 model OrderPayment {
@@ -144,7 +144,7 @@ model OrderPayment {
   orderId   Int
   order     Order @relation(fields: [orderId], references: [orderId])
 
-  amount      Decimal
+  amount      Int
   paymentDate DateTime @default(now())
   notes       String?
 }
@@ -205,7 +205,7 @@ model EmployeePayment {
 
   employee Employee @relation(fields: [employeeId], references: [employeeId])
 
-  amount        Decimal
+  amount        Int
   paymentPeriod String?
   paymentDate   DateTime @default(now())
   notes         String?
@@ -217,7 +217,7 @@ model EmployeePaymentPerOrderRate {
 
   employee Employee @relation(fields: [employeeId], references: [employeeId])
 
-  amount        Decimal
+  amount        Int
   effectiveFrom DateTime
   effectiveTo   DateTime?
 }

@@ -29,19 +29,19 @@ export type AggregateEmployeePayment = {
 export type EmployeePaymentAvgAggregateOutputType = {
   employeePaymentId: number | null
   employeeId: number | null
-  amount: runtime.Decimal | null
+  amount: number | null
 }
 
 export type EmployeePaymentSumAggregateOutputType = {
   employeePaymentId: number | null
   employeeId: number | null
-  amount: runtime.Decimal | null
+  amount: number | null
 }
 
 export type EmployeePaymentMinAggregateOutputType = {
   employeePaymentId: number | null
   employeeId: number | null
-  amount: runtime.Decimal | null
+  amount: number | null
   paymentPeriod: string | null
   paymentDate: Date | null
   notes: string | null
@@ -50,7 +50,7 @@ export type EmployeePaymentMinAggregateOutputType = {
 export type EmployeePaymentMaxAggregateOutputType = {
   employeePaymentId: number | null
   employeeId: number | null
-  amount: runtime.Decimal | null
+  amount: number | null
   paymentPeriod: string | null
   paymentDate: Date | null
   notes: string | null
@@ -196,7 +196,7 @@ export type EmployeePaymentGroupByArgs<ExtArgs extends runtime.Types.Extensions.
 export type EmployeePaymentGroupByOutputType = {
   employeePaymentId: number
   employeeId: number
-  amount: runtime.Decimal
+  amount: number
   paymentPeriod: string | null
   paymentDate: Date
   notes: string | null
@@ -228,7 +228,7 @@ export type EmployeePaymentWhereInput = {
   NOT?: Prisma.EmployeePaymentWhereInput | Prisma.EmployeePaymentWhereInput[]
   employeePaymentId?: Prisma.IntFilter<"EmployeePayment"> | number
   employeeId?: Prisma.IntFilter<"EmployeePayment"> | number
-  amount?: Prisma.DecimalFilter<"EmployeePayment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFilter<"EmployeePayment"> | number
   paymentPeriod?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
   paymentDate?: Prisma.DateTimeFilter<"EmployeePayment"> | Date | string
   notes?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
@@ -251,7 +251,7 @@ export type EmployeePaymentWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.EmployeePaymentWhereInput[]
   NOT?: Prisma.EmployeePaymentWhereInput | Prisma.EmployeePaymentWhereInput[]
   employeeId?: Prisma.IntFilter<"EmployeePayment"> | number
-  amount?: Prisma.DecimalFilter<"EmployeePayment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFilter<"EmployeePayment"> | number
   paymentPeriod?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
   paymentDate?: Prisma.DateTimeFilter<"EmployeePayment"> | Date | string
   notes?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
@@ -278,14 +278,14 @@ export type EmployeePaymentScalarWhereWithAggregatesInput = {
   NOT?: Prisma.EmployeePaymentScalarWhereWithAggregatesInput | Prisma.EmployeePaymentScalarWhereWithAggregatesInput[]
   employeePaymentId?: Prisma.IntWithAggregatesFilter<"EmployeePayment"> | number
   employeeId?: Prisma.IntWithAggregatesFilter<"EmployeePayment"> | number
-  amount?: Prisma.DecimalWithAggregatesFilter<"EmployeePayment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntWithAggregatesFilter<"EmployeePayment"> | number
   paymentPeriod?: Prisma.StringNullableWithAggregatesFilter<"EmployeePayment"> | string | null
   paymentDate?: Prisma.DateTimeWithAggregatesFilter<"EmployeePayment"> | Date | string
   notes?: Prisma.StringNullableWithAggregatesFilter<"EmployeePayment"> | string | null
 }
 
 export type EmployeePaymentCreateInput = {
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: number
   paymentPeriod?: string | null
   paymentDate?: Date | string
   notes?: string | null
@@ -295,14 +295,14 @@ export type EmployeePaymentCreateInput = {
 export type EmployeePaymentUncheckedCreateInput = {
   employeePaymentId?: number
   employeeId: number
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: number
   paymentPeriod?: string | null
   paymentDate?: Date | string
   notes?: string | null
 }
 
 export type EmployeePaymentUpdateInput = {
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -312,7 +312,7 @@ export type EmployeePaymentUpdateInput = {
 export type EmployeePaymentUncheckedUpdateInput = {
   employeePaymentId?: Prisma.IntFieldUpdateOperationsInput | number
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -321,14 +321,14 @@ export type EmployeePaymentUncheckedUpdateInput = {
 export type EmployeePaymentCreateManyInput = {
   employeePaymentId?: number
   employeeId: number
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: number
   paymentPeriod?: string | null
   paymentDate?: Date | string
   notes?: string | null
 }
 
 export type EmployeePaymentUpdateManyMutationInput = {
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -337,7 +337,7 @@ export type EmployeePaymentUpdateManyMutationInput = {
 export type EmployeePaymentUncheckedUpdateManyInput = {
   employeePaymentId?: Prisma.IntFieldUpdateOperationsInput | number
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -435,7 +435,7 @@ export type EmployeePaymentUncheckedUpdateManyWithoutEmployeeNestedInput = {
 }
 
 export type EmployeePaymentCreateWithoutEmployeeInput = {
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: number
   paymentPeriod?: string | null
   paymentDate?: Date | string
   notes?: string | null
@@ -443,7 +443,7 @@ export type EmployeePaymentCreateWithoutEmployeeInput = {
 
 export type EmployeePaymentUncheckedCreateWithoutEmployeeInput = {
   employeePaymentId?: number
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: number
   paymentPeriod?: string | null
   paymentDate?: Date | string
   notes?: string | null
@@ -481,7 +481,7 @@ export type EmployeePaymentScalarWhereInput = {
   NOT?: Prisma.EmployeePaymentScalarWhereInput | Prisma.EmployeePaymentScalarWhereInput[]
   employeePaymentId?: Prisma.IntFilter<"EmployeePayment"> | number
   employeeId?: Prisma.IntFilter<"EmployeePayment"> | number
-  amount?: Prisma.DecimalFilter<"EmployeePayment"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFilter<"EmployeePayment"> | number
   paymentPeriod?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
   paymentDate?: Prisma.DateTimeFilter<"EmployeePayment"> | Date | string
   notes?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
@@ -489,14 +489,14 @@ export type EmployeePaymentScalarWhereInput = {
 
 export type EmployeePaymentCreateManyEmployeeInput = {
   employeePaymentId?: number
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount: number
   paymentPeriod?: string | null
   paymentDate?: Date | string
   notes?: string | null
 }
 
 export type EmployeePaymentUpdateWithoutEmployeeInput = {
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -504,7 +504,7 @@ export type EmployeePaymentUpdateWithoutEmployeeInput = {
 
 export type EmployeePaymentUncheckedUpdateWithoutEmployeeInput = {
   employeePaymentId?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -512,7 +512,7 @@ export type EmployeePaymentUncheckedUpdateWithoutEmployeeInput = {
 
 export type EmployeePaymentUncheckedUpdateManyWithoutEmployeeInput = {
   employeePaymentId?: Prisma.IntFieldUpdateOperationsInput | number
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  amount?: Prisma.IntFieldUpdateOperationsInput | number
   paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -578,7 +578,7 @@ export type $EmployeePaymentPayload<ExtArgs extends runtime.Types.Extensions.Int
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     employeePaymentId: number
     employeeId: number
-    amount: runtime.Decimal
+    amount: number
     paymentPeriod: string | null
     paymentDate: Date
     notes: string | null
@@ -1008,7 +1008,7 @@ export interface Prisma__EmployeePaymentClient<T, Null = never, ExtArgs extends 
 export interface EmployeePaymentFieldRefs {
   readonly employeePaymentId: Prisma.FieldRef<"EmployeePayment", 'Int'>
   readonly employeeId: Prisma.FieldRef<"EmployeePayment", 'Int'>
-  readonly amount: Prisma.FieldRef<"EmployeePayment", 'Decimal'>
+  readonly amount: Prisma.FieldRef<"EmployeePayment", 'Int'>
   readonly paymentPeriod: Prisma.FieldRef<"EmployeePayment", 'String'>
   readonly paymentDate: Prisma.FieldRef<"EmployeePayment", 'DateTime'>
   readonly notes: Prisma.FieldRef<"EmployeePayment", 'String'>
