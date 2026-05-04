@@ -22,6 +22,5 @@ export type OrderDTO = {
   customerId: number;
   orderDate: Date;
   orderStatusId: number;
-  employeeId: number | null;
   notes: string | null;
 };

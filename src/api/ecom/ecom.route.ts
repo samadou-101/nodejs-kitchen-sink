@@ -13,5 +13,8 @@ ecomRouter.delete("/product/:id", productHandler);
 
 // order routes
 ecomRouter.post("/order/create", orderHnadler);
+ecomRouter.get("/order/:id", orderHnadler);
+ecomRouter.delete("/order/:id", orderHnadler);
+ecomRouter.patch("/order/:id", orderHnadler);
 
 export default ecomRouter;

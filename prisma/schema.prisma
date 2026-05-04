@@ -61,7 +61,7 @@ model Customer {
   name             String
   phone            String
   address          String
-  email            String?  @unique
+  email            String?
   registrationDate DateTime @default(now())
   clientId         String?
   ordersCount      Int      @default(0)
