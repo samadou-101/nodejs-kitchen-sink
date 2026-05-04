@@ -148,6 +148,23 @@ export const orderRepo = {
       where: { productId },
       data: { quantityAvailable: { increment: amount } },
     }),
+
+  findOrderItemsByOrderId: (tx: DbClient) => (orderId: number) =>
+    getClient(tx).orderItem.findMany({
+      where: { orderId },
+      select: { productId: true, quantity: true },
+    }),
+
+  incrementInventoryBatch:
+    (tx: DbClient) => (items: { productId: number; quantity: number }[]) =>
+      Promise.all(
+        items.map((item) =>
+          getClient(tx).inventory.updateMany({
+            where: { productId: item.productId },
+            data: { quantityAvailable: { increment: item.quantity } },
+          }),
+        ),
+      ),
 };
 
 export const bind = (tx: DbClient) => ({
@@ -165,4 +182,6 @@ export const bind = (tx: DbClient) => ({
   assignEmployee: orderRepo.assignEmployee(tx),
   unassignEmployee: orderRepo.unassignEmployee(tx),
   incrementInventory: orderRepo.incrementInventory(tx),
+  findOrderItemsByOrderId: orderRepo.findOrderItemsByOrderId(tx),
+  incrementInventoryBatch: orderRepo.incrementInventoryBatch(tx),
 });

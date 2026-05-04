@@ -62,7 +62,6 @@ export async function placeOrder(orderData: OrderData) {
     const order = await db.insertOrder(orderData);
 
     if (orderData.orderItems?.length) {
-      await checkAndDecrementInventory(orderData.orderItems, db);
       await db.createOrderItemsBatch(order.orderId, orderData.orderItems);
     }
 
@@ -121,7 +120,39 @@ export async function unassignEmployeeFromOrder(orderId: number) {
 }
 
 export async function updateOrderStatus(orderId: number, statusId: number) {
-  return await bind(prisma).setOrderStatus(orderId, statusId);
+  return await prisma.$transaction(async (tx) => {
+    const db = bind(tx);
+
+    const order = await db.findOrderById(orderId);
+    if (!order) {
+      throw new OrderNotFoundError(orderId);
+    }
+
+    const previousStatusId = order.orderStatusId;
+    const isConfirming = previousStatusId !== 2 && statusId === 2;
+    const isCancellingConfirmed = previousStatusId === 2 && statusId === 3;
+
+    if (isConfirming) {
+      const orderItems = await db.findOrderItemsByOrderId(orderId);
+      if (orderItems.length > 0) {
+        await checkAndDecrementInventory(
+          orderItems.map((i) => ({ productId: i.productId, quantity: i.quantity, price: 0 })),
+          db,
+        );
+      }
+    }
+
+    if (isCancellingConfirmed) {
+      const orderItems = await db.findOrderItemsByOrderId(orderId);
+      if (orderItems.length > 0) {
+        await db.incrementInventoryBatch(
+          orderItems.map((i) => ({ productId: i.productId, quantity: i.quantity })),
+        );
+      }
+    }
+
+    return db.setOrderStatus(orderId, statusId);
+  });
 }
 
 export async function updateInventory(
