@@ -43,3 +43,4 @@ Thumbs.db
 *.tmp
 tasks.todo
 /generated/prisma
+index.md
