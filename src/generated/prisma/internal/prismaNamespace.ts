@@ -1804,9 +1804,9 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 
 export const PendingAdminScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
   email: 'email',
-  isPending: 'isPending'
+  isPending: 'isPending',
+  userId: 'userId'
 } as const
 
 export type PendingAdminScalarFieldEnum = (typeof PendingAdminScalarFieldEnum)[keyof typeof PendingAdminScalarFieldEnum]

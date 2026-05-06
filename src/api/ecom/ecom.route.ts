@@ -1,3 +1,4 @@
+import { adminAuthController } from "@/modules/ecom/admin/controllers/auth.controller";
 import { orderHandler } from "@/modules/ecom/order/order.controller";
 import { productHandler } from "@/modules/ecom/product/product.controller";
 import express, { type Router } from "express";
@@ -19,5 +20,9 @@ ecomRouter.patch("/order/:id", orderHandler);
 ecomRouter.patch("/order/:id/status", orderHandler);
 ecomRouter.patch("/order/:id/employee", orderHandler);
 ecomRouter.patch("/order/:id/employee/remove", orderHandler);
+
+// Admin Auth
+ecomRouter.post("/admin/signup", adminAuthController);
+ecomRouter.post("/admin/login", adminAuthController);
 
 export default ecomRouter;

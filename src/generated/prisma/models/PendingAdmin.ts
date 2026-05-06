@@ -38,23 +38,23 @@ export type PendingAdminSumAggregateOutputType = {
 
 export type PendingAdminMinAggregateOutputType = {
   id: number | null
-  userId: number | null
   email: string | null
   isPending: boolean | null
+  userId: number | null
 }
 
 export type PendingAdminMaxAggregateOutputType = {
   id: number | null
-  userId: number | null
   email: string | null
   isPending: boolean | null
+  userId: number | null
 }
 
 export type PendingAdminCountAggregateOutputType = {
   id: number
-  userId: number
   email: number
   isPending: number
+  userId: number
   _all: number
 }
 
@@ -71,23 +71,23 @@ export type PendingAdminSumAggregateInputType = {
 
 export type PendingAdminMinAggregateInputType = {
   id?: true
-  userId?: true
   email?: true
   isPending?: true
+  userId?: true
 }
 
 export type PendingAdminMaxAggregateInputType = {
   id?: true
-  userId?: true
   email?: true
   isPending?: true
+  userId?: true
 }
 
 export type PendingAdminCountAggregateInputType = {
   id?: true
-  userId?: true
   email?: true
   isPending?: true
+  userId?: true
   _all?: true
 }
 
@@ -179,9 +179,9 @@ export type PendingAdminGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 
 export type PendingAdminGroupByOutputType = {
   id: number
-  userId: number
   email: string
   isPending: boolean
+  userId: number | null
   _count: PendingAdminCountAggregateOutputType | null
   _avg: PendingAdminAvgAggregateOutputType | null
   _sum: PendingAdminSumAggregateOutputType | null
@@ -209,17 +209,17 @@ export type PendingAdminWhereInput = {
   OR?: Prisma.PendingAdminWhereInput[]
   NOT?: Prisma.PendingAdminWhereInput | Prisma.PendingAdminWhereInput[]
   id?: Prisma.IntFilter<"PendingAdmin"> | number
-  userId?: Prisma.IntFilter<"PendingAdmin"> | number
   email?: Prisma.StringFilter<"PendingAdmin"> | string
   isPending?: Prisma.BoolFilter<"PendingAdmin"> | boolean
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  userId?: Prisma.IntNullableFilter<"PendingAdmin"> | number | null
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }
 
 export type PendingAdminOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   isPending?: Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -229,16 +229,16 @@ export type PendingAdminWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.PendingAdminWhereInput | Prisma.PendingAdminWhereInput[]
   OR?: Prisma.PendingAdminWhereInput[]
   NOT?: Prisma.PendingAdminWhereInput | Prisma.PendingAdminWhereInput[]
-  userId?: Prisma.IntFilter<"PendingAdmin"> | number
   isPending?: Prisma.BoolFilter<"PendingAdmin"> | boolean
-  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  userId?: Prisma.IntNullableFilter<"PendingAdmin"> | number | null
+  user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
 }, "id" | "email">
 
 export type PendingAdminOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   isPending?: Prisma.SortOrder
+  userId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PendingAdminCountOrderByAggregateInput
   _avg?: Prisma.PendingAdminAvgOrderByAggregateInput
   _max?: Prisma.PendingAdminMaxOrderByAggregateInput
@@ -251,42 +251,42 @@ export type PendingAdminScalarWhereWithAggregatesInput = {
   OR?: Prisma.PendingAdminScalarWhereWithAggregatesInput[]
   NOT?: Prisma.PendingAdminScalarWhereWithAggregatesInput | Prisma.PendingAdminScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"PendingAdmin"> | number
-  userId?: Prisma.IntWithAggregatesFilter<"PendingAdmin"> | number
   email?: Prisma.StringWithAggregatesFilter<"PendingAdmin"> | string
   isPending?: Prisma.BoolWithAggregatesFilter<"PendingAdmin"> | boolean
+  userId?: Prisma.IntNullableWithAggregatesFilter<"PendingAdmin"> | number | null
 }
 
 export type PendingAdminCreateInput = {
   email: string
   isPending?: boolean
-  user: Prisma.UserCreateNestedOneWithoutPendingAdminsInput
+  user?: Prisma.UserCreateNestedOneWithoutPendingAdminsInput
 }
 
 export type PendingAdminUncheckedCreateInput = {
   id?: number
-  userId: number
   email: string
   isPending?: boolean
+  userId?: number | null
 }
 
 export type PendingAdminUpdateInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   isPending?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  user?: Prisma.UserUpdateOneRequiredWithoutPendingAdminsNestedInput
+  user?: Prisma.UserUpdateOneWithoutPendingAdminsNestedInput
 }
 
 export type PendingAdminUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
   email?: Prisma.StringFieldUpdateOperationsInput | string
   isPending?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  userId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type PendingAdminCreateManyInput = {
   id?: number
-  userId: number
   email: string
   isPending?: boolean
+  userId?: number | null
 }
 
 export type PendingAdminUpdateManyMutationInput = {
@@ -296,9 +296,9 @@ export type PendingAdminUpdateManyMutationInput = {
 
 export type PendingAdminUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
   email?: Prisma.StringFieldUpdateOperationsInput | string
   isPending?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  userId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type PendingAdminListRelationFilter = {
@@ -313,9 +313,9 @@ export type PendingAdminOrderByRelationAggregateInput = {
 
 export type PendingAdminCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   isPending?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
 }
 
 export type PendingAdminAvgOrderByAggregateInput = {
@@ -325,16 +325,16 @@ export type PendingAdminAvgOrderByAggregateInput = {
 
 export type PendingAdminMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   isPending?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
 }
 
 export type PendingAdminMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  userId?: Prisma.SortOrder
   email?: Prisma.SortOrder
   isPending?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
 }
 
 export type PendingAdminSumOrderByAggregateInput = {
@@ -388,6 +388,14 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type PendingAdminCreateWithoutUserInput = {
   email: string
   isPending?: boolean
@@ -430,9 +438,9 @@ export type PendingAdminScalarWhereInput = {
   OR?: Prisma.PendingAdminScalarWhereInput[]
   NOT?: Prisma.PendingAdminScalarWhereInput | Prisma.PendingAdminScalarWhereInput[]
   id?: Prisma.IntFilter<"PendingAdmin"> | number
-  userId?: Prisma.IntFilter<"PendingAdmin"> | number
   email?: Prisma.StringFilter<"PendingAdmin"> | string
   isPending?: Prisma.BoolFilter<"PendingAdmin"> | boolean
+  userId?: Prisma.IntNullableFilter<"PendingAdmin"> | number | null
 }
 
 export type PendingAdminCreateManyUserInput = {
@@ -462,56 +470,56 @@ export type PendingAdminUncheckedUpdateManyWithoutUserInput = {
 
 export type PendingAdminSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
   email?: boolean
   isPending?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  userId?: boolean
+  user?: boolean | Prisma.PendingAdmin$userArgs<ExtArgs>
 }, ExtArgs["result"]["pendingAdmin"]>
 
 export type PendingAdminSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
   email?: boolean
   isPending?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  userId?: boolean
+  user?: boolean | Prisma.PendingAdmin$userArgs<ExtArgs>
 }, ExtArgs["result"]["pendingAdmin"]>
 
 export type PendingAdminSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  userId?: boolean
   email?: boolean
   isPending?: boolean
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  userId?: boolean
+  user?: boolean | Prisma.PendingAdmin$userArgs<ExtArgs>
 }, ExtArgs["result"]["pendingAdmin"]>
 
 export type PendingAdminSelectScalar = {
   id?: boolean
-  userId?: boolean
   email?: boolean
   isPending?: boolean
+  userId?: boolean
 }
 
-export type PendingAdminOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "email" | "isPending", ExtArgs["result"]["pendingAdmin"]>
+export type PendingAdminOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "isPending" | "userId", ExtArgs["result"]["pendingAdmin"]>
 export type PendingAdminInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.PendingAdmin$userArgs<ExtArgs>
 }
 export type PendingAdminIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.PendingAdmin$userArgs<ExtArgs>
 }
 export type PendingAdminIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.PendingAdmin$userArgs<ExtArgs>
 }
 
 export type $PendingAdminPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PendingAdmin"
   objects: {
-    user: Prisma.$UserPayload<ExtArgs>
+    user: Prisma.$UserPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
-    userId: number
     email: string
     isPending: boolean
+    userId: number | null
   }, ExtArgs["result"]["pendingAdmin"]>
   composites: {}
 }
@@ -906,7 +914,7 @@ readonly fields: PendingAdminFieldRefs;
  */
 export interface Prisma__PendingAdminClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.PendingAdmin$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PendingAdmin$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -937,9 +945,9 @@ export interface Prisma__PendingAdminClient<T, Null = never, ExtArgs extends run
  */
 export interface PendingAdminFieldRefs {
   readonly id: Prisma.FieldRef<"PendingAdmin", 'Int'>
-  readonly userId: Prisma.FieldRef<"PendingAdmin", 'Int'>
   readonly email: Prisma.FieldRef<"PendingAdmin", 'String'>
   readonly isPending: Prisma.FieldRef<"PendingAdmin", 'Boolean'>
+  readonly userId: Prisma.FieldRef<"PendingAdmin", 'Int'>
 }
     
 
@@ -1338,6 +1346,25 @@ export type PendingAdminDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many PendingAdmins to delete.
    */
   limit?: number
+}
+
+/**
+ * PendingAdmin.user
+ */
+export type PendingAdmin$userArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

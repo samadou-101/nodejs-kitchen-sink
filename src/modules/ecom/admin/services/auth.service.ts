@@ -2,6 +2,7 @@ import { hashPassword, verifyPassword } from "@/api/auth/auth.utils";
 import type { AdminData, AdminLoginData } from "../admin.types";
 import {
   findAdminByEmail,
+  findPendingAdminByEmail,
   insertAdmin,
   updatePending,
 } from "../repo/auth.repo";
@@ -12,12 +13,8 @@ import {
 } from "@/api/auth/password/session.service";
 
 export async function registerAdmin(adminData: AdminData) {
-  const inPendingList = await prisma.pendingAdmin.findUnique({
-    where: {
-      email: adminData.email,
-    },
-  });
-
+  const inPendingList = await findPendingAdminByEmail(adminData.email);
+  console.log(inPendingList);
   if (!inPendingList) {
     throw new Error("Email not activated");
   }

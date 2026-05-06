@@ -8,9 +8,10 @@ export async function adminAuthController(req: Request, res: Response) {
   const method = req.method;
   const POST_METHOD = "POST";
   const GET_METHOD = "GET";
-  const REGISTRATION_PATH = "/admin/register";
+  const REGISTRATION_PATH = "/admin/signup";
   const LOGIN_PATH = "/admin/login";
 
+  console.log("admin auth controller hit");
   if (path === REGISTRATION_PATH && method === POST_METHOD) {
     try {
       const adminData = req.body as AdminData;
@@ -42,7 +43,7 @@ export async function adminAuthController(req: Request, res: Response) {
     }
   }
 
-  if (path === LOGIN_PATH && method === GET_METHOD) {
+  if (path === LOGIN_PATH && method === POST_METHOD) {
     try {
       const loginData = req.body ?? {};
       if (!loginData || Object.keys(loginData).length === 0) {

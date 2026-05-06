@@ -9,8 +9,6 @@ import {
 import { prisma } from "@/config/db.config";
 import { Prisma } from "@/generated/prisma/client";
 import * as argon2 from "argon2";
-import type { SessionData } from "./auth.types";
-import { redisClient } from "@/config/redis.config";
 
 export async function checkAuth(
   req: Request,
@@ -132,11 +130,11 @@ export async function sendPasswordResetToken(req: Request, res: Response) {
       res.status(500).send("Something Went Wrong!");
       return;
     }
-    await prisma.passwodResetTokens.create({
+    await prisma.passwordResetToken.create({
       data: {
-        token_hash: hashedToken,
+        tokenHash: hashedToken,
         userId: userData.id,
-        expires_at: new Date(Date.now() + 60 * 1000),
+        expiresAt: new Date(Date.now() + 60 * 1000),
       },
     });
     res.status(200).json({
@@ -170,7 +168,7 @@ export async function confirmPasswordReset(req: Request, res: Response) {
       return;
     }
 
-    const tokenResetData = await prisma.passwodResetTokens.findFirst({
+    const tokenResetData = await prisma.passwordResetToken.findFirst({
       where: { userId: userData.id, used_at: null },
     });
 
@@ -181,7 +179,7 @@ export async function confirmPasswordReset(req: Request, res: Response) {
     }
 
     const validTokenHash = await argon2.verify(
-      tokenResetData?.token_hash,
+      tokenResetData?.tokenHash,
       resetToken,
     );
 
@@ -190,7 +188,7 @@ export async function confirmPasswordReset(req: Request, res: Response) {
       res.status(401).send("Unaothorized");
       return;
     }
-    if (tokenResetData.expires_at < new Date()) {
+    if (tokenResetData.expiresAt < new Date()) {
       console.log("reset token expired");
       res.status(401).send("Token Expired");
       return;
@@ -200,11 +198,11 @@ export async function confirmPasswordReset(req: Request, res: Response) {
       where: { email },
       data: { password: newHashedPassword },
     });
-    await prisma.passwodResetTokens.update({
+    await prisma.passwordResetToken.update({
       where: {
         id: tokenResetData.id,
       },
-      data: { used_at: new Date(Date.now()) },
+      data: { usedAt: new Date(Date.now()) },
     });
     res.status(201).send("Your password is updated successfully!");
     return;

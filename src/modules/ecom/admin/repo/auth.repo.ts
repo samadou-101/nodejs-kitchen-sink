@@ -41,3 +41,11 @@ export async function updatePending(email: string, isPending: boolean) {
     },
   });
 }
+
+export async function findPendingAdminByEmail(email: string) {
+  return await prisma.pendingAdmin.findUnique({
+    where: {
+      email,
+    },
+  });
+}
