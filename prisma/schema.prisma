@@ -32,10 +32,9 @@ model User {
 
 model PendingAdmin {
   id        Int     @id @default(autoincrement())
-  userId    Int
   email     String  @unique
   isPending Boolean @default(true)
-  user      User    @relation(fields: [userId], references: [id])
+  user      User    @relation(fields: [email], references: [email])
 }
 
 model Session {
