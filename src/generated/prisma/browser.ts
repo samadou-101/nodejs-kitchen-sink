@@ -28,6 +28,11 @@ export type User = Prisma.UserModel
  */
 export type PendingAdmin = Prisma.PendingAdminModel
 /**
+ * Model PendingEmployee
+ * 
+ */
+export type PendingEmployee = Prisma.PendingEmployeeModel
+/**
  * Model Session
  * 
  */

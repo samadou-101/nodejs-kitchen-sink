@@ -10,6 +10,7 @@
  */
 export type * from './models/User'
 export type * from './models/PendingAdmin'
+export type * from './models/PendingEmployee'
 export type * from './models/Session'
 export type * from './models/PasswordResetToken'
 export type * from './models/Customer'

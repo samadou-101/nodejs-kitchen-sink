@@ -1,6 +1,11 @@
 import type { EmployeeData, EmployeeRate } from "../admin.types";
+import { insertPendingList } from "../repo/employee.repo";
 
-export async function addEmployee(employeeData: EmployeeData) {}
+export async function addEmployeeToPendingList(email: string) {
+  await insertPendingList(email);
+}
+
+export async function addEmployeeRole(employeeId: number, roleId: number) {}
 
 export async function changeEmployeeStatus(
   employeeId: number,
@@ -8,8 +13,6 @@ export async function changeEmployeeStatus(
 ) {}
 
 export async function getEmployeeById(employeeId: number) {}
-
-export async function addEmployeeRole(employeeId: number, roleId: number) {}
 
 export async function removeEmployeeRole(employeeId: number, roleId: number) {}
 

@@ -386,6 +386,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   PendingAdmin: 'PendingAdmin',
+  PendingEmployee: 'PendingEmployee',
   Session: 'Session',
   PasswordResetToken: 'PasswordResetToken',
   Customer: 'Customer',
@@ -417,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "pendingAdmin" | "session" | "passwordResetToken" | "customer" | "productCategory" | "product" | "inventory" | "orderStatus" | "order" | "orderItem" | "orderPayment" | "employee" | "employeeRole" | "employeeRoleAssignment" | "employeePaymentType" | "employeePayment" | "employeePaymentPerOrderRate"
+    modelProps: "user" | "pendingAdmin" | "pendingEmployee" | "session" | "passwordResetToken" | "customer" | "productCategory" | "product" | "inventory" | "orderStatus" | "order" | "orderItem" | "orderPayment" | "employee" | "employeeRole" | "employeeRoleAssignment" | "employeePaymentType" | "employeePayment" | "employeePaymentPerOrderRate"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -566,6 +567,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.PendingAdminCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.PendingAdminCountAggregateOutputType> | number
+        }
+      }
+    }
+    PendingEmployee: {
+      payload: Prisma.$PendingEmployeePayload<ExtArgs>
+      fields: Prisma.PendingEmployeeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PendingEmployeeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingEmployeePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PendingEmployeeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingEmployeePayload>
+        }
+        findFirst: {
+          args: Prisma.PendingEmployeeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingEmployeePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PendingEmployeeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingEmployeePayload>
+        }
+        findMany: {
+          args: Prisma.PendingEmployeeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingEmployeePayload>[]
+        }
+        create: {
+          args: Prisma.PendingEmployeeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingEmployeePayload>
+        }
+        createMany: {
+          args: Prisma.PendingEmployeeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PendingEmployeeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingEmployeePayload>[]
+        }
+        delete: {
+          args: Prisma.PendingEmployeeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingEmployeePayload>
+        }
+        update: {
+          args: Prisma.PendingEmployeeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingEmployeePayload>
+        }
+        deleteMany: {
+          args: Prisma.PendingEmployeeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PendingEmployeeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PendingEmployeeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingEmployeePayload>[]
+        }
+        upsert: {
+          args: Prisma.PendingEmployeeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingEmployeePayload>
+        }
+        aggregate: {
+          args: Prisma.PendingEmployeeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePendingEmployee>
+        }
+        groupBy: {
+          args: Prisma.PendingEmployeeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PendingEmployeeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PendingEmployeeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PendingEmployeeCountAggregateOutputType> | number
         }
       }
     }
@@ -1812,6 +1887,15 @@ export const PendingAdminScalarFieldEnum = {
 export type PendingAdminScalarFieldEnum = (typeof PendingAdminScalarFieldEnum)[keyof typeof PendingAdminScalarFieldEnum]
 
 
+export const PendingEmployeeScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  isPending: 'isPending'
+} as const
+
+export type PendingEmployeeScalarFieldEnum = (typeof PendingEmployeeScalarFieldEnum)[keyof typeof PendingEmployeeScalarFieldEnum]
+
+
 export const SessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -2189,6 +2273,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   pendingAdmin?: Prisma.PendingAdminOmit
+  pendingEmployee?: Prisma.PendingEmployeeOmit
   session?: Prisma.SessionOmit
   passwordResetToken?: Prisma.PasswordResetTokenOmit
   customer?: Prisma.CustomerOmit
