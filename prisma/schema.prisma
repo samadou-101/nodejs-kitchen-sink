@@ -25,8 +25,16 @@ model User {
   passwordResetTokens PasswordResetToken[]
 
   // ecommerce relation
-  employee Employee?
-  customer Customer?
+  employee      Employee?
+  customer      Customer?
+  pendingAdmins PendingAdmin[]
+}
+
+model PendingAdmin {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  isPending Boolean @default(true)
+  user      User    @relation(fields: [userId], references: [id])
 }
 
 model Session {
