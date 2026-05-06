@@ -1,10 +1,39 @@
 import { hashPassword, verifyPassword } from "@/api/auth/auth.utils";
 import type { AdminData, AdminLoginData } from "../admin.types";
-import { findAdminByEmail, insertAdmin } from "../repo/auth.repo";
+import {
+  findAdminByEmail,
+  insertAdmin,
+  updatePending,
+} from "../repo/auth.repo";
+import { prisma } from "@/config/db.config";
+import {
+  cacheUserSession,
+  createSession,
+} from "@/api/auth/password/session.service";
 
 export async function registerAdmin(adminData: AdminData) {
+  const inPendingList = await prisma.pendingAdmin.findUnique({
+    where: {
+      email: adminData.email,
+    },
+  });
+
+  if (!inPendingList) {
+    throw new Error("Email not activated");
+  }
+  if (!inPendingList.isPending) {
+    throw new Error("Email already activated");
+  }
+
   const hashedPass = await hashPassword(adminData.password);
-  await insertAdmin({ ...adminData, password: hashedPass });
+  const admin = await insertAdmin({ ...adminData, password: hashedPass });
+  const sessionData = await createSession(admin.id);
+  if (sessionData !== null) {
+    await cacheUserSession(sessionData);
+  }
+  await updatePending(adminData.email, false);
+
+  return { admin, sessionData };
 }
 
 export async function loginAdmin(AdminLoginData: AdminLoginData) {
@@ -20,7 +49,11 @@ export async function loginAdmin(AdminLoginData: AdminLoginData) {
   if (!validPassword) {
     throw new Error("Invalid Credentials");
   }
-  return existingAdmin;
+  const sessionData = await createSession(existingAdmin.id);
+  if (sessionData !== null) {
+    await cacheUserSession(sessionData);
+  }
+  return { name: existingAdmin.name, email: existingAdmin.email, sessionData };
 }
 
 export async function logoutAdmin(adminId: number) {}

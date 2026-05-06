@@ -407,10 +407,6 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
-}
-
 export type SessionCreateWithoutUserInput = {
   id?: string
   createdAt?: Date | string

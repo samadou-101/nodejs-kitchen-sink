@@ -385,6 +385,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 
 export const ModelName = {
   User: 'User',
+  PendingAdmin: 'PendingAdmin',
   Session: 'Session',
   PasswordResetToken: 'PasswordResetToken',
   Customer: 'Customer',
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "passwordResetToken" | "customer" | "productCategory" | "product" | "inventory" | "orderStatus" | "order" | "orderItem" | "orderPayment" | "employee" | "employeeRole" | "employeeRoleAssignment" | "employeePaymentType" | "employeePayment" | "employeePaymentPerOrderRate"
+    modelProps: "user" | "pendingAdmin" | "session" | "passwordResetToken" | "customer" | "productCategory" | "product" | "inventory" | "orderStatus" | "order" | "orderItem" | "orderPayment" | "employee" | "employeeRole" | "employeeRoleAssignment" | "employeePaymentType" | "employeePayment" | "employeePaymentPerOrderRate"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -491,6 +492,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.UserCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.UserCountAggregateOutputType> | number
+        }
+      }
+    }
+    PendingAdmin: {
+      payload: Prisma.$PendingAdminPayload<ExtArgs>
+      fields: Prisma.PendingAdminFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PendingAdminFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAdminPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PendingAdminFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAdminPayload>
+        }
+        findFirst: {
+          args: Prisma.PendingAdminFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAdminPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PendingAdminFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAdminPayload>
+        }
+        findMany: {
+          args: Prisma.PendingAdminFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAdminPayload>[]
+        }
+        create: {
+          args: Prisma.PendingAdminCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAdminPayload>
+        }
+        createMany: {
+          args: Prisma.PendingAdminCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PendingAdminCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAdminPayload>[]
+        }
+        delete: {
+          args: Prisma.PendingAdminDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAdminPayload>
+        }
+        update: {
+          args: Prisma.PendingAdminUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAdminPayload>
+        }
+        deleteMany: {
+          args: Prisma.PendingAdminDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PendingAdminUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PendingAdminUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAdminPayload>[]
+        }
+        upsert: {
+          args: Prisma.PendingAdminUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PendingAdminPayload>
+        }
+        aggregate: {
+          args: Prisma.PendingAdminAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePendingAdmin>
+        }
+        groupBy: {
+          args: Prisma.PendingAdminGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PendingAdminGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PendingAdminCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PendingAdminCountAggregateOutputType> | number
         }
       }
     }
@@ -1727,6 +1802,16 @@ export const UserScalarFieldEnum = {
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+export const PendingAdminScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  email: 'email',
+  isPending: 'isPending'
+} as const
+
+export type PendingAdminScalarFieldEnum = (typeof PendingAdminScalarFieldEnum)[keyof typeof PendingAdminScalarFieldEnum]
+
+
 export const SessionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1959,6 +2044,13 @@ export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaMod
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -1969,13 +2061,6 @@ export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'DateTime[]'
  */
 export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
-    
-
-
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -2103,6 +2188,7 @@ export type PrismaClientOptions = ({
 }
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
+  pendingAdmin?: Prisma.PendingAdminOmit
   session?: Prisma.SessionOmit
   passwordResetToken?: Prisma.PasswordResetTokenOmit
   customer?: Prisma.CustomerOmit

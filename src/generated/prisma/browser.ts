@@ -23,6 +23,11 @@ export * from './enums';
  */
 export type User = Prisma.UserModel
 /**
+ * Model PendingAdmin
+ * 
+ */
+export type PendingAdmin = Prisma.PendingAdminModel
+/**
  * Model Session
  * 
  */

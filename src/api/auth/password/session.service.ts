@@ -73,7 +73,7 @@ export async function loginUserSession(req: Request, res: Response) {
   try {
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (!existingUser) {
-      res.send(400).send("Already exists");
+      res.send(400).send("No user found");
       return;
     }
     const isPasswordValid = await verifyPassword(
@@ -94,7 +94,10 @@ export async function loginUserSession(req: Request, res: Response) {
     res
       .status(200)
       .send({ name: existingUser.name, email: existingUser.email });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Something went wrong");
+  }
 }
 
 export async function createSession(

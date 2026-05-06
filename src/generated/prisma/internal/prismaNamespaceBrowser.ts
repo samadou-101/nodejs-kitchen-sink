@@ -52,6 +52,7 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
+  PendingAdmin: 'PendingAdmin',
   Session: 'Session',
   PasswordResetToken: 'PasswordResetToken',
   Customer: 'Customer',
@@ -94,6 +95,16 @@ export const UserScalarFieldEnum = {
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+export const PendingAdminScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  email: 'email',
+  isPending: 'isPending'
+} as const
+
+export type PendingAdminScalarFieldEnum = (typeof PendingAdminScalarFieldEnum)[keyof typeof PendingAdminScalarFieldEnum]
 
 
 export const SessionScalarFieldEnum = {
