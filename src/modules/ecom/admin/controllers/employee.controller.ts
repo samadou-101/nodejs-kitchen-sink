@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import {
-  addEmployeeRole,
+  assignEmployeeRole,
   addEmployeeToPendingList,
 } from "../services/employee.service";
 
