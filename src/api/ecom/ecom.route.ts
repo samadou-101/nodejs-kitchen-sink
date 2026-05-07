@@ -28,5 +28,15 @@ ecomRouter.post("/admin/login", adminAuthController);
 
 // Admin Employee
 ecomRouter.post("/admin/employee/add", employeeAdminHandler);
+ecomRouter.post("/admin/employees/:id/payment-type", employeeAdminHandler);
+ecomRouter.post("/admin/employees/:id/payments", employeeAdminHandler);
+
+// Admin Payroll
+ecomRouter.post("/admin/payroll/preview", employeeAdminHandler);
+ecomRouter.post("/admin/payroll", employeeAdminHandler);
+ecomRouter.get("/admin/payroll", employeeAdminHandler);
+ecomRouter.get("/admin/payroll/:id", employeeAdminHandler);
+ecomRouter.post("/admin/payroll/:id/confirm", employeeAdminHandler);
+ecomRouter.post("/admin/payroll/:id/paid", employeeAdminHandler);
 
 export default ecomRouter;

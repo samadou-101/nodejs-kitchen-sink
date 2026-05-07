@@ -370,6 +370,183 @@ paths:
           description: Empty data
         '500':
           description: Internal server error
+  /admin/employees/{id}/payment-type:
+    post:
+      summary: Assign payment type to employee
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Employee ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - paymentTypeId
+              properties:
+                paymentTypeId:
+                  type: integer
+                  description: "1 = Salary, 2 = Per Order"
+                salaryAmount:
+                  type: number
+                  description: Salary amount (for paymentTypeId 1)
+                perOrderRate:
+                  type: number
+                  description: Per order rate (for paymentTypeId 2)
+      responses:
+        '201':
+          description: Payment type assigned
+        '400':
+          description: Missing required fields
+        '500':
+          description: Internal server error
+  /admin/employees/{id}/payments:
+    post:
+      summary: Create manual payment for employee
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Employee ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: number
+                paymentPeriod:
+                  type: string
+                notes:
+                  type: string
+                contractId:
+                  type: integer
+      responses:
+        '201':
+          description: Payment created
+        '400':
+          description: Missing required fields
+        '500':
+          description: Internal server error
+  /admin/payroll/preview:
+    post:
+      summary: Preview payroll run
+      tags:
+        - Admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayrollRunInput'
+      responses:
+        '201':
+          description: Payroll preview created
+        '400':
+          description: Missing startDate or endDate
+        '500':
+          description: Internal server error
+  /admin/payroll:
+    post:
+      summary: Create payroll run (DRAFT)
+      tags:
+        - Admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayrollRunInput'
+      responses:
+        '201':
+          description: Payroll run created
+        '400':
+          description: Missing startDate or endDate
+        '500':
+          description: Internal server error
+    get:
+      summary: List payroll runs
+      tags:
+        - Admin
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+          description: Filter by status (DRAFT, CONFIRMED, PAID)
+      responses:
+        '200':
+          description: Payroll runs found
+        '500':
+          description: Internal server error
+  /admin/payroll/{id}:
+    get:
+      summary: Get payroll run by ID
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Payroll run ID
+      responses:
+        '200':
+          description: Payroll run found
+        '404':
+          description: Payroll run not found
+        '500':
+          description: Internal server error
+  /admin/payroll/{id}/confirm:
+    post:
+      summary: Confirm payroll run
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Payroll run ID
+      responses:
+        '200':
+          description: Payroll run confirmed
+        '500':
+          description: Internal server error
+  /admin/payroll/{id}/paid:
+    post:
+      summary: Mark payroll run as paid
+      tags:
+        - Admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Payroll run ID
+      responses:
+        '200':
+          description: Payroll run marked as paid
+        '500':
+          description: Internal server error
 components:
   schemas:
     ProductData:
@@ -525,3 +702,36 @@ components:
         password:
           type: string
           format: password
+    PayrollRunInput:
+      type: object
+      required:
+        - startDate
+        - endDate
+      properties:
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        employeeIds:
+          type: array
+          items:
+            type: integer
+    PayrollRunStatus:
+      type: string
+      enum:
+        - DRAFT
+        - CONFIRMED
+        - PAID
+    PayrollRunItemStatus:
+      type: string
+      enum:
+        - PENDING
+        - INCLUDED
+        - EXCLUDED
+    PaymentType:
+      type: string
+      enum:
+        - SALARY
+        - PER_ORDER
