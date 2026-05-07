@@ -4,6 +4,7 @@ import {
   findEmployeeById as findEmployeeByIdRepo,
   insertPendingList,
   removeEmployeeRole,
+  setEmployeePaymentType,
   updateEmployeeStatus,
 } from "../repo/employee.repo";
 
@@ -30,14 +31,16 @@ export async function unassignEmployeeRole(employeeId: number, roleId: number) {
   await removeEmployeeRole(employeeId, roleId);
 }
 
-export async function setEmployeePaymentType(
+export async function assignEmployeePaymentType(
   employeeId: number,
   paymentTypeId: number,
-) {}
+) {
+  await setEmployeePaymentType(employeeId, paymentTypeId);
+}
 
-export async function updateEmployeePaymentType(
-  employeeId: number,
-  paymentTypeId: number,
+export async function updateEmployeeSalary(
+  emplyoeeId: number,
+  salary: number,
 ) {}
 
 export async function setEmployeeRate(

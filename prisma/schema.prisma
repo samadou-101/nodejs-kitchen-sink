@@ -181,10 +181,10 @@ model Employee {
   paymentTypeId Int                 @default(1)
   paymentType   EmployeePaymentType @relation(fields: [paymentTypeId], references: [paymentTypeId])
 
-  roles         EmployeeRoleAssignment[]
-  ordersHandled Order[]
-  payments      EmployeePayment[]
-  rates         EmployeePaymentPerOrderRate[]
+  roles                    EmployeeRoleAssignment[]
+  ordersHandled            Order[]
+  payments                 EmployeePayment[]
+  employeePaymentContracts EmployeePaymentContract[]
 }
 
 model EmployeeRole {
@@ -208,10 +208,35 @@ model EmployeeRoleAssignment {
 
 model EmployeePaymentType {
   paymentTypeId Int     @id @default(autoincrement())
-  name          String
+  name          String // SALARY | PER_ORDER
   description   String?
 
+  contracts EmployeePaymentContract[]
   employees Employee[]
+}
+
+model EmployeePaymentContract {
+  contractId Int @id @default(autoincrement())
+
+  employeeId    Int
+  paymentTypeId Int
+
+  // SALARY mode
+  salaryAmount Int?
+
+  // PER ORDER mode
+  perOrderRate Int?
+
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
+
+  isActive Boolean @default(true)
+
+  employee         Employee            @relation(fields: [employeeId], references: [employeeId])
+  type             EmployeePaymentType @relation(fields: [paymentTypeId], references: [paymentTypeId])
+  employeePayments EmployeePayment[]
+
+  @@index([employeeId, isActive])
 }
 
 model EmployeePayment {
@@ -224,15 +249,8 @@ model EmployeePayment {
   paymentPeriod String?
   paymentDate   DateTime @default(now())
   notes         String?
-}
 
-model EmployeePaymentPerOrderRate {
-  rateId     Int @id @default(autoincrement())
-  employeeId Int
-
-  employee Employee @relation(fields: [employeeId], references: [employeeId])
-
-  amount        Int
-  effectiveFrom DateTime
-  effectiveTo   DateTime?
+  // optional snapshot for audit
+  contractId Int?
+  contract   EmployeePaymentContract? @relation(fields: [contractId], references: [contractId])
 }
