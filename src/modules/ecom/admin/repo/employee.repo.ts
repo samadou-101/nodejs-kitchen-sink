@@ -1,4 +1,10 @@
 import { prisma } from "@/config/db.config";
+import type {
+  CreateContractData,
+  CreatePaymentData,
+  PayrollInput,
+  PayrollRunInput,
+} from "../admin.types";
 
 // Employee Auth
 export async function insertPendingList(email: string) {
@@ -70,5 +76,163 @@ export async function setEmployeePaymentType(
         },
       },
     },
+  });
+}
+
+// Contract operations
+export async function createPaymentContract(data: CreateContractData) {
+  return await prisma.employeePaymentContract.create({
+    data: {
+      employeeId: data.employeeId,
+      paymentTypeId: data.paymentTypeId,
+      salaryAmount: data.salaryAmount ?? null,
+      perOrderRate: data.perOrderRate ?? null,
+      effectiveFrom: new Date(),
+      isActive: true,
+    },
+  });
+}
+
+export async function closePaymentContract(contractId: number) {
+  return await prisma.employeePaymentContract.update({
+    where: { contractId },
+    data: {
+      effectiveTo: new Date(),
+      isActive: false,
+    },
+  });
+}
+
+export async function getActiveContract(employeeId: number) {
+  return await prisma.employeePaymentContract.findFirst({
+    where: {
+      employeeId,
+      isActive: true,
+    },
+    orderBy: {
+      effectiveFrom: "desc",
+    },
+  });
+}
+
+export async function getContractsInPeriod(input: PayrollInput) {
+  return await prisma.employeePaymentContract.findMany({
+    where: {
+      employeeId: input.employeeId,
+      AND: [
+        {
+          effectiveFrom: {
+            lte: input.endDate,
+          },
+        },
+        {
+          OR: [
+            { effectiveTo: null },
+            { effectiveTo: { gte: input.startDate } },
+          ],
+        },
+      ],
+    },
+    orderBy: {
+      effectiveFrom: "asc",
+    },
+  });
+}
+
+// Payroll helpers
+export async function countOrdersInPeriod(input: PayrollInput) {
+  return await prisma.order.count({
+    where: {
+      employeeId: input.employeeId,
+      orderStatusId: 2,
+      orderDate: {
+        gte: input.startDate,
+        lte: input.endDate,
+      },
+    },
+  });
+}
+
+// Ledger - immutable after creation
+export async function createEmployeePayment(data: CreatePaymentData) {
+  return await prisma.employeePayment.create({
+    data: {
+      employeeId: data.employeeId,
+      amount: data.amount,
+      paymentPeriod: data.paymentPeriod ?? null,
+      notes: data.notes ?? null,
+      contractId: data.contractId ?? null,
+    },
+  });
+}
+
+// Payroll Run operations
+export async function createPayrollRun(input: PayrollRunInput) {
+  return await prisma.payrollRun.create({
+    data: {
+      startDate: input.startDate,
+      endDate: input.endDate,
+      status: "DRAFT",
+    },
+  });
+}
+
+export async function addPayrollRunItems(payrollRunId: number, items: Array<{
+  employeeId: number;
+  contractId: number | null;
+  amount: number;
+  status: string;
+  warning: string | null;
+}>) {
+  return await prisma.payrollRunItem.createMany({
+    data: items.map((item) => ({
+      payrollRunId,
+      employeeId: item.employeeId,
+      contractId: item.contractId,
+      amount: item.amount,
+      status: item.status,
+      warning: item.warning,
+    })),
+  });
+}
+
+export async function updatePayrollRunStatus(
+  payrollRunId: number,
+  status: string,
+  totalAmount?: number,
+) {
+  return await prisma.payrollRun.update({
+    where: { payrollRunId },
+    data: {
+      status,
+      ...(totalAmount !== undefined && { totalAmount }),
+      ...(status === "CONFIRMED" && { confirmedAt: new Date() }),
+    },
+  });
+}
+
+export async function getPayrollRunById(payrollRunId: number) {
+  return await prisma.payrollRun.findUnique({
+    where: { payrollRunId },
+    include: {
+      items: true,
+    },
+  });
+}
+
+export async function getPayrollRuns(status?: string) {
+  return await prisma.payrollRun.findMany({
+    where: status ? { status } : {},
+    orderBy: { createdAt: "desc" },
+    include: {
+      items: true,
+    },
+  });
+}
+
+export async function getActiveEmployees() {
+  return await prisma.employee.findMany({
+    where: { isActive: true },
+    select: { employeeId: true },
   });
 }

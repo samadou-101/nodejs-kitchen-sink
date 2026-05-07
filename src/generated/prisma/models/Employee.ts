@@ -237,7 +237,7 @@ export type EmployeeWhereInput = {
   roles?: Prisma.EmployeeRoleAssignmentListRelationFilter
   ordersHandled?: Prisma.OrderListRelationFilter
   payments?: Prisma.EmployeePaymentListRelationFilter
-  rates?: Prisma.EmployeePaymentPerOrderRateListRelationFilter
+  employeePaymentContracts?: Prisma.EmployeePaymentContractListRelationFilter
 }
 
 export type EmployeeOrderByWithRelationInput = {
@@ -252,7 +252,7 @@ export type EmployeeOrderByWithRelationInput = {
   roles?: Prisma.EmployeeRoleAssignmentOrderByRelationAggregateInput
   ordersHandled?: Prisma.OrderOrderByRelationAggregateInput
   payments?: Prisma.EmployeePaymentOrderByRelationAggregateInput
-  rates?: Prisma.EmployeePaymentPerOrderRateOrderByRelationAggregateInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractOrderByRelationAggregateInput
 }
 
 export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
@@ -270,7 +270,7 @@ export type EmployeeWhereUniqueInput = Prisma.AtLeast<{
   roles?: Prisma.EmployeeRoleAssignmentListRelationFilter
   ordersHandled?: Prisma.OrderListRelationFilter
   payments?: Prisma.EmployeePaymentListRelationFilter
-  rates?: Prisma.EmployeePaymentPerOrderRateListRelationFilter
+  employeePaymentContracts?: Prisma.EmployeePaymentContractListRelationFilter
 }, "employeeId" | "userId">
 
 export type EmployeeOrderByWithAggregationInput = {
@@ -308,7 +308,7 @@ export type EmployeeCreateInput = {
   roles?: Prisma.EmployeeRoleAssignmentCreateNestedManyWithoutEmployeeInput
   ordersHandled?: Prisma.OrderCreateNestedManyWithoutEmployeeInput
   payments?: Prisma.EmployeePaymentCreateNestedManyWithoutEmployeeInput
-  rates?: Prisma.EmployeePaymentPerOrderRateCreateNestedManyWithoutEmployeeInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateInput = {
@@ -321,7 +321,7 @@ export type EmployeeUncheckedCreateInput = {
   roles?: Prisma.EmployeeRoleAssignmentUncheckedCreateNestedManyWithoutEmployeeInput
   ordersHandled?: Prisma.OrderUncheckedCreateNestedManyWithoutEmployeeInput
   payments?: Prisma.EmployeePaymentUncheckedCreateNestedManyWithoutEmployeeInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUncheckedCreateNestedManyWithoutEmployeeInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUpdateInput = {
@@ -333,7 +333,7 @@ export type EmployeeUpdateInput = {
   roles?: Prisma.EmployeeRoleAssignmentUpdateManyWithoutEmployeeNestedInput
   ordersHandled?: Prisma.OrderUpdateManyWithoutEmployeeNestedInput
   payments?: Prisma.EmployeePaymentUpdateManyWithoutEmployeeNestedInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUpdateManyWithoutEmployeeNestedInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateInput = {
@@ -346,7 +346,7 @@ export type EmployeeUncheckedUpdateInput = {
   roles?: Prisma.EmployeeRoleAssignmentUncheckedUpdateManyWithoutEmployeeNestedInput
   ordersHandled?: Prisma.OrderUncheckedUpdateManyWithoutEmployeeNestedInput
   payments?: Prisma.EmployeePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUncheckedUpdateManyWithoutEmployeeNestedInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateManyInput = {
@@ -536,6 +536,20 @@ export type EmployeeUncheckedUpdateManyWithoutPaymentTypeNestedInput = {
   deleteMany?: Prisma.EmployeeScalarWhereInput | Prisma.EmployeeScalarWhereInput[]
 }
 
+export type EmployeeCreateNestedOneWithoutEmployeePaymentContractsInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutEmployeePaymentContractsInput, Prisma.EmployeeUncheckedCreateWithoutEmployeePaymentContractsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutEmployeePaymentContractsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+}
+
+export type EmployeeUpdateOneRequiredWithoutEmployeePaymentContractsNestedInput = {
+  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutEmployeePaymentContractsInput, Prisma.EmployeeUncheckedCreateWithoutEmployeePaymentContractsInput>
+  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutEmployeePaymentContractsInput
+  upsert?: Prisma.EmployeeUpsertWithoutEmployeePaymentContractsInput
+  connect?: Prisma.EmployeeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutEmployeePaymentContractsInput, Prisma.EmployeeUpdateWithoutEmployeePaymentContractsInput>, Prisma.EmployeeUncheckedUpdateWithoutEmployeePaymentContractsInput>
+}
+
 export type EmployeeCreateNestedOneWithoutPaymentsInput = {
   create?: Prisma.XOR<Prisma.EmployeeCreateWithoutPaymentsInput, Prisma.EmployeeUncheckedCreateWithoutPaymentsInput>
   connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutPaymentsInput
@@ -550,20 +564,6 @@ export type EmployeeUpdateOneRequiredWithoutPaymentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutPaymentsInput, Prisma.EmployeeUpdateWithoutPaymentsInput>, Prisma.EmployeeUncheckedUpdateWithoutPaymentsInput>
 }
 
-export type EmployeeCreateNestedOneWithoutRatesInput = {
-  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutRatesInput, Prisma.EmployeeUncheckedCreateWithoutRatesInput>
-  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutRatesInput
-  connect?: Prisma.EmployeeWhereUniqueInput
-}
-
-export type EmployeeUpdateOneRequiredWithoutRatesNestedInput = {
-  create?: Prisma.XOR<Prisma.EmployeeCreateWithoutRatesInput, Prisma.EmployeeUncheckedCreateWithoutRatesInput>
-  connectOrCreate?: Prisma.EmployeeCreateOrConnectWithoutRatesInput
-  upsert?: Prisma.EmployeeUpsertWithoutRatesInput
-  connect?: Prisma.EmployeeWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.EmployeeUpdateToOneWithWhereWithoutRatesInput, Prisma.EmployeeUpdateWithoutRatesInput>, Prisma.EmployeeUncheckedUpdateWithoutRatesInput>
-}
-
 export type EmployeeCreateWithoutUserInput = {
   name: string
   phoneNumber?: string | null
@@ -572,7 +572,7 @@ export type EmployeeCreateWithoutUserInput = {
   roles?: Prisma.EmployeeRoleAssignmentCreateNestedManyWithoutEmployeeInput
   ordersHandled?: Prisma.OrderCreateNestedManyWithoutEmployeeInput
   payments?: Prisma.EmployeePaymentCreateNestedManyWithoutEmployeeInput
-  rates?: Prisma.EmployeePaymentPerOrderRateCreateNestedManyWithoutEmployeeInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutUserInput = {
@@ -584,7 +584,7 @@ export type EmployeeUncheckedCreateWithoutUserInput = {
   roles?: Prisma.EmployeeRoleAssignmentUncheckedCreateNestedManyWithoutEmployeeInput
   ordersHandled?: Prisma.OrderUncheckedCreateNestedManyWithoutEmployeeInput
   payments?: Prisma.EmployeePaymentUncheckedCreateNestedManyWithoutEmployeeInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUncheckedCreateNestedManyWithoutEmployeeInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutUserInput = {
@@ -611,7 +611,7 @@ export type EmployeeUpdateWithoutUserInput = {
   roles?: Prisma.EmployeeRoleAssignmentUpdateManyWithoutEmployeeNestedInput
   ordersHandled?: Prisma.OrderUpdateManyWithoutEmployeeNestedInput
   payments?: Prisma.EmployeePaymentUpdateManyWithoutEmployeeNestedInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUpdateManyWithoutEmployeeNestedInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutUserInput = {
@@ -623,7 +623,7 @@ export type EmployeeUncheckedUpdateWithoutUserInput = {
   roles?: Prisma.EmployeeRoleAssignmentUncheckedUpdateManyWithoutEmployeeNestedInput
   ordersHandled?: Prisma.OrderUncheckedUpdateManyWithoutEmployeeNestedInput
   payments?: Prisma.EmployeePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUncheckedUpdateManyWithoutEmployeeNestedInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateWithoutOrdersHandledInput = {
@@ -634,7 +634,7 @@ export type EmployeeCreateWithoutOrdersHandledInput = {
   paymentType?: Prisma.EmployeePaymentTypeCreateNestedOneWithoutEmployeesInput
   roles?: Prisma.EmployeeRoleAssignmentCreateNestedManyWithoutEmployeeInput
   payments?: Prisma.EmployeePaymentCreateNestedManyWithoutEmployeeInput
-  rates?: Prisma.EmployeePaymentPerOrderRateCreateNestedManyWithoutEmployeeInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutOrdersHandledInput = {
@@ -646,7 +646,7 @@ export type EmployeeUncheckedCreateWithoutOrdersHandledInput = {
   paymentTypeId?: number
   roles?: Prisma.EmployeeRoleAssignmentUncheckedCreateNestedManyWithoutEmployeeInput
   payments?: Prisma.EmployeePaymentUncheckedCreateNestedManyWithoutEmployeeInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUncheckedCreateNestedManyWithoutEmployeeInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutOrdersHandledInput = {
@@ -673,7 +673,7 @@ export type EmployeeUpdateWithoutOrdersHandledInput = {
   paymentType?: Prisma.EmployeePaymentTypeUpdateOneRequiredWithoutEmployeesNestedInput
   roles?: Prisma.EmployeeRoleAssignmentUpdateManyWithoutEmployeeNestedInput
   payments?: Prisma.EmployeePaymentUpdateManyWithoutEmployeeNestedInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUpdateManyWithoutEmployeeNestedInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutOrdersHandledInput = {
@@ -685,7 +685,7 @@ export type EmployeeUncheckedUpdateWithoutOrdersHandledInput = {
   paymentTypeId?: Prisma.IntFieldUpdateOperationsInput | number
   roles?: Prisma.EmployeeRoleAssignmentUncheckedUpdateManyWithoutEmployeeNestedInput
   payments?: Prisma.EmployeePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUncheckedUpdateManyWithoutEmployeeNestedInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateWithoutRolesInput = {
@@ -696,7 +696,7 @@ export type EmployeeCreateWithoutRolesInput = {
   paymentType?: Prisma.EmployeePaymentTypeCreateNestedOneWithoutEmployeesInput
   ordersHandled?: Prisma.OrderCreateNestedManyWithoutEmployeeInput
   payments?: Prisma.EmployeePaymentCreateNestedManyWithoutEmployeeInput
-  rates?: Prisma.EmployeePaymentPerOrderRateCreateNestedManyWithoutEmployeeInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutRolesInput = {
@@ -708,7 +708,7 @@ export type EmployeeUncheckedCreateWithoutRolesInput = {
   paymentTypeId?: number
   ordersHandled?: Prisma.OrderUncheckedCreateNestedManyWithoutEmployeeInput
   payments?: Prisma.EmployeePaymentUncheckedCreateNestedManyWithoutEmployeeInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUncheckedCreateNestedManyWithoutEmployeeInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutRolesInput = {
@@ -735,7 +735,7 @@ export type EmployeeUpdateWithoutRolesInput = {
   paymentType?: Prisma.EmployeePaymentTypeUpdateOneRequiredWithoutEmployeesNestedInput
   ordersHandled?: Prisma.OrderUpdateManyWithoutEmployeeNestedInput
   payments?: Prisma.EmployeePaymentUpdateManyWithoutEmployeeNestedInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUpdateManyWithoutEmployeeNestedInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutRolesInput = {
@@ -747,7 +747,7 @@ export type EmployeeUncheckedUpdateWithoutRolesInput = {
   paymentTypeId?: Prisma.IntFieldUpdateOperationsInput | number
   ordersHandled?: Prisma.OrderUncheckedUpdateManyWithoutEmployeeNestedInput
   payments?: Prisma.EmployeePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUncheckedUpdateManyWithoutEmployeeNestedInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateWithoutPaymentTypeInput = {
@@ -758,7 +758,7 @@ export type EmployeeCreateWithoutPaymentTypeInput = {
   roles?: Prisma.EmployeeRoleAssignmentCreateNestedManyWithoutEmployeeInput
   ordersHandled?: Prisma.OrderCreateNestedManyWithoutEmployeeInput
   payments?: Prisma.EmployeePaymentCreateNestedManyWithoutEmployeeInput
-  rates?: Prisma.EmployeePaymentPerOrderRateCreateNestedManyWithoutEmployeeInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutPaymentTypeInput = {
@@ -770,7 +770,7 @@ export type EmployeeUncheckedCreateWithoutPaymentTypeInput = {
   roles?: Prisma.EmployeeRoleAssignmentUncheckedCreateNestedManyWithoutEmployeeInput
   ordersHandled?: Prisma.OrderUncheckedCreateNestedManyWithoutEmployeeInput
   payments?: Prisma.EmployeePaymentUncheckedCreateNestedManyWithoutEmployeeInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUncheckedCreateNestedManyWithoutEmployeeInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutPaymentTypeInput = {
@@ -811,6 +811,68 @@ export type EmployeeScalarWhereInput = {
   paymentTypeId?: Prisma.IntFilter<"Employee"> | number
 }
 
+export type EmployeeCreateWithoutEmployeePaymentContractsInput = {
+  name: string
+  phoneNumber?: string | null
+  isActive?: boolean
+  user: Prisma.UserCreateNestedOneWithoutEmployeeInput
+  paymentType?: Prisma.EmployeePaymentTypeCreateNestedOneWithoutEmployeesInput
+  roles?: Prisma.EmployeeRoleAssignmentCreateNestedManyWithoutEmployeeInput
+  ordersHandled?: Prisma.OrderCreateNestedManyWithoutEmployeeInput
+  payments?: Prisma.EmployeePaymentCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeUncheckedCreateWithoutEmployeePaymentContractsInput = {
+  employeeId?: number
+  userId: number
+  name: string
+  phoneNumber?: string | null
+  isActive?: boolean
+  paymentTypeId?: number
+  roles?: Prisma.EmployeeRoleAssignmentUncheckedCreateNestedManyWithoutEmployeeInput
+  ordersHandled?: Prisma.OrderUncheckedCreateNestedManyWithoutEmployeeInput
+  payments?: Prisma.EmployeePaymentUncheckedCreateNestedManyWithoutEmployeeInput
+}
+
+export type EmployeeCreateOrConnectWithoutEmployeePaymentContractsInput = {
+  where: Prisma.EmployeeWhereUniqueInput
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutEmployeePaymentContractsInput, Prisma.EmployeeUncheckedCreateWithoutEmployeePaymentContractsInput>
+}
+
+export type EmployeeUpsertWithoutEmployeePaymentContractsInput = {
+  update: Prisma.XOR<Prisma.EmployeeUpdateWithoutEmployeePaymentContractsInput, Prisma.EmployeeUncheckedUpdateWithoutEmployeePaymentContractsInput>
+  create: Prisma.XOR<Prisma.EmployeeCreateWithoutEmployeePaymentContractsInput, Prisma.EmployeeUncheckedCreateWithoutEmployeePaymentContractsInput>
+  where?: Prisma.EmployeeWhereInput
+}
+
+export type EmployeeUpdateToOneWithWhereWithoutEmployeePaymentContractsInput = {
+  where?: Prisma.EmployeeWhereInput
+  data: Prisma.XOR<Prisma.EmployeeUpdateWithoutEmployeePaymentContractsInput, Prisma.EmployeeUncheckedUpdateWithoutEmployeePaymentContractsInput>
+}
+
+export type EmployeeUpdateWithoutEmployeePaymentContractsInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  user?: Prisma.UserUpdateOneRequiredWithoutEmployeeNestedInput
+  paymentType?: Prisma.EmployeePaymentTypeUpdateOneRequiredWithoutEmployeesNestedInput
+  roles?: Prisma.EmployeeRoleAssignmentUpdateManyWithoutEmployeeNestedInput
+  ordersHandled?: Prisma.OrderUpdateManyWithoutEmployeeNestedInput
+  payments?: Prisma.EmployeePaymentUpdateManyWithoutEmployeeNestedInput
+}
+
+export type EmployeeUncheckedUpdateWithoutEmployeePaymentContractsInput = {
+  employeeId?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  paymentTypeId?: Prisma.IntFieldUpdateOperationsInput | number
+  roles?: Prisma.EmployeeRoleAssignmentUncheckedUpdateManyWithoutEmployeeNestedInput
+  ordersHandled?: Prisma.OrderUncheckedUpdateManyWithoutEmployeeNestedInput
+  payments?: Prisma.EmployeePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
+}
+
 export type EmployeeCreateWithoutPaymentsInput = {
   name: string
   phoneNumber?: string | null
@@ -819,7 +881,7 @@ export type EmployeeCreateWithoutPaymentsInput = {
   paymentType?: Prisma.EmployeePaymentTypeCreateNestedOneWithoutEmployeesInput
   roles?: Prisma.EmployeeRoleAssignmentCreateNestedManyWithoutEmployeeInput
   ordersHandled?: Prisma.OrderCreateNestedManyWithoutEmployeeInput
-  rates?: Prisma.EmployeePaymentPerOrderRateCreateNestedManyWithoutEmployeeInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeUncheckedCreateWithoutPaymentsInput = {
@@ -831,7 +893,7 @@ export type EmployeeUncheckedCreateWithoutPaymentsInput = {
   paymentTypeId?: number
   roles?: Prisma.EmployeeRoleAssignmentUncheckedCreateNestedManyWithoutEmployeeInput
   ordersHandled?: Prisma.OrderUncheckedCreateNestedManyWithoutEmployeeInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUncheckedCreateNestedManyWithoutEmployeeInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUncheckedCreateNestedManyWithoutEmployeeInput
 }
 
 export type EmployeeCreateOrConnectWithoutPaymentsInput = {
@@ -858,7 +920,7 @@ export type EmployeeUpdateWithoutPaymentsInput = {
   paymentType?: Prisma.EmployeePaymentTypeUpdateOneRequiredWithoutEmployeesNestedInput
   roles?: Prisma.EmployeeRoleAssignmentUpdateManyWithoutEmployeeNestedInput
   ordersHandled?: Prisma.OrderUpdateManyWithoutEmployeeNestedInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUpdateManyWithoutEmployeeNestedInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutPaymentsInput = {
@@ -870,69 +932,7 @@ export type EmployeeUncheckedUpdateWithoutPaymentsInput = {
   paymentTypeId?: Prisma.IntFieldUpdateOperationsInput | number
   roles?: Prisma.EmployeeRoleAssignmentUncheckedUpdateManyWithoutEmployeeNestedInput
   ordersHandled?: Prisma.OrderUncheckedUpdateManyWithoutEmployeeNestedInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUncheckedUpdateManyWithoutEmployeeNestedInput
-}
-
-export type EmployeeCreateWithoutRatesInput = {
-  name: string
-  phoneNumber?: string | null
-  isActive?: boolean
-  user: Prisma.UserCreateNestedOneWithoutEmployeeInput
-  paymentType?: Prisma.EmployeePaymentTypeCreateNestedOneWithoutEmployeesInput
-  roles?: Prisma.EmployeeRoleAssignmentCreateNestedManyWithoutEmployeeInput
-  ordersHandled?: Prisma.OrderCreateNestedManyWithoutEmployeeInput
-  payments?: Prisma.EmployeePaymentCreateNestedManyWithoutEmployeeInput
-}
-
-export type EmployeeUncheckedCreateWithoutRatesInput = {
-  employeeId?: number
-  userId: number
-  name: string
-  phoneNumber?: string | null
-  isActive?: boolean
-  paymentTypeId?: number
-  roles?: Prisma.EmployeeRoleAssignmentUncheckedCreateNestedManyWithoutEmployeeInput
-  ordersHandled?: Prisma.OrderUncheckedCreateNestedManyWithoutEmployeeInput
-  payments?: Prisma.EmployeePaymentUncheckedCreateNestedManyWithoutEmployeeInput
-}
-
-export type EmployeeCreateOrConnectWithoutRatesInput = {
-  where: Prisma.EmployeeWhereUniqueInput
-  create: Prisma.XOR<Prisma.EmployeeCreateWithoutRatesInput, Prisma.EmployeeUncheckedCreateWithoutRatesInput>
-}
-
-export type EmployeeUpsertWithoutRatesInput = {
-  update: Prisma.XOR<Prisma.EmployeeUpdateWithoutRatesInput, Prisma.EmployeeUncheckedUpdateWithoutRatesInput>
-  create: Prisma.XOR<Prisma.EmployeeCreateWithoutRatesInput, Prisma.EmployeeUncheckedCreateWithoutRatesInput>
-  where?: Prisma.EmployeeWhereInput
-}
-
-export type EmployeeUpdateToOneWithWhereWithoutRatesInput = {
-  where?: Prisma.EmployeeWhereInput
-  data: Prisma.XOR<Prisma.EmployeeUpdateWithoutRatesInput, Prisma.EmployeeUncheckedUpdateWithoutRatesInput>
-}
-
-export type EmployeeUpdateWithoutRatesInput = {
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  user?: Prisma.UserUpdateOneRequiredWithoutEmployeeNestedInput
-  paymentType?: Prisma.EmployeePaymentTypeUpdateOneRequiredWithoutEmployeesNestedInput
-  roles?: Prisma.EmployeeRoleAssignmentUpdateManyWithoutEmployeeNestedInput
-  ordersHandled?: Prisma.OrderUpdateManyWithoutEmployeeNestedInput
-  payments?: Prisma.EmployeePaymentUpdateManyWithoutEmployeeNestedInput
-}
-
-export type EmployeeUncheckedUpdateWithoutRatesInput = {
-  employeeId?: Prisma.IntFieldUpdateOperationsInput | number
-  userId?: Prisma.IntFieldUpdateOperationsInput | number
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  paymentTypeId?: Prisma.IntFieldUpdateOperationsInput | number
-  roles?: Prisma.EmployeeRoleAssignmentUncheckedUpdateManyWithoutEmployeeNestedInput
-  ordersHandled?: Prisma.OrderUncheckedUpdateManyWithoutEmployeeNestedInput
-  payments?: Prisma.EmployeePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeCreateManyPaymentTypeInput = {
@@ -951,7 +951,7 @@ export type EmployeeUpdateWithoutPaymentTypeInput = {
   roles?: Prisma.EmployeeRoleAssignmentUpdateManyWithoutEmployeeNestedInput
   ordersHandled?: Prisma.OrderUpdateManyWithoutEmployeeNestedInput
   payments?: Prisma.EmployeePaymentUpdateManyWithoutEmployeeNestedInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUpdateManyWithoutEmployeeNestedInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateWithoutPaymentTypeInput = {
@@ -963,7 +963,7 @@ export type EmployeeUncheckedUpdateWithoutPaymentTypeInput = {
   roles?: Prisma.EmployeeRoleAssignmentUncheckedUpdateManyWithoutEmployeeNestedInput
   ordersHandled?: Prisma.OrderUncheckedUpdateManyWithoutEmployeeNestedInput
   payments?: Prisma.EmployeePaymentUncheckedUpdateManyWithoutEmployeeNestedInput
-  rates?: Prisma.EmployeePaymentPerOrderRateUncheckedUpdateManyWithoutEmployeeNestedInput
+  employeePaymentContracts?: Prisma.EmployeePaymentContractUncheckedUpdateManyWithoutEmployeeNestedInput
 }
 
 export type EmployeeUncheckedUpdateManyWithoutPaymentTypeInput = {
@@ -983,14 +983,14 @@ export type EmployeeCountOutputType = {
   roles: number
   ordersHandled: number
   payments: number
-  rates: number
+  employeePaymentContracts: number
 }
 
 export type EmployeeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   roles?: boolean | EmployeeCountOutputTypeCountRolesArgs
   ordersHandled?: boolean | EmployeeCountOutputTypeCountOrdersHandledArgs
   payments?: boolean | EmployeeCountOutputTypeCountPaymentsArgs
-  rates?: boolean | EmployeeCountOutputTypeCountRatesArgs
+  employeePaymentContracts?: boolean | EmployeeCountOutputTypeCountEmployeePaymentContractsArgs
 }
 
 /**
@@ -1027,8 +1027,8 @@ export type EmployeeCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Typ
 /**
  * EmployeeCountOutputType without action
  */
-export type EmployeeCountOutputTypeCountRatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.EmployeePaymentPerOrderRateWhereInput
+export type EmployeeCountOutputTypeCountEmployeePaymentContractsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EmployeePaymentContractWhereInput
 }
 
 
@@ -1044,7 +1044,7 @@ export type EmployeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   roles?: boolean | Prisma.Employee$rolesArgs<ExtArgs>
   ordersHandled?: boolean | Prisma.Employee$ordersHandledArgs<ExtArgs>
   payments?: boolean | Prisma.Employee$paymentsArgs<ExtArgs>
-  rates?: boolean | Prisma.Employee$ratesArgs<ExtArgs>
+  employeePaymentContracts?: boolean | Prisma.Employee$employeePaymentContractsArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["employee"]>
 
@@ -1086,7 +1086,7 @@ export type EmployeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArg
   roles?: boolean | Prisma.Employee$rolesArgs<ExtArgs>
   ordersHandled?: boolean | Prisma.Employee$ordersHandledArgs<ExtArgs>
   payments?: boolean | Prisma.Employee$paymentsArgs<ExtArgs>
-  rates?: boolean | Prisma.Employee$ratesArgs<ExtArgs>
+  employeePaymentContracts?: boolean | Prisma.Employee$employeePaymentContractsArgs<ExtArgs>
   _count?: boolean | Prisma.EmployeeCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type EmployeeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1106,7 +1106,7 @@ export type $EmployeePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     roles: Prisma.$EmployeeRoleAssignmentPayload<ExtArgs>[]
     ordersHandled: Prisma.$OrderPayload<ExtArgs>[]
     payments: Prisma.$EmployeePaymentPayload<ExtArgs>[]
-    rates: Prisma.$EmployeePaymentPerOrderRatePayload<ExtArgs>[]
+    employeePaymentContracts: Prisma.$EmployeePaymentContractPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     employeeId: number
@@ -1514,7 +1514,7 @@ export interface Prisma__EmployeeClient<T, Null = never, ExtArgs extends runtime
   roles<T extends Prisma.Employee$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmployeeRoleAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   ordersHandled<T extends Prisma.Employee$ordersHandledArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$ordersHandledArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payments<T extends Prisma.Employee$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmployeePaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  rates<T extends Prisma.Employee$ratesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$ratesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmployeePaymentPerOrderRatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  employeePaymentContracts<T extends Prisma.Employee$employeePaymentContractsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Employee$employeePaymentContractsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmployeePaymentContractPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2023,27 +2023,27 @@ export type Employee$paymentsArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
- * Employee.rates
+ * Employee.employeePaymentContracts
  */
-export type Employee$ratesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Employee$employeePaymentContractsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the EmployeePaymentPerOrderRate
+   * Select specific fields to fetch from the EmployeePaymentContract
    */
-  select?: Prisma.EmployeePaymentPerOrderRateSelect<ExtArgs> | null
+  select?: Prisma.EmployeePaymentContractSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the EmployeePaymentPerOrderRate
+   * Omit specific fields from the EmployeePaymentContract
    */
-  omit?: Prisma.EmployeePaymentPerOrderRateOmit<ExtArgs> | null
+  omit?: Prisma.EmployeePaymentContractOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.EmployeePaymentPerOrderRateInclude<ExtArgs> | null
-  where?: Prisma.EmployeePaymentPerOrderRateWhereInput
-  orderBy?: Prisma.EmployeePaymentPerOrderRateOrderByWithRelationInput | Prisma.EmployeePaymentPerOrderRateOrderByWithRelationInput[]
-  cursor?: Prisma.EmployeePaymentPerOrderRateWhereUniqueInput
+  include?: Prisma.EmployeePaymentContractInclude<ExtArgs> | null
+  where?: Prisma.EmployeePaymentContractWhereInput
+  orderBy?: Prisma.EmployeePaymentContractOrderByWithRelationInput | Prisma.EmployeePaymentContractOrderByWithRelationInput[]
+  cursor?: Prisma.EmployeePaymentContractWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.EmployeePaymentPerOrderRateScalarFieldEnum | Prisma.EmployeePaymentPerOrderRateScalarFieldEnum[]
+  distinct?: Prisma.EmployeePaymentContractScalarFieldEnum | Prisma.EmployeePaymentContractScalarFieldEnum[]
 }
 
 /**

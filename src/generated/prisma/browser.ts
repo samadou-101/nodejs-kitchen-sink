@@ -103,12 +103,22 @@ export type EmployeeRoleAssignment = Prisma.EmployeeRoleAssignmentModel
  */
 export type EmployeePaymentType = Prisma.EmployeePaymentTypeModel
 /**
+ * Model EmployeePaymentContract
+ * 
+ */
+export type EmployeePaymentContract = Prisma.EmployeePaymentContractModel
+/**
  * Model EmployeePayment
  * 
  */
 export type EmployeePayment = Prisma.EmployeePaymentModel
 /**
- * Model EmployeePaymentPerOrderRate
+ * Model PayrollRun
  * 
  */
-export type EmployeePaymentPerOrderRate = Prisma.EmployeePaymentPerOrderRateModel
+export type PayrollRun = Prisma.PayrollRunModel
+/**
+ * Model PayrollRunItem
+ * 
+ */
+export type PayrollRunItem = Prisma.PayrollRunItemModel

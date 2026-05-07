@@ -254,3 +254,27 @@ model EmployeePayment {
   contractId Int?
   contract   EmployeePaymentContract? @relation(fields: [contractId], references: [contractId])
 }
+
+model PayrollRun {
+  payrollRunId   Int       @id @default(autoincrement())
+  startDate     DateTime
+  endDate       DateTime
+  status        String    @default("DRAFT")
+  totalAmount   Int?
+  createdAt     DateTime  @default(now())
+  confirmedAt   DateTime?
+
+  items         PayrollRunItem[]
+}
+
+model PayrollRunItem {
+  payrollRunItemId Int     @id @default(autoincrement())
+  payrollRunId    Int
+  employeeId      Int
+  contractId      Int?
+  amount          Int
+  status          String   @default("PENDING")
+  warning         String?
+
+  payrollRun     PayrollRun @relation(fields: [payrollRunId], references: [payrollRunId])
+}

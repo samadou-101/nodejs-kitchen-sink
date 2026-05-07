@@ -68,8 +68,10 @@ export const ModelName = {
   EmployeeRole: 'EmployeeRole',
   EmployeeRoleAssignment: 'EmployeeRoleAssignment',
   EmployeePaymentType: 'EmployeePaymentType',
+  EmployeePaymentContract: 'EmployeePaymentContract',
   EmployeePayment: 'EmployeePayment',
-  EmployeePaymentPerOrderRate: 'EmployeePaymentPerOrderRate'
+  PayrollRun: 'PayrollRun',
+  PayrollRunItem: 'PayrollRunItem'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -267,27 +269,57 @@ export const EmployeePaymentTypeScalarFieldEnum = {
 export type EmployeePaymentTypeScalarFieldEnum = (typeof EmployeePaymentTypeScalarFieldEnum)[keyof typeof EmployeePaymentTypeScalarFieldEnum]
 
 
+export const EmployeePaymentContractScalarFieldEnum = {
+  contractId: 'contractId',
+  employeeId: 'employeeId',
+  paymentTypeId: 'paymentTypeId',
+  salaryAmount: 'salaryAmount',
+  perOrderRate: 'perOrderRate',
+  effectiveFrom: 'effectiveFrom',
+  effectiveTo: 'effectiveTo',
+  isActive: 'isActive'
+} as const
+
+export type EmployeePaymentContractScalarFieldEnum = (typeof EmployeePaymentContractScalarFieldEnum)[keyof typeof EmployeePaymentContractScalarFieldEnum]
+
+
 export const EmployeePaymentScalarFieldEnum = {
   employeePaymentId: 'employeePaymentId',
   employeeId: 'employeeId',
   amount: 'amount',
   paymentPeriod: 'paymentPeriod',
   paymentDate: 'paymentDate',
-  notes: 'notes'
+  notes: 'notes',
+  contractId: 'contractId'
 } as const
 
 export type EmployeePaymentScalarFieldEnum = (typeof EmployeePaymentScalarFieldEnum)[keyof typeof EmployeePaymentScalarFieldEnum]
 
 
-export const EmployeePaymentPerOrderRateScalarFieldEnum = {
-  rateId: 'rateId',
-  employeeId: 'employeeId',
-  amount: 'amount',
-  effectiveFrom: 'effectiveFrom',
-  effectiveTo: 'effectiveTo'
+export const PayrollRunScalarFieldEnum = {
+  payrollRunId: 'payrollRunId',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  status: 'status',
+  totalAmount: 'totalAmount',
+  createdAt: 'createdAt',
+  confirmedAt: 'confirmedAt'
 } as const
 
-export type EmployeePaymentPerOrderRateScalarFieldEnum = (typeof EmployeePaymentPerOrderRateScalarFieldEnum)[keyof typeof EmployeePaymentPerOrderRateScalarFieldEnum]
+export type PayrollRunScalarFieldEnum = (typeof PayrollRunScalarFieldEnum)[keyof typeof PayrollRunScalarFieldEnum]
+
+
+export const PayrollRunItemScalarFieldEnum = {
+  payrollRunItemId: 'payrollRunItemId',
+  payrollRunId: 'payrollRunId',
+  employeeId: 'employeeId',
+  contractId: 'contractId',
+  amount: 'amount',
+  status: 'status',
+  warning: 'warning'
+} as const
+
+export type PayrollRunItemScalarFieldEnum = (typeof PayrollRunItemScalarFieldEnum)[keyof typeof PayrollRunItemScalarFieldEnum]
 
 
 export const SortOrder = {
