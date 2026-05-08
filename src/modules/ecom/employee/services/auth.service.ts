@@ -1,5 +1,5 @@
-import { hashPassword } from "@/api/auth/auth.utils";
-import type { EmployeeData, EmployeeRequestData } from "../employee.types";
+import { hashPassword, verifyPassword } from "@/api/auth/auth.utils";
+import type { EmployeeData, EmployeeLoginData, EmployeeRequestData } from "../employee.types";
 import { bind } from "../repo/auth.repo";
 import { prisma } from "@/config/db.config";
 import {
@@ -54,3 +54,26 @@ export async function registerEmployee(data: EmployeeRequestData) {
 
   return { employee, sessionData };
 }
+
+export async function loginEmployee(loginData: EmployeeLoginData) {
+  const repo = bind(prisma);
+  const existingEmployee = await repo.findEmployeeByEmail(loginData.email);
+  if (!existingEmployee) {
+    throw new Error("No Employee found");
+  }
+
+  const validPassword = await verifyPassword(
+    loginData.password,
+    existingEmployee.password,
+  );
+  if (!validPassword) {
+    throw new Error("Invalid Credentials");
+  }
+  const sessionData = await createSession(existingEmployee.id);
+  if (sessionData !== null) {
+    await cacheUserSession(sessionData);
+  }
+  return { name: existingEmployee.name, email: existingEmployee.email, sessionData };
+}
+
+export async function logoutEmployee(employeeId: number) {}

@@ -17,17 +17,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductData'
+              $ref: "#/components/schemas/ProductData"
       responses:
-        '201':
+        "201":
           description: Product created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
-        '409':
+                $ref: "#/components/schemas/Product"
+        "409":
           description: Invalid data
-        '500':
+        "500":
           description: Internal server error
   /product/update:
     post:
@@ -39,13 +39,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductData'
+              $ref: "#/components/schemas/ProductData"
       responses:
-        '201':
+        "201":
           description: Product updated successfully
-        '409':
+        "409":
           description: Invalid data
-        '500':
+        "500":
           description: Internal server error
   /product/{id}:
     get:
@@ -60,17 +60,17 @@ paths:
             type: integer
           description: Product ID
       responses:
-        '200':
+        "200":
           description: Product found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
-        '400':
+                $ref: "#/components/schemas/Product"
+        "400":
           description: Invalid Product ID
-        '404':
+        "404":
           description: Product not found
-        '500':
+        "500":
           description: Internal server error
     delete:
       summary: Delete product by ID
@@ -84,11 +84,11 @@ paths:
             type: integer
           description: Product ID
       responses:
-        '200':
+        "200":
           description: Product deleted successfully
-        '400':
+        "400":
           description: Invalid Product ID
-        '500':
+        "500":
           description: Internal server error
   /products:
     get:
@@ -96,17 +96,17 @@ paths:
       tags:
         - Products
       responses:
-        '200':
+        "200":
           description: Products found
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Product'
-        '400':
+                  $ref: "#/components/schemas/Product"
+        "400":
           description: No products found
-        '500':
+        "500":
           description: Internal server error
   /order/create:
     post:
@@ -118,17 +118,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OrderData'
+              $ref: "#/components/schemas/OrderData"
       responses:
-        '201':
+        "201":
           description: Order created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderDTO'
-        '400':
+                $ref: "#/components/schemas/OrderDTO"
+        "400":
           description: Failed creating order
-        '500':
+        "500":
           description: Internal server error
   /order/{id}:
     get:
@@ -143,17 +143,17 @@ paths:
             type: integer
           description: Order ID
       responses:
-        '200':
+        "200":
           description: Order found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderResponse'
-        '400':
+                $ref: "#/components/schemas/OrderResponse"
+        "400":
           description: Invalid order ID
-        '404':
+        "404":
           description: Order not found
-        '500':
+        "500":
           description: Internal server error
     patch:
       summary: Update order
@@ -171,13 +171,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OrderData'
+              $ref: "#/components/schemas/OrderData"
       responses:
-        '200':
+        "200":
           description: Order updated successfully
-        '400':
+        "400":
           description: Invalid order ID
-        '500':
+        "500":
           description: Internal server error
     delete:
       summary: Delete order
@@ -191,11 +191,11 @@ paths:
             type: integer
           description: Order ID
       responses:
-        '204':
+        "204":
           description: Order deleted successfully
-        '400':
+        "400":
           description: Invalid order ID
-        '500':
+        "500":
           description: Internal server error
   /order/{id}/status:
     patch:
@@ -222,11 +222,11 @@ paths:
                   type: integer
                   description: Status ID to set
       responses:
-        '200':
+        "200":
           description: Order status updated
-        '400':
+        "400":
           description: Invalid order ID or status ID
-        '500':
+        "500":
           description: Internal server error
   /order/{id}/employee:
     patch:
@@ -253,11 +253,11 @@ paths:
                   type: integer
                   description: Employee ID to assign
       responses:
-        '200':
+        "200":
           description: Employee assigned
-        '400':
+        "400":
           description: Invalid order ID
-        '500':
+        "500":
           description: Internal server error
   /order/{id}/employee/remove:
     patch:
@@ -272,11 +272,11 @@ paths:
             type: integer
           description: Order ID
       responses:
-        '200':
+        "200":
           description: Employee unassigned
-        '400':
+        "400":
           description: Invalid order ID
-        '500':
+        "500":
           description: Internal server error
   /admin/signup:
     post:
@@ -288,9 +288,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AdminData'
+              $ref: "#/components/schemas/AdminData"
       responses:
-        '201':
+        "201":
           description: Admin registered successfully
           content:
             application/json:
@@ -301,9 +301,9 @@ paths:
                     type: string
                   email:
                     type: string
-        '400':
+        "400":
           description: Invalid data or user already exists
-        '500':
+        "500":
           description: Internal server error
   /admin/login:
     post:
@@ -326,7 +326,7 @@ paths:
                 password:
                   type: string
       responses:
-        '200':
+        "200":
           description: Login successful
           content:
             application/json:
@@ -342,9 +342,9 @@ paths:
               schema:
                 type: string
                 example: sid=sessionId; Path=/; HttpOnly; Max-Age=604800
-        '400':
+        "400":
           description: Invalid credentials
-        '500':
+        "500":
           description: Internal server error
   /admin/employee/add:
     post:
@@ -364,11 +364,11 @@ paths:
                   type: string
                   format: email
       responses:
-        '201':
+        "201":
           description: Employee activated
-        '400':
+        "400":
           description: Empty data
-        '500':
+        "500":
           description: Internal server error
   /admin/employees/{id}/payment-type:
     post:
@@ -401,11 +401,11 @@ paths:
                   type: number
                   description: Per order rate (for paymentTypeId 2)
       responses:
-        '201':
+        "201":
           description: Payment type assigned
-        '400':
+        "400":
           description: Missing required fields
-        '500':
+        "500":
           description: Internal server error
   /admin/employees/{id}/payments:
     post:
@@ -437,11 +437,11 @@ paths:
                 contractId:
                   type: integer
       responses:
-        '201':
+        "201":
           description: Payment created
-        '400':
+        "400":
           description: Missing required fields
-        '500':
+        "500":
           description: Internal server error
   /admin/payroll/preview:
     post:
@@ -453,13 +453,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PayrollRunInput'
+              $ref: "#/components/schemas/PayrollRunInput"
       responses:
-        '201':
+        "201":
           description: Payroll preview created
-        '400':
+        "400":
           description: Missing startDate or endDate
-        '500':
+        "500":
           description: Internal server error
   /admin/payroll:
     post:
@@ -471,13 +471,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PayrollRunInput'
+              $ref: "#/components/schemas/PayrollRunInput"
       responses:
-        '201':
+        "201":
           description: Payroll run created
-        '400':
+        "400":
           description: Missing startDate or endDate
-        '500':
+        "500":
           description: Internal server error
     get:
       summary: List payroll runs
@@ -490,9 +490,9 @@ paths:
             type: string
           description: Filter by status (DRAFT, CONFIRMED, PAID)
       responses:
-        '200':
+        "200":
           description: Payroll runs found
-        '500':
+        "500":
           description: Internal server error
   /admin/payroll/{id}:
     get:
@@ -507,11 +507,11 @@ paths:
             type: integer
           description: Payroll run ID
       responses:
-        '200':
+        "200":
           description: Payroll run found
-        '404':
+        "404":
           description: Payroll run not found
-        '500':
+        "500":
           description: Internal server error
   /admin/payroll/{id}/confirm:
     post:
@@ -526,9 +526,9 @@ paths:
             type: integer
           description: Payroll run ID
       responses:
-        '200':
+        "200":
           description: Payroll run confirmed
-        '500':
+        "500":
           description: Internal server error
   /admin/payroll/{id}/paid:
     post:
@@ -543,9 +543,77 @@ paths:
             type: integer
           description: Payroll run ID
       responses:
-        '200':
+        "200":
           description: Payroll run marked as paid
-        '500':
+        "500":
+          description: Internal server error
+  /employee/signup:
+    post:
+      summary: Register new employee
+      tags:
+        - Employee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmployeeData"
+      responses:
+        "201":
+          description: Employee registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  email:
+                    type: string
+        "400":
+          description: Invalid data or user already exists
+        "500":
+          description: Internal server error
+  /employee/login:
+    post:
+      summary: Login employee
+      tags:
+        - Employee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  email:
+                    type: string
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: sid=sessionId; Path=/; HttpOnly; Max-Age=604800
+        "400":
+          description: Invalid credentials
+        "500":
           description: Internal server error
 components:
   schemas:
@@ -630,11 +698,11 @@ components:
         orderId:
           type: integer
         customer:
-          $ref: '#/components/schemas/Customer'
+          $ref: "#/components/schemas/Customer"
         orderItems:
           type: array
           items:
-            $ref: '#/components/schemas/OrderItem'
+            $ref: "#/components/schemas/OrderItem"
         orderDate:
           type: string
           format: date-time
@@ -669,11 +737,11 @@ components:
         customerId:
           type: integer
         customer:
-          $ref: '#/components/schemas/Customer'
+          $ref: "#/components/schemas/Customer"
         orderItems:
           type: array
           items:
-            $ref: '#/components/schemas/OrderItem'
+            $ref: "#/components/schemas/OrderItem"
         orderDate:
           type: string
           format: date-time
@@ -699,6 +767,24 @@ components:
         email:
           type: string
           format: email
+        password:
+          type: string
+          format: password
+    EmployeeData:
+      type: object
+      required:
+        - name
+        - email
+        - phoneNumber
+        - password
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phoneNumber:
+          type: string
         password:
           type: string
           format: password

@@ -14,4 +14,6 @@ export type EmployeeData = {
   password: string;
 };
 
+export type EmployeeLoginData = Omit<EmployeeData, "name" | "userId">;
+
 export type DbClient = PrismaClient | Prisma.TransactionClient;

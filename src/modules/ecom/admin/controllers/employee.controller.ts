@@ -21,7 +21,8 @@ export async function employeeAdminHandler(req: Request, res: Response) {
 
   // Employee paths
   const EMPLOYEE_ACTIVATION_PATH = "/admin/employee/add";
-  const EMPLOYEE_PAYMENT_TYPE_PATH = /^\/admin\/employees\/(\d+)\/payment-type$/;
+  const EMPLOYEE_PAYMENT_TYPE_PATH =
+    /^\/admin\/employees\/(\d+)\/payment-type$/;
   const EMPLOYEE_PAYMENT_PATH = /^\/admin\/employees\/(\d+)\/payments$/;
 
   // Payroll paths
@@ -67,12 +68,20 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         return;
       }
 
-      if (paymentTypeId === 1) {
-        await assignEmployeePaymentType(employeeId, paymentTypeId, salaryAmount);
-      } else if (paymentTypeId === 2) {
+      if (paymentTypeId === 1 && salaryAmount) {
+        await assignEmployeePaymentType(
+          employeeId,
+          paymentTypeId,
+          salaryAmount,
+        );
+      } else if (paymentTypeId === 2 && perOrderRate) {
         await assignEmployeeRate(employeeId, perOrderRate);
       } else {
-        res.status(400).send("Invalid payment type");
+        res
+          .status(400)
+          .send(
+            `${paymentTypeId === 1 && !salaryAmount ? "Invalid Salary amount" : "Invalid Per order amount"}`,
+          );
         return;
       }
 

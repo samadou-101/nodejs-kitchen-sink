@@ -11,7 +11,7 @@ import type {
 
 const getClient = (tx?: DbClient) => tx || prisma;
 export const employeeRepo = {
-  findPendingAdminByEmail: (tx: DbClient) => (email: string) =>
+  findPendingEmployeeByEmail: (tx: DbClient) => (email: string) =>
     getClient(tx).pendingEmployee.findUnique({
       where: {
         email,
@@ -47,13 +47,26 @@ export const employeeRepo = {
         isPending: false,
       },
     }),
+  findEmployeeByEmail: (tx: DbClient) => (email: string) =>
+    getClient(tx).user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password: true,
+      },
+    }),
 };
 
 export const bind = (tx: DbClient) => {
   return {
-    findPendingAdminByEmail: employeeRepo.findPendingAdminByEmail(tx),
+    findPendingAdminByEmail: employeeRepo.findPendingEmployeeByEmail(tx),
     createUser: employeeRepo.createUser(tx),
     insertEmployee: employeeRepo.insertEmployee(tx),
     updatePendingIfActive: employeeRepo.updatePendingIfActive,
+    findEmployeeByEmail: employeeRepo.findEmployeeByEmail(tx),
   };
 };
