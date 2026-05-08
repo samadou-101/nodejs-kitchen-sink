@@ -12,6 +12,7 @@ import {
   markPayrollRunAsPaid,
   runPayrollPreview,
 } from "../services/employee.service";
+import type { PayrollRunStatus } from "../admin.types";
 
 export async function employeeAdminHandler(req: Request, res: Response) {
   const path = req.path;
@@ -175,7 +176,12 @@ export async function employeeAdminHandler(req: Request, res: Response) {
   if (path === PAYROLL_LIST_PATH && method === GET_METHOD) {
     try {
       const { status } = req.query ?? {};
-      const runs = await getPayrollRunsService(status as string | undefined);
+      const uppercasedStatus = status
+        ? (status as string).toUpperCase()
+        : undefined;
+      const runs = await getPayrollRunsService(
+        uppercasedStatus as PayrollRunStatus | undefined,
+      );
       res.status(200).json(runs);
       return;
     } catch (error) {

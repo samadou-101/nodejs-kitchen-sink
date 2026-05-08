@@ -24,6 +24,7 @@ import type {
   PayrollRunInput,
   PayrollRunItemPreview,
   PayrollRunPreview,
+  PayrollRunStatus,
 } from "../admin.types";
 
 // Employee  Auth
@@ -301,7 +302,7 @@ export async function markPayrollRunAsPaid(payrollRunId: number) {
   return { success: true };
 }
 
-export async function getPayrollRunsService(status?: string) {
+export async function getPayrollRunsService(status?: PayrollRunStatus) {
   return await getPayrollRuns(status);
 }
 
