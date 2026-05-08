@@ -151,6 +151,8 @@ async function calculateEmployeePayroll(
   let amount = 0;
   let warning: string | null = null;
   let contractId: number | null = null;
+  let contractType: "salary" | "perOrder" | null = null;
+  let hasOrders = false;
 
   if (!activeContract) {
     return {
@@ -158,10 +160,13 @@ async function calculateEmployeePayroll(
       contractId: null,
       amount: 0,
       warning: "No active contract",
+      contractType: null,
+      hasOrders: false,
     };
   }
 
   contractId = activeContract.contractId;
+  contractType = activeContract.salaryAmount !== null ? "salary" : "perOrder";
 
   if (contracts.length === 0) {
     return {
@@ -169,6 +174,8 @@ async function calculateEmployeePayroll(
       contractId,
       amount: 0,
       warning: "No contracts in period",
+      contractType,
+      hasOrders: false,
     };
   }
 
@@ -181,17 +188,20 @@ async function calculateEmployeePayroll(
       amount += contract.salaryAmount;
     } else if (contract.perOrderRate !== null) {
       const orderCount = await countOrdersInPeriod(input);
+      hasOrders = orderCount > 0;
       amount += orderCount * contract.perOrderRate;
     } else {
       warning = "Missing salary or rate";
     }
   }
 
-  if (amount === 0) {
-    warning = "Zero earnings";
+  if (amount === 0 && contractType === "perOrder" && !hasOrders) {
+    warning = "Per-order employee with no confirmed orders";
+  } else if (amount === 0 && contractType === "salary") {
+    warning = "Salary employee calculated to zero";
   }
 
-  return { employeeId, contractId, amount, warning };
+  return { employeeId, contractId, amount, warning, contractType, hasOrders };
 }
 
 export async function runPayrollPreview(
