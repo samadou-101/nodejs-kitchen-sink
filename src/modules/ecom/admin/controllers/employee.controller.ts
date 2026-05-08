@@ -105,14 +105,14 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         return;
       }
       const employeeId = parseInt(employeeIdStr, 10);
-      const { amount, paymentPeriod, notes, contractId } = req.body ?? {};
+      const { amount, paymentPeriodLabel, notes, contractId } = req.body ?? {};
 
       if (!employeeId || !amount) {
         res.status(400).send("Missing required fields");
         return;
       }
 
-      await createPayment(employeeId, amount, paymentPeriod, notes, contractId);
+      await createPayment(employeeId, amount, paymentPeriodLabel, notes, contractId);
       res.status(201).json({ success: true, employeeId, amount });
       return;
     } catch (error) {

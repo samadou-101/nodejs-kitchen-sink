@@ -123,14 +123,14 @@ export async function calculatePayroll(
 export async function createPayment(
   employeeId: number,
   amount: number,
-  paymentPeriod?: string,
+  paymentPeriodLabel?: string,
   notes?: string,
   contractId?: number,
 ) {
   const data: CreatePaymentData = {
     employeeId,
     amount,
-    paymentPeriod: paymentPeriod ?? null,
+    paymentPeriodLabel: paymentPeriodLabel ?? null,
     notes: notes ?? null,
     contractId: contractId ?? null,
   };
@@ -278,11 +278,14 @@ export async function confirmPayrollRun(payrollRunId: number) {
 
   const includedItems = run.items.filter((item) => item.status === "INCLUDED");
 
+  const label = `Payroll run #${payrollRunId}`;
   for (const item of includedItems) {
     const data: CreatePaymentData = {
       employeeId: item.employeeId,
       amount: item.amount,
-      paymentPeriod: `${run.startDate.toISOString()} - ${run.endDate.toISOString()}`,
+      paymentPeriodLabel: label,
+      paymentPeriodStart: run.startDate,
+      paymentPeriodEnd: run.endDate,
       notes: `Payroll run #${payrollRunId}`,
       contractId: item.contractId ?? null,
     };

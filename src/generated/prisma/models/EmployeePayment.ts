@@ -44,7 +44,9 @@ export type EmployeePaymentMinAggregateOutputType = {
   employeePaymentId: number | null
   employeeId: number | null
   amount: number | null
-  paymentPeriod: string | null
+  paymentPeriodLabel: string | null
+  paymentPeriodStart: Date | null
+  paymentPeriodEnd: Date | null
   paymentDate: Date | null
   notes: string | null
   contractId: number | null
@@ -54,7 +56,9 @@ export type EmployeePaymentMaxAggregateOutputType = {
   employeePaymentId: number | null
   employeeId: number | null
   amount: number | null
-  paymentPeriod: string | null
+  paymentPeriodLabel: string | null
+  paymentPeriodStart: Date | null
+  paymentPeriodEnd: Date | null
   paymentDate: Date | null
   notes: string | null
   contractId: number | null
@@ -64,7 +68,9 @@ export type EmployeePaymentCountAggregateOutputType = {
   employeePaymentId: number
   employeeId: number
   amount: number
-  paymentPeriod: number
+  paymentPeriodLabel: number
+  paymentPeriodStart: number
+  paymentPeriodEnd: number
   paymentDate: number
   notes: number
   contractId: number
@@ -90,7 +96,9 @@ export type EmployeePaymentMinAggregateInputType = {
   employeePaymentId?: true
   employeeId?: true
   amount?: true
-  paymentPeriod?: true
+  paymentPeriodLabel?: true
+  paymentPeriodStart?: true
+  paymentPeriodEnd?: true
   paymentDate?: true
   notes?: true
   contractId?: true
@@ -100,7 +108,9 @@ export type EmployeePaymentMaxAggregateInputType = {
   employeePaymentId?: true
   employeeId?: true
   amount?: true
-  paymentPeriod?: true
+  paymentPeriodLabel?: true
+  paymentPeriodStart?: true
+  paymentPeriodEnd?: true
   paymentDate?: true
   notes?: true
   contractId?: true
@@ -110,7 +120,9 @@ export type EmployeePaymentCountAggregateInputType = {
   employeePaymentId?: true
   employeeId?: true
   amount?: true
-  paymentPeriod?: true
+  paymentPeriodLabel?: true
+  paymentPeriodStart?: true
+  paymentPeriodEnd?: true
   paymentDate?: true
   notes?: true
   contractId?: true
@@ -207,7 +219,9 @@ export type EmployeePaymentGroupByOutputType = {
   employeePaymentId: number
   employeeId: number
   amount: number
-  paymentPeriod: string | null
+  paymentPeriodLabel: string | null
+  paymentPeriodStart: Date | null
+  paymentPeriodEnd: Date | null
   paymentDate: Date
   notes: string | null
   contractId: number | null
@@ -240,7 +254,9 @@ export type EmployeePaymentWhereInput = {
   employeePaymentId?: Prisma.IntFilter<"EmployeePayment"> | number
   employeeId?: Prisma.IntFilter<"EmployeePayment"> | number
   amount?: Prisma.IntFilter<"EmployeePayment"> | number
-  paymentPeriod?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
+  paymentPeriodLabel?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
+  paymentPeriodStart?: Prisma.DateTimeNullableFilter<"EmployeePayment"> | Date | string | null
+  paymentPeriodEnd?: Prisma.DateTimeNullableFilter<"EmployeePayment"> | Date | string | null
   paymentDate?: Prisma.DateTimeFilter<"EmployeePayment"> | Date | string
   notes?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
   contractId?: Prisma.IntNullableFilter<"EmployeePayment"> | number | null
@@ -252,7 +268,9 @@ export type EmployeePaymentOrderByWithRelationInput = {
   employeePaymentId?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  paymentPeriod?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPeriodLabel?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPeriodStart?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPeriodEnd?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentDate?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   contractId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -267,7 +285,9 @@ export type EmployeePaymentWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.EmployeePaymentWhereInput | Prisma.EmployeePaymentWhereInput[]
   employeeId?: Prisma.IntFilter<"EmployeePayment"> | number
   amount?: Prisma.IntFilter<"EmployeePayment"> | number
-  paymentPeriod?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
+  paymentPeriodLabel?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
+  paymentPeriodStart?: Prisma.DateTimeNullableFilter<"EmployeePayment"> | Date | string | null
+  paymentPeriodEnd?: Prisma.DateTimeNullableFilter<"EmployeePayment"> | Date | string | null
   paymentDate?: Prisma.DateTimeFilter<"EmployeePayment"> | Date | string
   notes?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
   contractId?: Prisma.IntNullableFilter<"EmployeePayment"> | number | null
@@ -279,7 +299,9 @@ export type EmployeePaymentOrderByWithAggregationInput = {
   employeePaymentId?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  paymentPeriod?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPeriodLabel?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPeriodStart?: Prisma.SortOrderInput | Prisma.SortOrder
+  paymentPeriodEnd?: Prisma.SortOrderInput | Prisma.SortOrder
   paymentDate?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   contractId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -297,7 +319,9 @@ export type EmployeePaymentScalarWhereWithAggregatesInput = {
   employeePaymentId?: Prisma.IntWithAggregatesFilter<"EmployeePayment"> | number
   employeeId?: Prisma.IntWithAggregatesFilter<"EmployeePayment"> | number
   amount?: Prisma.IntWithAggregatesFilter<"EmployeePayment"> | number
-  paymentPeriod?: Prisma.StringNullableWithAggregatesFilter<"EmployeePayment"> | string | null
+  paymentPeriodLabel?: Prisma.StringNullableWithAggregatesFilter<"EmployeePayment"> | string | null
+  paymentPeriodStart?: Prisma.DateTimeNullableWithAggregatesFilter<"EmployeePayment"> | Date | string | null
+  paymentPeriodEnd?: Prisma.DateTimeNullableWithAggregatesFilter<"EmployeePayment"> | Date | string | null
   paymentDate?: Prisma.DateTimeWithAggregatesFilter<"EmployeePayment"> | Date | string
   notes?: Prisma.StringNullableWithAggregatesFilter<"EmployeePayment"> | string | null
   contractId?: Prisma.IntNullableWithAggregatesFilter<"EmployeePayment"> | number | null
@@ -305,7 +329,9 @@ export type EmployeePaymentScalarWhereWithAggregatesInput = {
 
 export type EmployeePaymentCreateInput = {
   amount: number
-  paymentPeriod?: string | null
+  paymentPeriodLabel?: string | null
+  paymentPeriodStart?: Date | string | null
+  paymentPeriodEnd?: Date | string | null
   paymentDate?: Date | string
   notes?: string | null
   employee: Prisma.EmployeeCreateNestedOneWithoutPaymentsInput
@@ -316,7 +342,9 @@ export type EmployeePaymentUncheckedCreateInput = {
   employeePaymentId?: number
   employeeId: number
   amount: number
-  paymentPeriod?: string | null
+  paymentPeriodLabel?: string | null
+  paymentPeriodStart?: Date | string | null
+  paymentPeriodEnd?: Date | string | null
   paymentDate?: Date | string
   notes?: string | null
   contractId?: number | null
@@ -324,7 +352,9 @@ export type EmployeePaymentUncheckedCreateInput = {
 
 export type EmployeePaymentUpdateInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   employee?: Prisma.EmployeeUpdateOneRequiredWithoutPaymentsNestedInput
@@ -335,7 +365,9 @@ export type EmployeePaymentUncheckedUpdateInput = {
   employeePaymentId?: Prisma.IntFieldUpdateOperationsInput | number
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -345,7 +377,9 @@ export type EmployeePaymentCreateManyInput = {
   employeePaymentId?: number
   employeeId: number
   amount: number
-  paymentPeriod?: string | null
+  paymentPeriodLabel?: string | null
+  paymentPeriodStart?: Date | string | null
+  paymentPeriodEnd?: Date | string | null
   paymentDate?: Date | string
   notes?: string | null
   contractId?: number | null
@@ -353,7 +387,9 @@ export type EmployeePaymentCreateManyInput = {
 
 export type EmployeePaymentUpdateManyMutationInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -362,7 +398,9 @@ export type EmployeePaymentUncheckedUpdateManyInput = {
   employeePaymentId?: Prisma.IntFieldUpdateOperationsInput | number
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -382,7 +420,9 @@ export type EmployeePaymentCountOrderByAggregateInput = {
   employeePaymentId?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  paymentPeriod?: Prisma.SortOrder
+  paymentPeriodLabel?: Prisma.SortOrder
+  paymentPeriodStart?: Prisma.SortOrder
+  paymentPeriodEnd?: Prisma.SortOrder
   paymentDate?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   contractId?: Prisma.SortOrder
@@ -399,7 +439,9 @@ export type EmployeePaymentMaxOrderByAggregateInput = {
   employeePaymentId?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  paymentPeriod?: Prisma.SortOrder
+  paymentPeriodLabel?: Prisma.SortOrder
+  paymentPeriodStart?: Prisma.SortOrder
+  paymentPeriodEnd?: Prisma.SortOrder
   paymentDate?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   contractId?: Prisma.SortOrder
@@ -409,7 +451,9 @@ export type EmployeePaymentMinOrderByAggregateInput = {
   employeePaymentId?: Prisma.SortOrder
   employeeId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  paymentPeriod?: Prisma.SortOrder
+  paymentPeriodLabel?: Prisma.SortOrder
+  paymentPeriodStart?: Prisma.SortOrder
+  paymentPeriodEnd?: Prisma.SortOrder
   paymentDate?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   contractId?: Prisma.SortOrder
@@ -508,7 +552,9 @@ export type EmployeePaymentUncheckedUpdateManyWithoutContractNestedInput = {
 
 export type EmployeePaymentCreateWithoutEmployeeInput = {
   amount: number
-  paymentPeriod?: string | null
+  paymentPeriodLabel?: string | null
+  paymentPeriodStart?: Date | string | null
+  paymentPeriodEnd?: Date | string | null
   paymentDate?: Date | string
   notes?: string | null
   contract?: Prisma.EmployeePaymentContractCreateNestedOneWithoutEmployeePaymentsInput
@@ -517,7 +563,9 @@ export type EmployeePaymentCreateWithoutEmployeeInput = {
 export type EmployeePaymentUncheckedCreateWithoutEmployeeInput = {
   employeePaymentId?: number
   amount: number
-  paymentPeriod?: string | null
+  paymentPeriodLabel?: string | null
+  paymentPeriodStart?: Date | string | null
+  paymentPeriodEnd?: Date | string | null
   paymentDate?: Date | string
   notes?: string | null
   contractId?: number | null
@@ -556,7 +604,9 @@ export type EmployeePaymentScalarWhereInput = {
   employeePaymentId?: Prisma.IntFilter<"EmployeePayment"> | number
   employeeId?: Prisma.IntFilter<"EmployeePayment"> | number
   amount?: Prisma.IntFilter<"EmployeePayment"> | number
-  paymentPeriod?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
+  paymentPeriodLabel?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
+  paymentPeriodStart?: Prisma.DateTimeNullableFilter<"EmployeePayment"> | Date | string | null
+  paymentPeriodEnd?: Prisma.DateTimeNullableFilter<"EmployeePayment"> | Date | string | null
   paymentDate?: Prisma.DateTimeFilter<"EmployeePayment"> | Date | string
   notes?: Prisma.StringNullableFilter<"EmployeePayment"> | string | null
   contractId?: Prisma.IntNullableFilter<"EmployeePayment"> | number | null
@@ -564,7 +614,9 @@ export type EmployeePaymentScalarWhereInput = {
 
 export type EmployeePaymentCreateWithoutContractInput = {
   amount: number
-  paymentPeriod?: string | null
+  paymentPeriodLabel?: string | null
+  paymentPeriodStart?: Date | string | null
+  paymentPeriodEnd?: Date | string | null
   paymentDate?: Date | string
   notes?: string | null
   employee: Prisma.EmployeeCreateNestedOneWithoutPaymentsInput
@@ -574,7 +626,9 @@ export type EmployeePaymentUncheckedCreateWithoutContractInput = {
   employeePaymentId?: number
   employeeId: number
   amount: number
-  paymentPeriod?: string | null
+  paymentPeriodLabel?: string | null
+  paymentPeriodStart?: Date | string | null
+  paymentPeriodEnd?: Date | string | null
   paymentDate?: Date | string
   notes?: string | null
 }
@@ -608,7 +662,9 @@ export type EmployeePaymentUpdateManyWithWhereWithoutContractInput = {
 export type EmployeePaymentCreateManyEmployeeInput = {
   employeePaymentId?: number
   amount: number
-  paymentPeriod?: string | null
+  paymentPeriodLabel?: string | null
+  paymentPeriodStart?: Date | string | null
+  paymentPeriodEnd?: Date | string | null
   paymentDate?: Date | string
   notes?: string | null
   contractId?: number | null
@@ -616,7 +672,9 @@ export type EmployeePaymentCreateManyEmployeeInput = {
 
 export type EmployeePaymentUpdateWithoutEmployeeInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contract?: Prisma.EmployeePaymentContractUpdateOneWithoutEmployeePaymentsNestedInput
@@ -625,7 +683,9 @@ export type EmployeePaymentUpdateWithoutEmployeeInput = {
 export type EmployeePaymentUncheckedUpdateWithoutEmployeeInput = {
   employeePaymentId?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -634,7 +694,9 @@ export type EmployeePaymentUncheckedUpdateWithoutEmployeeInput = {
 export type EmployeePaymentUncheckedUpdateManyWithoutEmployeeInput = {
   employeePaymentId?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -644,14 +706,18 @@ export type EmployeePaymentCreateManyContractInput = {
   employeePaymentId?: number
   employeeId: number
   amount: number
-  paymentPeriod?: string | null
+  paymentPeriodLabel?: string | null
+  paymentPeriodStart?: Date | string | null
+  paymentPeriodEnd?: Date | string | null
   paymentDate?: Date | string
   notes?: string | null
 }
 
 export type EmployeePaymentUpdateWithoutContractInput = {
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   employee?: Prisma.EmployeeUpdateOneRequiredWithoutPaymentsNestedInput
@@ -661,7 +727,9 @@ export type EmployeePaymentUncheckedUpdateWithoutContractInput = {
   employeePaymentId?: Prisma.IntFieldUpdateOperationsInput | number
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -670,7 +738,9 @@ export type EmployeePaymentUncheckedUpdateManyWithoutContractInput = {
   employeePaymentId?: Prisma.IntFieldUpdateOperationsInput | number
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  paymentPeriod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paymentPeriodStart?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentPeriodEnd?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   paymentDate?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
@@ -681,7 +751,9 @@ export type EmployeePaymentSelect<ExtArgs extends runtime.Types.Extensions.Inter
   employeePaymentId?: boolean
   employeeId?: boolean
   amount?: boolean
-  paymentPeriod?: boolean
+  paymentPeriodLabel?: boolean
+  paymentPeriodStart?: boolean
+  paymentPeriodEnd?: boolean
   paymentDate?: boolean
   notes?: boolean
   contractId?: boolean
@@ -693,7 +765,9 @@ export type EmployeePaymentSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   employeePaymentId?: boolean
   employeeId?: boolean
   amount?: boolean
-  paymentPeriod?: boolean
+  paymentPeriodLabel?: boolean
+  paymentPeriodStart?: boolean
+  paymentPeriodEnd?: boolean
   paymentDate?: boolean
   notes?: boolean
   contractId?: boolean
@@ -705,7 +779,9 @@ export type EmployeePaymentSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   employeePaymentId?: boolean
   employeeId?: boolean
   amount?: boolean
-  paymentPeriod?: boolean
+  paymentPeriodLabel?: boolean
+  paymentPeriodStart?: boolean
+  paymentPeriodEnd?: boolean
   paymentDate?: boolean
   notes?: boolean
   contractId?: boolean
@@ -717,13 +793,15 @@ export type EmployeePaymentSelectScalar = {
   employeePaymentId?: boolean
   employeeId?: boolean
   amount?: boolean
-  paymentPeriod?: boolean
+  paymentPeriodLabel?: boolean
+  paymentPeriodStart?: boolean
+  paymentPeriodEnd?: boolean
   paymentDate?: boolean
   notes?: boolean
   contractId?: boolean
 }
 
-export type EmployeePaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"employeePaymentId" | "employeeId" | "amount" | "paymentPeriod" | "paymentDate" | "notes" | "contractId", ExtArgs["result"]["employeePayment"]>
+export type EmployeePaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"employeePaymentId" | "employeeId" | "amount" | "paymentPeriodLabel" | "paymentPeriodStart" | "paymentPeriodEnd" | "paymentDate" | "notes" | "contractId", ExtArgs["result"]["employeePayment"]>
 export type EmployeePaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   employee?: boolean | Prisma.EmployeeDefaultArgs<ExtArgs>
   contract?: boolean | Prisma.EmployeePayment$contractArgs<ExtArgs>
@@ -747,7 +825,9 @@ export type $EmployeePaymentPayload<ExtArgs extends runtime.Types.Extensions.Int
     employeePaymentId: number
     employeeId: number
     amount: number
-    paymentPeriod: string | null
+    paymentPeriodLabel: string | null
+    paymentPeriodStart: Date | null
+    paymentPeriodEnd: Date | null
     paymentDate: Date
     notes: string | null
     contractId: number | null
@@ -1179,7 +1259,9 @@ export interface EmployeePaymentFieldRefs {
   readonly employeePaymentId: Prisma.FieldRef<"EmployeePayment", 'Int'>
   readonly employeeId: Prisma.FieldRef<"EmployeePayment", 'Int'>
   readonly amount: Prisma.FieldRef<"EmployeePayment", 'Int'>
-  readonly paymentPeriod: Prisma.FieldRef<"EmployeePayment", 'String'>
+  readonly paymentPeriodLabel: Prisma.FieldRef<"EmployeePayment", 'String'>
+  readonly paymentPeriodStart: Prisma.FieldRef<"EmployeePayment", 'DateTime'>
+  readonly paymentPeriodEnd: Prisma.FieldRef<"EmployeePayment", 'DateTime'>
   readonly paymentDate: Prisma.FieldRef<"EmployeePayment", 'DateTime'>
   readonly notes: Prisma.FieldRef<"EmployeePayment", 'String'>
   readonly contractId: Prisma.FieldRef<"EmployeePayment", 'Int'>

@@ -287,7 +287,9 @@ export const EmployeePaymentScalarFieldEnum = {
   employeePaymentId: 'employeePaymentId',
   employeeId: 'employeeId',
   amount: 'amount',
-  paymentPeriod: 'paymentPeriod',
+  paymentPeriodLabel: 'paymentPeriodLabel',
+  paymentPeriodStart: 'paymentPeriodStart',
+  paymentPeriodEnd: 'paymentPeriodEnd',
   paymentDate: 'paymentDate',
   notes: 'notes',
   contractId: 'contractId'

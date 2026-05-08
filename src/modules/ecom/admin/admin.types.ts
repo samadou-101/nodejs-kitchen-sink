@@ -24,7 +24,9 @@ export interface PayrollInput {
 export interface CreatePaymentData {
   employeeId: number;
   amount: number;
-  paymentPeriod?: string | null;
+  paymentPeriodLabel?: string | null;
+  paymentPeriodStart?: Date | null;
+  paymentPeriodEnd?: Date | null;
   notes?: string | null;
   contractId?: number | null;
 }

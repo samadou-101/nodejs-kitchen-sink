@@ -159,7 +159,9 @@ export async function createEmployeePayment(data: CreatePaymentData) {
     data: {
       employeeId: data.employeeId,
       amount: data.amount,
-      paymentPeriod: data.paymentPeriod ?? null,
+      paymentPeriodLabel: data.paymentPeriodLabel ?? null,
+      paymentPeriodStart: data.paymentPeriodStart ?? null,
+      paymentPeriodEnd: data.paymentPeriodEnd ?? null,
       notes: data.notes ?? null,
       contractId: data.contractId ?? null,
     },
