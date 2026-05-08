@@ -270,13 +270,16 @@ model PayrollRun {
 }
 
 model PayrollRunItem {
-  payrollRunItemId Int     @id @default(autoincrement())
-  payrollRunId    Int
-  employeeId      Int
-  contractId      Int?
-  amount          Int
-  status          String   @default("PENDING")
-  warning         String?
+  payrollRunItemId Int        @id @default(autoincrement())
+  payrollRunId     Int
+  employeeId       Int
+  contractId       Int?
+  amount           Int
+  calculationStatus String   @default("PENDING")  // PENDING | INCLUDED | EXCLUDED
+  paymentStatus    String   @default("UNPAID")   // UNPAID | CONFIRMED | PAID
+  warning          String?
+  paidAt           DateTime?
+  confirmedAt      DateTime?
 
   payrollRun     PayrollRun @relation(fields: [payrollRunId], references: [payrollRunId])
 }

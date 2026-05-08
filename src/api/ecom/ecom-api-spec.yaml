@@ -430,8 +430,9 @@ paths:
               properties:
                 amount:
                   type: number
-                paymentPeriod:
+                paymentPeriodLabel:
                   type: string
+                  description: Human-readable label for the payment period
                 notes:
                   type: string
                 contractId:
@@ -545,6 +546,81 @@ paths:
       responses:
         "200":
           description: Payroll run marked as paid
+        "500":
+          description: Internal server error
+  /admin/payroll/{runId}/items/{itemId}:
+    get:
+      summary: Get payroll run item by ID
+      tags:
+        - Admin
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Payroll run ID
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Payroll run item ID
+      responses:
+        "200":
+          description: Payroll run item found
+        "404":
+          description: Payroll run item not found
+        "500":
+          description: Internal server error
+  /admin/payroll/{runId}/items/{itemId}/confirm:
+    post:
+      summary: Confirm single payroll run item
+      tags:
+        - Admin
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Payroll run ID
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Payroll run item ID
+      responses:
+        "200":
+          description: Payroll run item confirmed
+        "400":
+          description: Only INCLUDED and UNPAID items can be confirmed
+        "500":
+          description: Internal server error
+  /admin/payroll/{runId}/items/{itemId}/paid:
+    post:
+      summary: Mark single payroll run item as paid
+      tags:
+        - Admin
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Payroll run ID
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Payroll run item ID
+      responses:
+        "200":
+          description: Payroll run item marked as paid
+        "400":
+          description: Only CONFIRMED items can be marked as paid
         "500":
           description: Internal server error
   /employee/signup:
@@ -810,12 +886,18 @@ components:
         - DRAFT
         - CONFIRMED
         - PAID
-    PayrollRunItemStatus:
+    PayrollRunItemCalculationStatus:
       type: string
       enum:
         - PENDING
         - INCLUDED
         - EXCLUDED
+    PayrollRunItemPaymentStatus:
+      type: string
+      enum:
+        - UNPAID
+        - CONFIRMED
+        - PAID
     PaymentType:
       type: string
       enum:

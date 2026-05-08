@@ -4,10 +4,13 @@ import {
   assignEmployeeRate,
   assignEmployeeRole,
   addEmployeeToPendingList,
+  confirmPayrollItem,
   createPayment,
+  payPayrollItem,
   updateEmployeeSalary,
   getPayrollRunsService,
   getPayrollRunByIdService,
+  getPayrollRunItemByIdService,
   confirmPayrollRun,
   markPayrollRunAsPaid,
   runPayrollPreview,
@@ -33,6 +36,11 @@ export async function employeeAdminHandler(req: Request, res: Response) {
   const PAYROLL_GET_PATH = /^\/admin\/payroll\/(\d+)$/;
   const PAYROLL_CONFIRM_PATH = /^\/admin\/payroll\/(\d+)\/confirm$/;
   const PAYROLL_PAID_PATH = /^\/admin\/payroll\/(\d+)\/paid$/;
+
+  // Payroll Item paths
+  const PAYROLL_ITEM_GET_PATH = /^\/admin\/payroll\/(\d+)\/items\/(\d+)$/;
+  const PAYROLL_ITEM_CONFIRM_PATH = /^\/admin\/payroll\/(\d+)\/items\/(\d+)\/confirm$/;
+  const PAYROLL_ITEM_PAID_PATH = /^\/admin\/payroll\/(\d+)\/items\/(\d+)\/paid$/;
 
   // Employee Activation
   if (path === EMPLOYEE_ACTIVATION_PATH && method === POST_METHOD) {
@@ -248,6 +256,70 @@ export async function employeeAdminHandler(req: Request, res: Response) {
       }
       const payrollRunId = parseInt(payrollRunIdStr, 10);
       const result = await markPayrollRunAsPaid(payrollRunId);
+      res.status(200).json(result);
+      return;
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Something went wrong");
+    }
+    return;
+  }
+
+  // Payroll Item Get
+  const payrollItemGetMatch = path.match(PAYROLL_ITEM_GET_PATH);
+  if (payrollItemGetMatch && method === GET_METHOD) {
+    try {
+      const payrollRunItemIdStr = payrollItemGetMatch[2];
+      if (!payrollRunItemIdStr) {
+        res.status(400).send("Invalid payroll run item ID");
+        return;
+      }
+      const payrollRunItemId = parseInt(payrollRunItemIdStr, 10);
+      const item = await getPayrollRunItemByIdService(payrollRunItemId);
+      if (!item) {
+        res.status(404).send("Payroll run item not found");
+        return;
+      }
+      res.status(200).json(item);
+      return;
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Something went wrong");
+    }
+    return;
+  }
+
+  // Payroll Item Confirm
+  const payrollItemConfirmMatch = path.match(PAYROLL_ITEM_CONFIRM_PATH);
+  if (payrollItemConfirmMatch && method === POST_METHOD) {
+    try {
+      const payrollRunItemIdStr = payrollItemConfirmMatch[2];
+      if (!payrollRunItemIdStr) {
+        res.status(400).send("Invalid payroll run item ID");
+        return;
+      }
+      const payrollRunItemId = parseInt(payrollRunItemIdStr, 10);
+      const result = await confirmPayrollItem(payrollRunItemId);
+      res.status(200).json(result);
+      return;
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Something went wrong");
+    }
+    return;
+  }
+
+  // Payroll Item Mark as Paid
+  const payrollItemPaidMatch = path.match(PAYROLL_ITEM_PAID_PATH);
+  if (payrollItemPaidMatch && method === POST_METHOD) {
+    try {
+      const payrollRunItemIdStr = payrollItemPaidMatch[2];
+      if (!payrollRunItemIdStr) {
+        res.status(400).send("Invalid payroll run item ID");
+        return;
+      }
+      const payrollRunItemId = parseInt(payrollRunItemIdStr, 10);
+      const result = await payPayrollItem(payrollRunItemId);
       res.status(200).json(result);
       return;
     } catch (error) {

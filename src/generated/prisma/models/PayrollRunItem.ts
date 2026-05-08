@@ -48,8 +48,11 @@ export type PayrollRunItemMinAggregateOutputType = {
   employeeId: number | null
   contractId: number | null
   amount: number | null
-  status: string | null
+  calculationStatus: string | null
+  paymentStatus: string | null
   warning: string | null
+  paidAt: Date | null
+  confirmedAt: Date | null
 }
 
 export type PayrollRunItemMaxAggregateOutputType = {
@@ -58,8 +61,11 @@ export type PayrollRunItemMaxAggregateOutputType = {
   employeeId: number | null
   contractId: number | null
   amount: number | null
-  status: string | null
+  calculationStatus: string | null
+  paymentStatus: string | null
   warning: string | null
+  paidAt: Date | null
+  confirmedAt: Date | null
 }
 
 export type PayrollRunItemCountAggregateOutputType = {
@@ -68,8 +74,11 @@ export type PayrollRunItemCountAggregateOutputType = {
   employeeId: number
   contractId: number
   amount: number
-  status: number
+  calculationStatus: number
+  paymentStatus: number
   warning: number
+  paidAt: number
+  confirmedAt: number
   _all: number
 }
 
@@ -96,8 +105,11 @@ export type PayrollRunItemMinAggregateInputType = {
   employeeId?: true
   contractId?: true
   amount?: true
-  status?: true
+  calculationStatus?: true
+  paymentStatus?: true
   warning?: true
+  paidAt?: true
+  confirmedAt?: true
 }
 
 export type PayrollRunItemMaxAggregateInputType = {
@@ -106,8 +118,11 @@ export type PayrollRunItemMaxAggregateInputType = {
   employeeId?: true
   contractId?: true
   amount?: true
-  status?: true
+  calculationStatus?: true
+  paymentStatus?: true
   warning?: true
+  paidAt?: true
+  confirmedAt?: true
 }
 
 export type PayrollRunItemCountAggregateInputType = {
@@ -116,8 +131,11 @@ export type PayrollRunItemCountAggregateInputType = {
   employeeId?: true
   contractId?: true
   amount?: true
-  status?: true
+  calculationStatus?: true
+  paymentStatus?: true
   warning?: true
+  paidAt?: true
+  confirmedAt?: true
   _all?: true
 }
 
@@ -213,8 +231,11 @@ export type PayrollRunItemGroupByOutputType = {
   employeeId: number
   contractId: number | null
   amount: number
-  status: string
+  calculationStatus: string
+  paymentStatus: string
   warning: string | null
+  paidAt: Date | null
+  confirmedAt: Date | null
   _count: PayrollRunItemCountAggregateOutputType | null
   _avg: PayrollRunItemAvgAggregateOutputType | null
   _sum: PayrollRunItemSumAggregateOutputType | null
@@ -246,8 +267,11 @@ export type PayrollRunItemWhereInput = {
   employeeId?: Prisma.IntFilter<"PayrollRunItem"> | number
   contractId?: Prisma.IntNullableFilter<"PayrollRunItem"> | number | null
   amount?: Prisma.IntFilter<"PayrollRunItem"> | number
-  status?: Prisma.StringFilter<"PayrollRunItem"> | string
+  calculationStatus?: Prisma.StringFilter<"PayrollRunItem"> | string
+  paymentStatus?: Prisma.StringFilter<"PayrollRunItem"> | string
   warning?: Prisma.StringNullableFilter<"PayrollRunItem"> | string | null
+  paidAt?: Prisma.DateTimeNullableFilter<"PayrollRunItem"> | Date | string | null
+  confirmedAt?: Prisma.DateTimeNullableFilter<"PayrollRunItem"> | Date | string | null
   payrollRun?: Prisma.XOR<Prisma.PayrollRunScalarRelationFilter, Prisma.PayrollRunWhereInput>
 }
 
@@ -257,8 +281,11 @@ export type PayrollRunItemOrderByWithRelationInput = {
   employeeId?: Prisma.SortOrder
   contractId?: Prisma.SortOrderInput | Prisma.SortOrder
   amount?: Prisma.SortOrder
-  status?: Prisma.SortOrder
+  calculationStatus?: Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrder
   warning?: Prisma.SortOrderInput | Prisma.SortOrder
+  paidAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   payrollRun?: Prisma.PayrollRunOrderByWithRelationInput
 }
 
@@ -271,8 +298,11 @@ export type PayrollRunItemWhereUniqueInput = Prisma.AtLeast<{
   employeeId?: Prisma.IntFilter<"PayrollRunItem"> | number
   contractId?: Prisma.IntNullableFilter<"PayrollRunItem"> | number | null
   amount?: Prisma.IntFilter<"PayrollRunItem"> | number
-  status?: Prisma.StringFilter<"PayrollRunItem"> | string
+  calculationStatus?: Prisma.StringFilter<"PayrollRunItem"> | string
+  paymentStatus?: Prisma.StringFilter<"PayrollRunItem"> | string
   warning?: Prisma.StringNullableFilter<"PayrollRunItem"> | string | null
+  paidAt?: Prisma.DateTimeNullableFilter<"PayrollRunItem"> | Date | string | null
+  confirmedAt?: Prisma.DateTimeNullableFilter<"PayrollRunItem"> | Date | string | null
   payrollRun?: Prisma.XOR<Prisma.PayrollRunScalarRelationFilter, Prisma.PayrollRunWhereInput>
 }, "payrollRunItemId">
 
@@ -282,8 +312,11 @@ export type PayrollRunItemOrderByWithAggregationInput = {
   employeeId?: Prisma.SortOrder
   contractId?: Prisma.SortOrderInput | Prisma.SortOrder
   amount?: Prisma.SortOrder
-  status?: Prisma.SortOrder
+  calculationStatus?: Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrder
   warning?: Prisma.SortOrderInput | Prisma.SortOrder
+  paidAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PayrollRunItemCountOrderByAggregateInput
   _avg?: Prisma.PayrollRunItemAvgOrderByAggregateInput
   _max?: Prisma.PayrollRunItemMaxOrderByAggregateInput
@@ -300,16 +333,22 @@ export type PayrollRunItemScalarWhereWithAggregatesInput = {
   employeeId?: Prisma.IntWithAggregatesFilter<"PayrollRunItem"> | number
   contractId?: Prisma.IntNullableWithAggregatesFilter<"PayrollRunItem"> | number | null
   amount?: Prisma.IntWithAggregatesFilter<"PayrollRunItem"> | number
-  status?: Prisma.StringWithAggregatesFilter<"PayrollRunItem"> | string
+  calculationStatus?: Prisma.StringWithAggregatesFilter<"PayrollRunItem"> | string
+  paymentStatus?: Prisma.StringWithAggregatesFilter<"PayrollRunItem"> | string
   warning?: Prisma.StringNullableWithAggregatesFilter<"PayrollRunItem"> | string | null
+  paidAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PayrollRunItem"> | Date | string | null
+  confirmedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"PayrollRunItem"> | Date | string | null
 }
 
 export type PayrollRunItemCreateInput = {
   employeeId: number
   contractId?: number | null
   amount: number
-  status?: string
+  calculationStatus?: string
+  paymentStatus?: string
   warning?: string | null
+  paidAt?: Date | string | null
+  confirmedAt?: Date | string | null
   payrollRun: Prisma.PayrollRunCreateNestedOneWithoutItemsInput
 }
 
@@ -319,16 +358,22 @@ export type PayrollRunItemUncheckedCreateInput = {
   employeeId: number
   contractId?: number | null
   amount: number
-  status?: string
+  calculationStatus?: string
+  paymentStatus?: string
   warning?: string | null
+  paidAt?: Date | string | null
+  confirmedAt?: Date | string | null
 }
 
 export type PayrollRunItemUpdateInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   contractId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  calculationStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   warning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   payrollRun?: Prisma.PayrollRunUpdateOneRequiredWithoutItemsNestedInput
 }
 
@@ -338,8 +383,11 @@ export type PayrollRunItemUncheckedUpdateInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   contractId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  calculationStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   warning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PayrollRunItemCreateManyInput = {
@@ -348,16 +396,22 @@ export type PayrollRunItemCreateManyInput = {
   employeeId: number
   contractId?: number | null
   amount: number
-  status?: string
+  calculationStatus?: string
+  paymentStatus?: string
   warning?: string | null
+  paidAt?: Date | string | null
+  confirmedAt?: Date | string | null
 }
 
 export type PayrollRunItemUpdateManyMutationInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   contractId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  calculationStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   warning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PayrollRunItemUncheckedUpdateManyInput = {
@@ -366,8 +420,11 @@ export type PayrollRunItemUncheckedUpdateManyInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   contractId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  calculationStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   warning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PayrollRunItemListRelationFilter = {
@@ -386,8 +443,11 @@ export type PayrollRunItemCountOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   contractId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  status?: Prisma.SortOrder
+  calculationStatus?: Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrder
   warning?: Prisma.SortOrder
+  paidAt?: Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrder
 }
 
 export type PayrollRunItemAvgOrderByAggregateInput = {
@@ -404,8 +464,11 @@ export type PayrollRunItemMaxOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   contractId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  status?: Prisma.SortOrder
+  calculationStatus?: Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrder
   warning?: Prisma.SortOrder
+  paidAt?: Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrder
 }
 
 export type PayrollRunItemMinOrderByAggregateInput = {
@@ -414,8 +477,11 @@ export type PayrollRunItemMinOrderByAggregateInput = {
   employeeId?: Prisma.SortOrder
   contractId?: Prisma.SortOrder
   amount?: Prisma.SortOrder
-  status?: Prisma.SortOrder
+  calculationStatus?: Prisma.SortOrder
+  paymentStatus?: Prisma.SortOrder
   warning?: Prisma.SortOrder
+  paidAt?: Prisma.SortOrder
+  confirmedAt?: Prisma.SortOrder
 }
 
 export type PayrollRunItemSumOrderByAggregateInput = {
@@ -472,8 +538,11 @@ export type PayrollRunItemCreateWithoutPayrollRunInput = {
   employeeId: number
   contractId?: number | null
   amount: number
-  status?: string
+  calculationStatus?: string
+  paymentStatus?: string
   warning?: string | null
+  paidAt?: Date | string | null
+  confirmedAt?: Date | string | null
 }
 
 export type PayrollRunItemUncheckedCreateWithoutPayrollRunInput = {
@@ -481,8 +550,11 @@ export type PayrollRunItemUncheckedCreateWithoutPayrollRunInput = {
   employeeId: number
   contractId?: number | null
   amount: number
-  status?: string
+  calculationStatus?: string
+  paymentStatus?: string
   warning?: string | null
+  paidAt?: Date | string | null
+  confirmedAt?: Date | string | null
 }
 
 export type PayrollRunItemCreateOrConnectWithoutPayrollRunInput = {
@@ -520,8 +592,11 @@ export type PayrollRunItemScalarWhereInput = {
   employeeId?: Prisma.IntFilter<"PayrollRunItem"> | number
   contractId?: Prisma.IntNullableFilter<"PayrollRunItem"> | number | null
   amount?: Prisma.IntFilter<"PayrollRunItem"> | number
-  status?: Prisma.StringFilter<"PayrollRunItem"> | string
+  calculationStatus?: Prisma.StringFilter<"PayrollRunItem"> | string
+  paymentStatus?: Prisma.StringFilter<"PayrollRunItem"> | string
   warning?: Prisma.StringNullableFilter<"PayrollRunItem"> | string | null
+  paidAt?: Prisma.DateTimeNullableFilter<"PayrollRunItem"> | Date | string | null
+  confirmedAt?: Prisma.DateTimeNullableFilter<"PayrollRunItem"> | Date | string | null
 }
 
 export type PayrollRunItemCreateManyPayrollRunInput = {
@@ -529,16 +604,22 @@ export type PayrollRunItemCreateManyPayrollRunInput = {
   employeeId: number
   contractId?: number | null
   amount: number
-  status?: string
+  calculationStatus?: string
+  paymentStatus?: string
   warning?: string | null
+  paidAt?: Date | string | null
+  confirmedAt?: Date | string | null
 }
 
 export type PayrollRunItemUpdateWithoutPayrollRunInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   contractId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  calculationStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   warning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PayrollRunItemUncheckedUpdateWithoutPayrollRunInput = {
@@ -546,8 +627,11 @@ export type PayrollRunItemUncheckedUpdateWithoutPayrollRunInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   contractId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  calculationStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   warning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PayrollRunItemUncheckedUpdateManyWithoutPayrollRunInput = {
@@ -555,8 +639,11 @@ export type PayrollRunItemUncheckedUpdateManyWithoutPayrollRunInput = {
   employeeId?: Prisma.IntFieldUpdateOperationsInput | number
   contractId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   amount?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  calculationStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  paymentStatus?: Prisma.StringFieldUpdateOperationsInput | string
   warning?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  confirmedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -567,8 +654,11 @@ export type PayrollRunItemSelect<ExtArgs extends runtime.Types.Extensions.Intern
   employeeId?: boolean
   contractId?: boolean
   amount?: boolean
-  status?: boolean
+  calculationStatus?: boolean
+  paymentStatus?: boolean
   warning?: boolean
+  paidAt?: boolean
+  confirmedAt?: boolean
   payrollRun?: boolean | Prisma.PayrollRunDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["payrollRunItem"]>
 
@@ -578,8 +668,11 @@ export type PayrollRunItemSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   employeeId?: boolean
   contractId?: boolean
   amount?: boolean
-  status?: boolean
+  calculationStatus?: boolean
+  paymentStatus?: boolean
   warning?: boolean
+  paidAt?: boolean
+  confirmedAt?: boolean
   payrollRun?: boolean | Prisma.PayrollRunDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["payrollRunItem"]>
 
@@ -589,8 +682,11 @@ export type PayrollRunItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   employeeId?: boolean
   contractId?: boolean
   amount?: boolean
-  status?: boolean
+  calculationStatus?: boolean
+  paymentStatus?: boolean
   warning?: boolean
+  paidAt?: boolean
+  confirmedAt?: boolean
   payrollRun?: boolean | Prisma.PayrollRunDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["payrollRunItem"]>
 
@@ -600,11 +696,14 @@ export type PayrollRunItemSelectScalar = {
   employeeId?: boolean
   contractId?: boolean
   amount?: boolean
-  status?: boolean
+  calculationStatus?: boolean
+  paymentStatus?: boolean
   warning?: boolean
+  paidAt?: boolean
+  confirmedAt?: boolean
 }
 
-export type PayrollRunItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"payrollRunItemId" | "payrollRunId" | "employeeId" | "contractId" | "amount" | "status" | "warning", ExtArgs["result"]["payrollRunItem"]>
+export type PayrollRunItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"payrollRunItemId" | "payrollRunId" | "employeeId" | "contractId" | "amount" | "calculationStatus" | "paymentStatus" | "warning" | "paidAt" | "confirmedAt", ExtArgs["result"]["payrollRunItem"]>
 export type PayrollRunItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   payrollRun?: boolean | Prisma.PayrollRunDefaultArgs<ExtArgs>
 }
@@ -626,8 +725,11 @@ export type $PayrollRunItemPayload<ExtArgs extends runtime.Types.Extensions.Inte
     employeeId: number
     contractId: number | null
     amount: number
-    status: string
+    calculationStatus: string
+    paymentStatus: string
     warning: string | null
+    paidAt: Date | null
+    confirmedAt: Date | null
   }, ExtArgs["result"]["payrollRunItem"]>
   composites: {}
 }
@@ -1057,8 +1159,11 @@ export interface PayrollRunItemFieldRefs {
   readonly employeeId: Prisma.FieldRef<"PayrollRunItem", 'Int'>
   readonly contractId: Prisma.FieldRef<"PayrollRunItem", 'Int'>
   readonly amount: Prisma.FieldRef<"PayrollRunItem", 'Int'>
-  readonly status: Prisma.FieldRef<"PayrollRunItem", 'String'>
+  readonly calculationStatus: Prisma.FieldRef<"PayrollRunItem", 'String'>
+  readonly paymentStatus: Prisma.FieldRef<"PayrollRunItem", 'String'>
   readonly warning: Prisma.FieldRef<"PayrollRunItem", 'String'>
+  readonly paidAt: Prisma.FieldRef<"PayrollRunItem", 'DateTime'>
+  readonly confirmedAt: Prisma.FieldRef<"PayrollRunItem", 'DateTime'>
 }
     
 

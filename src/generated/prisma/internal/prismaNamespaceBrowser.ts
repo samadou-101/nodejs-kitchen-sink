@@ -317,8 +317,11 @@ export const PayrollRunItemScalarFieldEnum = {
   employeeId: 'employeeId',
   contractId: 'contractId',
   amount: 'amount',
-  status: 'status',
-  warning: 'warning'
+  calculationStatus: 'calculationStatus',
+  paymentStatus: 'paymentStatus',
+  warning: 'warning',
+  paidAt: 'paidAt',
+  confirmedAt: 'confirmedAt'
 } as const
 
 export type PayrollRunItemScalarFieldEnum = (typeof PayrollRunItemScalarFieldEnum)[keyof typeof PayrollRunItemScalarFieldEnum]

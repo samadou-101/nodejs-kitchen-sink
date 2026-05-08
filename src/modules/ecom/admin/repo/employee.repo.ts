@@ -183,7 +183,8 @@ export async function addPayrollRunItems(payrollRunId: number, items: Array<{
   employeeId: number;
   contractId: number | null;
   amount: number;
-  status: string;
+  calculationStatus: string;
+  paymentStatus?: string;
   warning: string | null;
 }>) {
   return await prisma.payrollRunItem.createMany({
@@ -192,7 +193,8 @@ export async function addPayrollRunItems(payrollRunId: number, items: Array<{
       employeeId: item.employeeId,
       contractId: item.contractId,
       amount: item.amount,
-      status: item.status,
+      calculationStatus: item.calculationStatus,
+      paymentStatus: item.paymentStatus ?? "UNPAID",
       warning: item.warning,
     })),
   });
@@ -236,5 +238,46 @@ export async function getActiveEmployees() {
   return await prisma.employee.findMany({
     where: { isActive: true },
     select: { employeeId: true },
+  });
+}
+
+// Payroll Run Item operations
+export async function getPayrollRunItemById(payrollRunItemId: number) {
+  return await prisma.payrollRunItem.findUnique({
+    where: { payrollRunItemId },
+  });
+}
+
+export async function confirmPayrollRunItem(payrollRunItemId: number) {
+  return await prisma.payrollRunItem.update({
+    where: { payrollRunItemId },
+    data: {
+      paymentStatus: "CONFIRMED",
+      confirmedAt: new Date(),
+    },
+  });
+}
+
+export async function markPayrollRunItemPaid(payrollRunItemId: number) {
+  return await prisma.payrollRunItem.update({
+    where: { payrollRunItemId },
+    data: {
+      paymentStatus: "PAID",
+      paidAt: new Date(),
+    },
+  });
+}
+
+export async function updatePayrollRunItemPaymentStatus(
+  payrollRunItemId: number,
+  paymentStatus: string,
+) {
+  return await prisma.payrollRunItem.update({
+    where: { payrollRunItemId },
+    data: {
+      paymentStatus,
+      ...(paymentStatus === "CONFIRMED" && { confirmedAt: new Date() }),
+      ...(paymentStatus === "PAID" && { paidAt: new Date() }),
+    },
   });
 }

@@ -32,7 +32,8 @@ export interface CreatePaymentData {
 }
 
 export type PayrollRunStatus = "DRAFT" | "CONFIRMED" | "PAID";
-export type PayrollRunItemStatus = "PENDING" | "INCLUDED" | "EXCLUDED";
+export type PayrollRunItemCalculationStatus = "PENDING" | "INCLUDED" | "EXCLUDED";
+export type PayrollRunItemPaymentStatus = "UNPAID" | "CONFIRMED" | "PAID";
 
 export interface PayrollRunInput {
   startDate: Date;
@@ -44,8 +45,11 @@ export interface PayrollRunItemPreview {
   employeeId: number;
   contractId: number | null;
   amount: number;
-  status: PayrollRunItemStatus;
+  calculationStatus: PayrollRunItemCalculationStatus;
+  paymentStatus: PayrollRunItemPaymentStatus;
   warning: string | null;
+  paidAt: Date | null;
+  confirmedAt: Date | null;
 }
 
 export interface PayrollRunPreview {

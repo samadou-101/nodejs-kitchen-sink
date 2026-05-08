@@ -2,6 +2,7 @@ import {
   addEmployeeRole,
   addPayrollRunItems,
   closePaymentContract,
+  confirmPayrollRunItem,
   countOrdersInPeriod,
   createEmployeePayment,
   createPayrollRun,
@@ -11,8 +12,11 @@ import {
   getActiveEmployees,
   getContractsInPeriod,
   getPayrollRunById,
+  getPayrollRunById as getPayrollRunByIdRepo,
   getPayrollRuns,
+  getPayrollRunItemById,
   insertPendingList,
+  markPayrollRunItemPaid,
   removeEmployeeRole,
   updateEmployeeStatus,
   updatePayrollRunStatus,
@@ -230,12 +234,12 @@ export async function runPayrollPreview(
       result.warning === "Missing salary or rate"
     ) {
       errors.push(`Employee ${emp.employeeId}: ${result.warning}`);
-      items.push({ ...result, status: "EXCLUDED" });
+      items.push({ ...result, calculationStatus: "EXCLUDED", paymentStatus: "UNPAID", paidAt: null, confirmedAt: null });
     } else {
       if (result.warning) {
         warnings.push(`Employee ${emp.employeeId}: ${result.warning}`);
       }
-      items.push({ ...result, status: "INCLUDED" });
+      items.push({ ...result, calculationStatus: "INCLUDED", paymentStatus: "UNPAID", paidAt: null, confirmedAt: null });
       totalAmount += result.amount;
     }
   }
@@ -252,7 +256,8 @@ export async function runPayrollPreview(
       employeeId: item.employeeId,
       contractId: item.contractId,
       amount: item.amount,
-      status: item.status,
+      calculationStatus: item.calculationStatus,
+      paymentStatus: "UNPAID",
       warning: item.warning,
     })),
   );
@@ -276,7 +281,7 @@ export async function confirmPayrollRun(payrollRunId: number) {
     throw new Error("Only DRAFT payroll runs can be confirmed");
   }
 
-  const includedItems = run.items.filter((item) => item.status === "INCLUDED");
+  const includedItems = run.items.filter((item) => item.calculationStatus === "INCLUDED");
 
   const label = `Payroll run #${payrollRunId}`;
   for (const item of includedItems) {
@@ -290,6 +295,7 @@ export async function confirmPayrollRun(payrollRunId: number) {
       contractId: item.contractId ?? null,
     };
     await createEmployeePayment(data);
+    await confirmPayrollRunItem(item.payrollRunItemId);
   }
 
   const totalAmount = includedItems.reduce(
@@ -311,8 +317,13 @@ export async function markPayrollRunAsPaid(payrollRunId: number) {
     throw new Error("Only CONFIRMED payroll runs can be marked as paid");
   }
 
+  const confirmedItems = run.items.filter((item) => item.paymentStatus === "CONFIRMED");
+  for (const item of confirmedItems) {
+    await markPayrollRunItemPaid(item.payrollRunItemId);
+  }
+
   await updatePayrollRunStatus(payrollRunId, "PAID");
-  return { success: true };
+  return { success: true, employeeCount: confirmedItems.length };
 }
 
 export async function getPayrollRunsService(status?: PayrollRunStatus) {
@@ -321,4 +332,58 @@ export async function getPayrollRunsService(status?: PayrollRunStatus) {
 
 export async function getPayrollRunByIdService(payrollRunId: number) {
   return await getPayrollRunById(payrollRunId);
+}
+
+export async function getPayrollRunItemByIdService(payrollRunItemId: number) {
+  return await getPayrollRunItemById(payrollRunItemId);
+}
+
+export async function confirmPayrollItem(payrollRunItemId: number) {
+  const item = await getPayrollRunItemById(payrollRunItemId);
+  if (!item) {
+    throw new Error("Payroll run item not found");
+  }
+
+  if (item.calculationStatus !== "INCLUDED") {
+    throw new Error("Only INCLUDED items can be confirmed");
+  }
+
+  if (item.paymentStatus !== "UNPAID") {
+    throw new Error("Only UNPAID items can be confirmed");
+  }
+
+  const run = await getPayrollRunByIdRepo(item.payrollRunId);
+  if (!run) {
+    throw new Error("Payroll run not found");
+  }
+
+  const label = `Payroll run #${run.payrollRunId}`;
+
+  const data: CreatePaymentData = {
+    employeeId: item.employeeId,
+    amount: item.amount,
+    paymentPeriodLabel: label,
+    paymentPeriodStart: run.startDate,
+    paymentPeriodEnd: run.endDate,
+    notes: `Payroll run #${run.payrollRunId}, Item #${payrollRunItemId}`,
+    contractId: item.contractId ?? null,
+  };
+  await createEmployeePayment(data);
+  await confirmPayrollRunItem(payrollRunItemId);
+
+  return { success: true, payrollRunItemId, amount: item.amount };
+}
+
+export async function payPayrollItem(payrollRunItemId: number) {
+  const item = await getPayrollRunItemById(payrollRunItemId);
+  if (!item) {
+    throw new Error("Payroll run item not found");
+  }
+
+  if (item.paymentStatus !== "CONFIRMED") {
+    throw new Error("Only CONFIRMED items can be marked as paid");
+  }
+
+  await markPayrollRunItemPaid(payrollRunItemId);
+  return { success: true, payrollRunItemId, amount: item.amount };
 }
