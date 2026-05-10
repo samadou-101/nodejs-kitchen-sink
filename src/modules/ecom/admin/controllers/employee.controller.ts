@@ -14,6 +14,7 @@ import {
   confirmPayrollRun,
   markPayrollRunAsPaid,
   runPayrollPreview,
+  getEmployeePerformanceService,
 } from "../services/employee.service";
 import type { PayrollRunStatus } from "../admin.types";
 
@@ -41,6 +42,9 @@ export async function employeeAdminHandler(req: Request, res: Response) {
   const PAYROLL_ITEM_GET_PATH = /^\/admin\/payroll\/(\d+)\/items\/(\d+)$/;
   const PAYROLL_ITEM_CONFIRM_PATH = /^\/admin\/payroll\/(\d+)\/items\/(\d+)\/confirm$/;
   const PAYROLL_ITEM_PAID_PATH = /^\/admin\/payroll\/(\d+)\/items\/(\d+)\/paid$/;
+
+  // Employee Performance
+  const EMPLOYEE_PERF_PATH = /^\/admin\/employees\/(\d+)\/performance$/;
 
   // Employee Activation
   if (path === EMPLOYEE_ACTIVATION_PATH && method === POST_METHOD) {
@@ -321,7 +325,26 @@ export async function employeeAdminHandler(req: Request, res: Response) {
       const payrollRunItemId = parseInt(payrollRunItemIdStr, 10);
       const result = await payPayrollItem(payrollRunItemId);
       res.status(200).json(result);
-      return;
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Something went wrong");
+    }
+    return;
+  }
+
+  // Employee Performance
+  const perfMatch = path.match(EMPLOYEE_PERF_PATH);
+  if (perfMatch && method === GET_METHOD) {
+    try {
+      const employeeIdStr = perfMatch[1];
+      if (!employeeIdStr) {
+        res.status(400).send("Invalid employee ID");
+        return;
+      }
+      const employeeId = parseInt(employeeIdStr, 10);
+      const days = req.query.days ? parseInt(req.query.days as string, 10) : 30;
+      const perf = await getEmployeePerformanceService(employeeId, days);
+      res.status(200).json(perf);
     } catch (error) {
       console.error(error);
       res.status(500).send("Something went wrong");

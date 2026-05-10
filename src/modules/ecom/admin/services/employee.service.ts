@@ -20,6 +20,7 @@ import {
   removeEmployeeRole,
   updateEmployeeStatus,
   updatePayrollRunStatus,
+  getEmployeePerformance,
 } from "../repo/employee.repo";
 import type {
   CreateContractData,
@@ -386,4 +387,8 @@ export async function payPayrollItem(payrollRunItemId: number) {
 
   await markPayrollRunItemPaid(payrollRunItemId);
   return { success: true, payrollRunItemId, amount: item.amount };
+}
+
+export async function getEmployeePerformanceService(employeeId: number, days?: number) {
+  return await getEmployeePerformance(employeeId, days);
 }

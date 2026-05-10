@@ -1,3 +1,9 @@
+export type CategoryData = {
+  categoryId?: number;
+  name: string;
+  description?: string;
+};
+
 export type ProductData = {
   id?: number;
   name: string;
@@ -5,4 +11,11 @@ export type ProductData = {
   price: number;
   categoryId: number;
   initialStock?: number;
+};
+
+export type ProductFilter = {
+  search?: string;
+  categoryId?: number;
+  page?: number;
+  limit?: number;
 };

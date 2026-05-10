@@ -1,5 +1,7 @@
 import { Prisma, type PrismaClient } from "@/generated/prisma/client";
 
+export type DbClient = PrismaClient | Prisma.TransactionClient;
+
 export type EmployeeRequestData = {
   name: string;
   email: string;
@@ -16,4 +18,7 @@ export type EmployeeData = {
 
 export type EmployeeLoginData = Omit<EmployeeData, "name" | "userId">;
 
-export type DbClient = PrismaClient | Prisma.TransactionClient;
+export type EmployeeOrderData = {
+  orderId: number;
+  notes?: string;
+};

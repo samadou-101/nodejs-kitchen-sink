@@ -197,3 +197,16 @@ export async function updateInventory(
   if (result.count === 0) throw new ProductNotFoundError(productId);
   return result;
 }
+
+export async function listOrders(filter: {
+  statusId?: number;
+  employeeId?: number;
+  page?: number;
+  limit?: number;
+}) {
+  return await bind(prisma).findOrders(filter);
+}
+
+export async function trackOrdersByPhone(phone: string) {
+  return await bind(prisma).findOrdersByPhone(phone);
+}

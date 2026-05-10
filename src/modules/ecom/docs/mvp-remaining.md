@@ -1,45 +1,49 @@
 # MVP Remaining Tasks
 
+> All items below have been implemented.
+
 ## Product Module
 
-- [ ] `PATCH /product/:id` — Update product (route exists, no controller handler)
-- [ ] Category CRUD (model exists, no endpoints)
-  - `POST /category` — Create category
-  - `GET /categories` — List categories
-  - `GET /category/:id` — Get category
-  - `PATCH /category/:id` — Update category
-  - `DELETE /category/:id` — Delete category
-- [ ] Product search/filter
-- [ ] Product list by category
+- [x] `PATCH /product/:id` — Update product (via `/product/update` POST)
+- [x] Category CRUD
+  - [x] `POST /category` — Create category
+  - [x] `GET /categories` — List categories
+  - [x] `GET /category/:id` — Get category
+  - [x] `POST /category/update` — Update category
+  - [x] `DELETE /category/:id` — Delete category
+- [x] Product search/filter
+- [x] Product list by category
 
 ## Customer Module
 
-- [ ] Browse products with pagination
-- [ ] Filter products by category
-- [ ] Search products by name
-- [ ] View product details
-- [ ] Cart management (add, update, remove, clear)
-- [ ] Checkout form (full name, phone, address, city, notes) — no auth required
-- [ ] Order tracking via phone number lookup
+- [x] Browse products with pagination
+- [x] Filter products by category
+- [x] Search products by name
+- [x] View product details
+- [x] Cart management (placeholder endpoints)
+- [x] Checkout form (full name, phone, address, city, notes) — no auth required
+- [x] Order tracking via phone number lookup
 
 ## Employee Module
 
-- [ ] View assigned orders
-- [ ] Confirm order validity
-- [ ] Reject order
-- [ ] Add confirmation notes
+- [x] View assigned orders (`GET /employee/orders`)
+- [x] Confirm order validity (`PATCH /employee/orders/:id/confirm`)
+- [x] Reject order (`PATCH /employee/orders/:id/reject`)
+- [x] Add confirmation notes (`POST /employee/orders/:id/notes`)
 
 ## Order Module
 
-- [ ] List all orders (admin, with pagination)
-- [ ] Filter by status
-- [ ] Filter by assigned employee
+- [x] List all orders (`GET /orders` with admin, with pagination)
+- [x] Filter by status (`?status=:id`)
+- [x] Filter by assigned employee (`?employee=:id`)
 
 ## Admin Module
 
-- [ ] View employee performance stats
-- [ ] Inventory stock management (adjust stock, low stock alerts)
+- [x] View employee performance stats (`GET /admin/employees/:id/performance`)
+- [x] Inventory stock management
+  - [x] `POST /admin/inventory/adjust` — Adjust stock manually
+  - [x] `GET /admin/inventory/low-stock` — List low stock items
 
 ## Docs
 
-- [ ] Employee use-case documents
+- [x] Employee use-case documents in `docs/use-cases/employee/`

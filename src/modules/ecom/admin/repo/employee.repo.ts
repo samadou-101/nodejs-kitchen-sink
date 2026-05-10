@@ -281,3 +281,38 @@ export async function updatePayrollRunItemPaymentStatus(
     },
   });
 }
+
+export async function getEmployeePerformance(employeeId: number, days = 30) {
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
+
+  const [ordersHandled, paymentsReceived, activeContract] = await Promise.all([
+    prisma.order.count({
+      where: {
+        employeeId,
+        orderDate: { gte: startDate },
+      },
+    }),
+    prisma.employeePayment.aggregate({
+      where: {
+        employeeId,
+        paymentDate: { gte: startDate },
+      },
+      _sum: { amount: true },
+      _count: true,
+    }),
+    prisma.employeePaymentContract.findFirst({
+      where: { employeeId, isActive: true },
+    }),
+  ]);
+
+  return {
+    employeeId,
+    period: { startDate, endDate: new Date() },
+    ordersHandled,
+    totalEarnings: paymentsReceived._sum.amount ?? 0,
+    paymentsCount: paymentsReceived._count,
+    paymentType: activeContract?.salaryAmount ? "SALARY" : "PER_ORDER",
+    rate: activeContract?.salaryAmount ?? activeContract?.perOrderRate ?? null,
+  };
+}

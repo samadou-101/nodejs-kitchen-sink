@@ -167,6 +167,41 @@ export const orderRepo = {
           }),
         ),
       ),
+
+  findOrders: (tx: DbClient) => (filter: {
+    statusId?: number;
+    employeeId?: number;
+    page?: number;
+    limit?: number;
+  }) => {
+    const { statusId, employeeId, page = 1, limit = 20 } = filter;
+    const skip = (page - 1) * limit;
+    return getClient(tx).order.findMany({
+      where: {
+        ...(statusId ? { orderStatusId: statusId } : {}),
+        ...(employeeId ? { employeeId } : {}),
+      },
+      include: {
+        customer: true,
+        status: true,
+        employee: { include: { user: { select: { name: true } } } },
+        orderItems: { include: { product: true } },
+      },
+      orderBy: { orderDate: "desc" },
+      skip,
+      take: limit,
+    });
+  },
+
+  findOrdersByPhone: (tx: DbClient) => (phone: string) =>
+    getClient(tx).order.findMany({
+      where: { customer: { phone } },
+      include: {
+        status: true,
+        orderItems: { include: { product: true } },
+      },
+      orderBy: { orderDate: "desc" },
+    }),
 };
 
 export const bind = (tx: DbClient) => ({
@@ -186,4 +221,6 @@ export const bind = (tx: DbClient) => ({
   incrementInventory: orderRepo.incrementInventory(tx),
   findOrderItemsByOrderId: orderRepo.findOrderItemsByOrderId(tx),
   incrementInventoryBatch: orderRepo.incrementInventoryBatch(tx),
+  findOrders: orderRepo.findOrders(tx),
+  findOrdersByPhone: orderRepo.findOrdersByPhone(tx),
 });

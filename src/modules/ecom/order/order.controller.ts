@@ -7,6 +7,8 @@ import {
   updateOrderStatus,
   assignOrderToEmployee,
   unassignEmployeeFromOrder,
+  listOrders,
+  trackOrdersByPhone,
 } from "./order.service";
 import type { OrderData, OrderDTO } from "./order.types";
 import { handleError } from "./order.utils";
@@ -30,6 +32,26 @@ export async function orderHandler(req: Request, res: Response) {
         orderStatusId: order.orderStatusId,
       };
       res.status(201).json(orderResponse);
+    } catch (error) {
+      handleError(res, error);
+    }
+    return;
+  }
+
+  if (req.path === "/orders" && req.method === "GET") {
+    try {
+      const filter: {
+        statusId?: number;
+        employeeId?: number;
+        page?: number;
+        limit?: number;
+      } = {};
+      if (req.query.status) filter.statusId = Number(req.query.status);
+      if (req.query.employee) filter.employeeId = Number(req.query.employee);
+      if (req.query.page) filter.page = Number(req.query.page);
+      if (req.query.limit) filter.limit = Number(req.query.limit);
+      const orders = await listOrders(filter);
+      res.status(200).json(orders);
     } catch (error) {
       handleError(res, error);
     }
