@@ -1,9 +1,8 @@
-import type { Response, NextFunction } from "express";
-import type { AuthenticatedRequest } from "../rbac/rbac.context";
+import type { Request, Response, NextFunction } from "express";
 import { hasPermission, hasAnyPermission, hasAllPermissions } from "../rbac/rbac.matcher";
 
 export function requirePermission(...requiredPermissions: string[]) {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const auth = req.auth;
 
     if (!auth) {
@@ -27,7 +26,7 @@ export function requirePermission(...requiredPermissions: string[]) {
 }
 
 export function requireAnyPermission(...requiredPermissions: string[]) {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const auth = req.auth;
 
     if (!auth) {

@@ -1,9 +1,8 @@
-import type { Response, NextFunction } from "express";
-import type { AuthenticatedRequest } from "../rbac/rbac.context";
+import type { Request, Response, NextFunction } from "express";
 import type { RoleName } from "../rbac/rbac.types";
 
 export function requireRole(...requiredRoles: RoleName[]) {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const auth = req.auth;
 
     if (!auth) {
@@ -27,7 +26,7 @@ export function requireRole(...requiredRoles: RoleName[]) {
 }
 
 export function requireSuperAdmin(
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ): void {

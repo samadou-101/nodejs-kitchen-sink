@@ -76,13 +76,6 @@ export async function invalidateAuthCache(userId: number): Promise<void> {
   await redisClient.del(key);
 }
 
-export async function attachAuthContext(
-  req: Request,
-  authContext: AuthContext,
-): Promise<void> {
-  (req as any).auth = authContext;
-}
-
-export function getAuthContext(req: Request): AuthContext | null {
-  return (req as any).auth ?? null;
+export function getAuthContext(req: Request): AuthContext | undefined {
+  return req.auth;
 }

@@ -1,13 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
 import type { AuthContext } from "./rbac.types";
-import { resolveAuthContext, attachAuthContext } from "./rbac.service";
+import { resolveAuthContext } from "./rbac.service";
 import { getUseSessionFromDB } from "@/api/auth/password/session.service";
 import { redisClient } from "@/config/redis.config";
-import { Prisma } from "@/generated/prisma/client";
-
-export interface AuthenticatedRequest extends Request {
-  auth?: AuthContext;
-}
 
 const EXTEND_THRESHOLD_MS = 3 * 24 * 60 * 60 * 1000;
 const EXTENSION_MS = 7 * 24 * 60 * 60 * 1000;
@@ -44,7 +39,7 @@ export async function authenticate(
     }
 
     const authContext = await resolveAuthContext(session.userId);
-    await attachAuthContext(req as AuthenticatedRequest, authContext);
+    req.auth = authContext;
 
     next();
   } catch (error) {
@@ -89,8 +84,7 @@ export function requireAuth(
   res: Response,
   next: NextFunction,
 ): void {
-  const auth = (req as AuthenticatedRequest).auth;
-  if (!auth) {
+  if (!req.auth) {
     res.status(401).json({ error: "Authentication required" });
     return;
   }
