@@ -8,6 +8,7 @@ import {
   canCancelOrder,
   canAssignOrder,
   canViewAllOrders,
+  canViewAssignedOrders,
   canCreateOrder,
   canDeleteOrder,
 } from "../policies/order.policy";
@@ -98,6 +99,11 @@ export function enforceAssignOrder(ctx: AuthContext): AuthorizationResult {
 export function enforceViewAllOrders(ctx: AuthContext): AuthorizationResult {
   const allowed = canViewAllOrders(ctx);
   return { allowed, reason: allowed ? undefined : "Not authorized to view all orders" };
+}
+
+export function enforceViewAssignedOrders(ctx: AuthContext): AuthorizationResult {
+  const allowed = canViewAssignedOrders(ctx);
+  return { allowed, reason: allowed ? undefined : "Not authorized to view assigned orders" };
 }
 
 export function enforceCreateOrder(ctx: AuthContext): AuthorizationResult {

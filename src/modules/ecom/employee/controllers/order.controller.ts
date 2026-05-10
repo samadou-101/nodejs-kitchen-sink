@@ -6,6 +6,19 @@ import {
   rejectOrder,
   addOrderNotes,
 } from "../services/order.service";
+import { ForbiddenError, UnauthorizedError } from "@/modules/ecom/auth/errors";
+
+function handleAuthError(res: Response, error: unknown) {
+  if (error instanceof UnauthorizedError) {
+    res.status(401).json({ error: error.message });
+    return true;
+  }
+  if (error instanceof ForbiddenError) {
+    res.status(403).json({ error: error.message });
+    return true;
+  }
+  return false;
+}
 
 export async function employeeOrderHandler(req: Request, res: Response) {
   const path = req.path;
@@ -18,11 +31,13 @@ export async function employeeOrderHandler(req: Request, res: Response) {
       return;
     }
     try {
-      const orders = await getAssignedOrders(Number(employeeId));
+      const orders = await getAssignedOrders(Number(employeeId), req.auth);
       res.status(200).json(orders);
     } catch (error: any) {
-      console.error(error);
-      res.status(500).json({ message: error.message });
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).json({ message: error.message });
+      }
     }
     return;
   }
@@ -34,7 +49,9 @@ export async function employeeOrderHandler(req: Request, res: Response) {
       const order = await confirmOrder(orderId, req.auth);
       res.status(200).json({ message: "Order confirmed", order });
     } catch (error: any) {
-      res.status(500).json({ message: error.message });
+      if (!handleAuthError(res, error)) {
+        res.status(500).json({ message: error.message });
+      }
     }
     return;
   }
@@ -46,7 +63,9 @@ export async function employeeOrderHandler(req: Request, res: Response) {
       const order = await rejectOrder(orderId, req.auth);
       res.status(200).json({ message: "Order rejected", order });
     } catch (error: any) {
-      res.status(500).json({ message: error.message });
+      if (!handleAuthError(res, error)) {
+        res.status(500).json({ message: error.message });
+      }
     }
     return;
   }
@@ -63,7 +82,9 @@ export async function employeeOrderHandler(req: Request, res: Response) {
       const order = await addOrderNotes(orderId, notes, req.auth);
       res.status(200).json({ message: "Notes added", order });
     } catch (error: any) {
-      res.status(500).json({ message: error.message });
+      if (!handleAuthError(res, error)) {
+        res.status(500).json({ message: error.message });
+      }
     }
     return;
   }

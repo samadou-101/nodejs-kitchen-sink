@@ -18,6 +18,7 @@ import {
   enforceCreateProduct,
   enforceUpdateProduct,
   enforceDeleteProduct,
+  enforceViewProduct,
 } from "@/modules/ecom/auth";
 import { assertAuth, checkAuthz } from "@/modules/ecom/auth/errors";
 
@@ -58,11 +59,21 @@ export async function removeProduct(id: number, auth: unknown) {
   });
 }
 
-export async function getProductById(id: number) {
+export async function getProductById(id: number, auth?: unknown) {
+  if (auth) {
+    assertAuth(auth);
+    const result = await enforceViewProduct(auth as any, prisma, id);
+    checkAuthz(result);
+  }
   return await findProductByIdRepo(id);
 }
 
-export async function getAllProducts(filter?: ProductFilter) {
+export async function getAllProducts(filter?: ProductFilter, auth?: unknown) {
+  if (auth) {
+    assertAuth(auth);
+    const result = await enforceViewProduct(auth as any, prisma, 0);
+    checkAuthz(result);
+  }
   return await findAllProductsRepo(filter);
 }
 
@@ -73,11 +84,21 @@ export async function createCategory(data: CategoryData, auth: unknown) {
   return await insertCategory(data);
 }
 
-export async function getCategoryById(id: number) {
+export async function getCategoryById(id: number, auth?: unknown) {
+  if (auth) {
+    assertAuth(auth);
+    const result = await enforceViewProduct(auth as any, prisma, 0);
+    checkAuthz(result);
+  }
   return await findCategoryById(id);
 }
 
-export async function getAllCategories() {
+export async function getAllCategories(auth?: unknown) {
+  if (auth) {
+    assertAuth(auth);
+    const result = await enforceViewProduct(auth as any, prisma, 0);
+    checkAuthz(result);
+  }
   return await findAllCategories();
 }
 
@@ -103,10 +124,20 @@ export async function removeCategory(id: number, auth: unknown) {
   });
 }
 
-export async function searchProducts(query: string) {
+export async function searchProducts(query: string, auth?: unknown) {
+  if (auth) {
+    assertAuth(auth);
+    const result = await enforceViewProduct(auth as any, prisma, 0);
+    checkAuthz(result);
+  }
   return await searchProductsRepo(query);
 }
 
-export async function getProductsByCategory(categoryId: number) {
+export async function getProductsByCategory(categoryId: number, auth?: unknown) {
+  if (auth) {
+    assertAuth(auth);
+    const result = await enforceViewProduct(auth as any, prisma, 0);
+    checkAuthz(result);
+  }
   return await findProductsByCategory(categoryId);
 }

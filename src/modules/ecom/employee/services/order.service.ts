@@ -1,11 +1,23 @@
 import { prisma } from "@/config/db.config";
 import { bind } from "../repo/order.repo";
+import {
+  enforceViewAssignedOrders,
+  enforceUpdateOrder,
+  enforceViewOrder,
+} from "@/modules/ecom/auth";
+import { assertAuth, checkAuthz } from "@/modules/ecom/auth/errors";
 
-export async function getAssignedOrders(employeeId: number) {
+export async function getAssignedOrders(employeeId: number, auth: unknown) {
+  assertAuth(auth);
+  const result = enforceViewAssignedOrders(auth as any);
+  checkAuthz(result);
   return await bind(prisma).findAssignedOrders(employeeId);
 }
 
-export async function getOrderById(orderId: number) {
+export async function getOrderById(orderId: number, auth: unknown) {
+  assertAuth(auth);
+  const result = await enforceViewOrder(auth as any, prisma, orderId);
+  checkAuthz(result);
   return await bind(prisma).findOrderById(orderId);
 }
 
@@ -16,7 +28,8 @@ export async function confirmOrder(orderId: number, auth: unknown) {
     throw new Error("Order not found");
   }
   if (order.orderStatusId === 1) {
-    const { updateOrderStatus } = await import("@/modules/ecom/order/order.service");
+    const { updateOrderStatus } =
+      await import("@/modules/ecom/order/order.service");
     return updateOrderStatus(orderId, 2, auth);
   }
   return order;
@@ -28,11 +41,19 @@ export async function rejectOrder(orderId: number, auth: unknown) {
   if (!order) {
     throw new Error("Order not found");
   }
-  const { updateOrderStatus } = await import("@/modules/ecom/order/order.service");
+  const { updateOrderStatus } =
+    await import("@/modules/ecom/order/order.service");
   return updateOrderStatus(orderId, 5, auth);
 }
 
-export async function addOrderNotes(orderId: number, notes: string, auth: unknown) {
+export async function addOrderNotes(
+  orderId: number,
+  notes: string,
+  auth: unknown,
+) {
+  assertAuth(auth);
+  const result = await enforceUpdateOrder(auth as any, prisma, orderId);
+  checkAuthz(result);
   const db = bind(prisma);
   return await db.updateOrderNotes(orderId, notes);
 }

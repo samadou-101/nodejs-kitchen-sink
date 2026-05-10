@@ -51,6 +51,13 @@ export function canViewAllOrders(ctx: AuthContext): boolean {
   return false;
 }
 
+export function canViewAssignedOrders(ctx: AuthContext): boolean {
+  if (ctx.isSuperAdmin) return true;
+  if (ctx.roleNames.includes("ADMIN")) return true;
+  if (ctx.roleNames.includes("EMPLOYEE")) return true;
+  return false;
+}
+
 export function canCreateOrder(ctx: AuthContext): boolean {
   return true;
 }

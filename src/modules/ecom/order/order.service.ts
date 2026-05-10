@@ -8,10 +8,13 @@ import {
 } from "./order.errors";
 import {
   enforceCreateOrder,
+  enforceViewOrder,
   enforceUpdateOrder,
   enforceDeleteOrder,
   enforceAssignOrder,
+  enforceConfirmOrder,
   enforceViewAllOrders,
+  enforceUpdateInventory,
 } from "@/modules/ecom/auth";
 import { assertAuth, checkAuthz } from "@/modules/ecom/auth/errors";
 
@@ -83,11 +86,17 @@ export async function placeOrder(orderData: OrderData, auth: unknown) {
 
 export async function getOrderById(orderId: number, auth: unknown) {
   assertAuth(auth);
-  const db = bind(prisma);
-  const order = await db.findOrderById(orderId);
-  if (!order) return null;
 
-  return order;
+  return await prisma.$transaction(async (tx) => {
+    const db = bind(tx);
+    const result = await enforceViewOrder(auth as any, tx, orderId);
+    checkAuthz(result);
+
+    const order = await db.findOrderById(orderId);
+    if (!order) return null;
+
+    return order;
+  });
 }
 
 export async function updateOrder(orderData: OrderData, auth: unknown) {
@@ -126,7 +135,12 @@ export async function updateOrderItems(
   auth: unknown,
 ) {
   assertAuth(auth);
-  return await bind(prisma).replaceOrderItems(orderId, orderItems);
+
+  return await prisma.$transaction(async (tx) => {
+    const result = await enforceUpdateOrder(auth as any, tx, orderId);
+    checkAuthz(result);
+    return await bind(tx).replaceOrderItems(orderId, orderItems);
+  });
 }
 
 export async function deleteOrderById(orderId: number, auth: unknown) {
@@ -177,7 +191,7 @@ export async function updateOrderStatus(
     return await prisma.$transaction(async (tx) => {
       const db = bind(tx);
 
-      const result = await enforceAssignOrder(auth as any);
+      const result = await enforceConfirmOrder(auth as any, tx, orderId);
       checkAuthz(result);
 
       const order = await db.findOrderById(orderId);
@@ -227,7 +241,12 @@ export async function updateInventory(
   productId: number,
   action: "increase" | "decrease",
   amount: number,
+  auth: unknown,
 ) {
+  assertAuth(auth);
+  const result = enforceUpdateInventory(auth as any);
+  checkAuthz(result);
+
   const db = bind(prisma);
 
   if (action === "decrease") {
@@ -249,9 +268,9 @@ export async function updateInventory(
     return result;
   }
 
-  const result = await db.incrementInventory(productId, amount);
-  if (result.count === 0) throw new ProductNotFoundError(productId);
-  return result;
+  const result2 = await db.incrementInventory(productId, amount);
+  if (result2.count === 0) throw new ProductNotFoundError(productId);
+  return result2;
 }
 
 export async function listOrders(

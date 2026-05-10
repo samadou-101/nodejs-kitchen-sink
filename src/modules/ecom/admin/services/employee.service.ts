@@ -35,9 +35,15 @@ import type {
 import {
   enforceCreateEmployee,
   enforceUpdateEmployee,
+  enforceViewEmployee,
   enforceDeactivateEmployee,
   enforceViewEmployeePerformance,
   enforceManageEmployeePayment,
+  enforceViewPayroll,
+  enforceCreatePayroll,
+  enforceConfirmPayroll,
+  enforceViewPayrollItem,
+  enforceUpdatePayrollItem,
 } from "@/modules/ecom/auth";
 import { assertAuth, checkAuthz } from "@/modules/ecom/auth/errors";
 
@@ -54,7 +60,7 @@ export async function assignUserRole(
   auth: unknown,
 ) {
   assertAuth(auth);
-  const result = enforceCreateEmployee(auth as any);
+  const result = await enforceUpdateEmployee(auth as any, prisma, 0);
   checkAuthz(result);
   await addUserRole(userId, roleId);
 }
@@ -79,7 +85,9 @@ export async function changeEmployeeStatus(
 
 export async function getEmployeeById(employeeId: number, auth: unknown) {
   assertAuth(auth);
-  await findEmployeeByIdRepo(employeeId);
+  const result = await enforceViewEmployee(auth as any, prisma, employeeId);
+  checkAuthz(result);
+  return await findEmployeeByIdRepo(employeeId);
 }
 
 export async function unassignUserRole(
@@ -88,7 +96,7 @@ export async function unassignUserRole(
   auth: unknown,
 ) {
   assertAuth(auth);
-  const result = enforceCreateEmployee(auth as any);
+  const result = await enforceUpdateEmployee(auth as any, prisma, 0);
   checkAuthz(result);
   await removeUserRole(userId, roleId);
 }
@@ -96,124 +104,93 @@ export async function unassignUserRole(
 export async function assignEmployeePaymentType(
   employeeId: number,
   paymentTypeId: number,
+  auth: unknown,
   salaryAmount?: number,
   perOrderRate?: number,
-  auth?: unknown,
 ) {
-  if (auth) {
-    assertAuth(auth);
-    return await prisma.$transaction(async (tx) => {
-      const result = await enforceManageEmployeePayment(
-        auth as any,
-        tx,
-        employeeId,
-      );
-      checkAuthz(result);
+  assertAuth(auth);
+  return await prisma.$transaction(async (tx) => {
+    const result = await enforceManageEmployeePayment(
+      auth as any,
+      tx,
+      employeeId,
+    );
+    checkAuthz(result);
 
-      const data: CreateContractData = {
-        employeeId,
-        paymentTypeId,
-        salaryAmount: salaryAmount ?? null,
-        perOrderRate: perOrderRate ?? null,
-      };
-      await createPaymentContract(data);
-    });
-  }
-
-  const data: CreateContractData = {
-    employeeId,
-    paymentTypeId,
-    salaryAmount: salaryAmount ?? null,
-    perOrderRate: perOrderRate ?? null,
-  };
-  await createPaymentContract(data);
+    const data: CreateContractData = {
+      employeeId,
+      paymentTypeId,
+      salaryAmount: salaryAmount ?? null,
+      perOrderRate: perOrderRate ?? null,
+    };
+    await createPaymentContract(data);
+  });
 }
 
 export async function updateEmployeeSalary(
   employeeId: number,
   salaryAmount: number,
-  auth?: unknown,
+  auth: unknown,
 ) {
-  if (auth) {
-    assertAuth(auth);
-    return await prisma.$transaction(async (tx) => {
-      const result = await enforceManageEmployeePayment(
-        auth as any,
-        tx,
-        employeeId,
-      );
-      checkAuthz(result);
+  assertAuth(auth);
+  return await prisma.$transaction(async (tx) => {
+    const result = await enforceManageEmployeePayment(
+      auth as any,
+      tx,
+      employeeId,
+    );
+    checkAuthz(result);
 
-      const activeContract = await getActiveContract(employeeId);
-      if (activeContract) {
-        await closePaymentContract(activeContract.contractId);
-      }
-      const data: CreateContractData = {
-        employeeId,
-        paymentTypeId: 1,
-        salaryAmount,
-      };
-      await createPaymentContract(data);
-    });
-  }
-
-  const activeContract = await getActiveContract(employeeId);
-  if (activeContract) {
-    await closePaymentContract(activeContract.contractId);
-  }
-  const data: CreateContractData = {
-    employeeId,
-    paymentTypeId: 1,
-    salaryAmount,
-  };
-  await createPaymentContract(data);
+    const activeContract = await getActiveContract(employeeId);
+    if (activeContract) {
+      await closePaymentContract(activeContract.contractId);
+    }
+    const data: CreateContractData = {
+      employeeId,
+      paymentTypeId: 1,
+      salaryAmount,
+    };
+    await createPaymentContract(data);
+  });
 }
 
 export async function assignEmployeeRate(
   employeeId: number,
   perOrderRate: number,
-  auth?: unknown,
+  auth: unknown,
 ) {
-  if (auth) {
-    assertAuth(auth);
-    return await prisma.$transaction(async (tx) => {
-      const result = await enforceManageEmployeePayment(
-        auth as any,
-        tx,
-        employeeId,
-      );
-      checkAuthz(result);
+  assertAuth(auth);
+  return await prisma.$transaction(async (tx) => {
+    const result = await enforceManageEmployeePayment(
+      auth as any,
+      tx,
+      employeeId,
+    );
+    checkAuthz(result);
 
-      const activeContract = await getActiveContract(employeeId);
-      if (activeContract) {
-        await closePaymentContract(activeContract.contractId);
-      }
-      const data: CreateContractData = {
-        employeeId,
-        paymentTypeId: 2,
-        perOrderRate,
-      };
-      await createPaymentContract(data);
-    });
-  }
-
-  const activeContract = await getActiveContract(employeeId);
-  if (activeContract) {
-    await closePaymentContract(activeContract.contractId);
-  }
-  const data: CreateContractData = {
-    employeeId,
-    paymentTypeId: 2,
-    perOrderRate,
-  };
-  await createPaymentContract(data);
+    const activeContract = await getActiveContract(employeeId);
+    if (activeContract) {
+      await closePaymentContract(activeContract.contractId);
+    }
+    const data: CreateContractData = {
+      employeeId,
+      paymentTypeId: 2,
+      perOrderRate,
+    };
+    await createPaymentContract(data);
+  });
 }
 
 export async function calculatePayroll(
   employeeId: number,
   startDate: Date,
   endDate: Date,
+  auth: unknown,
 ) {
+  assertAuth(auth);
+  const result = enforceViewPayroll(auth as any);
+  checkAuthz(result);
+
   const input: PayrollInput = { employeeId, startDate, endDate };
   const contracts = await getContractsInPeriod(input);
   let totalEarnings = 0;
@@ -233,40 +210,29 @@ export async function calculatePayroll(
 export async function createPayment(
   employeeId: number,
   amount: number,
+  auth: unknown,
   paymentPeriodLabel?: string,
   notes?: string,
   contractId?: number,
-  auth?: unknown,
 ) {
-  if (auth) {
-    assertAuth(auth);
-    return await prisma.$transaction(async (tx) => {
-      const result = await enforceManageEmployeePayment(
-        auth as any,
-        tx,
-        employeeId,
-      );
-      checkAuthz(result);
+  assertAuth(auth);
+  return await prisma.$transaction(async (tx) => {
+    const result = await enforceManageEmployeePayment(
+      auth as any,
+      tx,
+      employeeId,
+    );
+    checkAuthz(result);
 
-      const data: CreatePaymentData = {
-        employeeId,
-        amount,
-        paymentPeriodLabel: paymentPeriodLabel ?? null,
-        notes: notes ?? null,
-        contractId: contractId ?? null,
-      };
-      await createEmployeePayment(data);
-    });
-  }
-
-  const data: CreatePaymentData = {
-    employeeId,
-    amount,
-    paymentPeriodLabel: paymentPeriodLabel ?? null,
-    notes: notes ?? null,
-    contractId: contractId ?? null,
-  };
-  await createEmployeePayment(data);
+    const data: CreatePaymentData = {
+      employeeId,
+      amount,
+      paymentPeriodLabel: paymentPeriodLabel ?? null,
+      notes: notes ?? null,
+      contractId: contractId ?? null,
+    };
+    await createEmployeePayment(data);
+  });
 }
 
 async function calculateEmployeePayroll(
@@ -339,7 +305,7 @@ export async function runPayrollPreview(
   auth: unknown,
 ): Promise<PayrollRunPreview> {
   assertAuth(auth);
-  const result = enforceCreateEmployee(auth as any);
+  const result = enforceCreatePayroll(auth as any);
   checkAuthz(result);
 
   const { startDate, endDate, employeeIds } = input;
@@ -407,6 +373,9 @@ export async function confirmPayrollRun(
   auth: unknown,
 ) {
   assertAuth(auth);
+  const result = await enforceConfirmPayroll(auth as any, prisma, payrollRunId);
+  checkAuthz(result);
+
   const run = await getPayrollRunById(payrollRunId);
   if (!run) {
     throw new Error("Payroll run not found");
@@ -449,6 +418,9 @@ export async function markPayrollRunAsPaid(
   auth: unknown,
 ) {
   assertAuth(auth);
+  const result = await enforceConfirmPayroll(auth as any, prisma, payrollRunId);
+  checkAuthz(result);
+
   const run = await getPayrollRunById(payrollRunId);
   if (!run) {
     throw new Error("Payroll run not found");
@@ -471,22 +443,37 @@ export async function markPayrollRunAsPaid(
 
 export async function getPayrollRunsService(
   status?: PayrollRunStatus,
-  _auth?: unknown,
+  auth?: unknown,
 ) {
+  if (auth) {
+    assertAuth(auth);
+    const result = enforceViewPayroll(auth as any);
+    checkAuthz(result);
+  }
   return await getPayrollRuns(status);
 }
 
 export async function getPayrollRunByIdService(
   payrollRunId: number,
-  _auth?: unknown,
+  auth?: unknown,
 ) {
+  if (auth) {
+    assertAuth(auth);
+    const result = enforceViewPayroll(auth as any);
+    checkAuthz(result);
+  }
   return await getPayrollRunById(payrollRunId);
 }
 
 export async function getPayrollRunItemByIdService(
   payrollRunItemId: number,
-  _auth?: unknown,
+  auth?: unknown,
 ) {
+  if (auth) {
+    assertAuth(auth);
+    const result = await enforceViewPayrollItem(auth as any, prisma, payrollRunItemId);
+    checkAuthz(result);
+  }
   return await getPayrollRunItemById(payrollRunItemId);
 }
 
@@ -495,6 +482,9 @@ export async function confirmPayrollItem(
   auth: unknown,
 ) {
   assertAuth(auth);
+  const result = await enforceUpdatePayrollItem(auth as any, prisma, payrollRunItemId);
+  checkAuthz(result);
+
   const item = await getPayrollRunItemById(payrollRunItemId);
   if (!item) {
     throw new Error("Payroll run item not found");
@@ -535,6 +525,9 @@ export async function payPayrollItem(
   auth: unknown,
 ) {
   assertAuth(auth);
+  const result = await enforceUpdatePayrollItem(auth as any, prisma, payrollRunItemId);
+  checkAuthz(result);
+
   const item = await getPayrollRunItemById(payrollRunItemId);
   if (!item) {
     throw new Error("Payroll run item not found");

@@ -49,10 +49,12 @@ export async function inventoryAdminHandler(req: Request, res: Response) {
   if (path === "/admin/inventory/low-stock" && method === "GET") {
     try {
       const threshold = req.query.threshold ? Number(req.query.threshold) : 10;
-      const products = await getLowStockProducts(threshold);
+      const products = await getLowStockProducts(threshold, req.auth);
       res.status(200).json(products);
     } catch (error: any) {
-      res.status(500).json({ message: error.message });
+      if (!handleAuthError(res, error)) {
+        res.status(500).json({ message: error.message });
+      }
     }
     return;
   }

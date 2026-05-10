@@ -92,9 +92,9 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         await assignEmployeePaymentType(
           employeeId,
           paymentTypeId,
+          req.auth,
           salaryAmount,
           undefined,
-          req.auth,
         );
       } else if (paymentTypeId === 2 && perOrderRate) {
         await assignEmployeeRate(employeeId, perOrderRate, req.auth);
@@ -135,10 +135,10 @@ export async function employeeAdminHandler(req: Request, res: Response) {
       await createPayment(
         employeeId,
         amount,
+        req.auth,
         paymentPeriodLabel,
         notes,
         contractId,
-        req.auth,
       );
       res.status(201).json({ success: true, employeeId, amount });
       return;

@@ -40,5 +40,5 @@ export function canUpdateInventory(ctx: AuthContext): boolean {
 export function canViewInventory(ctx: AuthContext): boolean {
   if (ctx.isSuperAdmin) return true;
   if (ctx.roleNames.includes("ADMIN")) return true;
-  return true;
+  return false;
 }
