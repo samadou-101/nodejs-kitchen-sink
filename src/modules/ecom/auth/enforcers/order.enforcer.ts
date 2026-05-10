@@ -92,7 +92,7 @@ export async function enforceCancelOrder(
 }
 
 export function enforceAssignOrder(ctx: AuthContext): AuthorizationResult {
-  const allowed = canAssignOrder(ctx, { orderId: 0, employeeId: null, customerId: 0 });
+  const allowed = canAssignOrder(ctx);
   return { allowed, reason: allowed ? undefined : "Not authorized to assign this order" };
 }
 

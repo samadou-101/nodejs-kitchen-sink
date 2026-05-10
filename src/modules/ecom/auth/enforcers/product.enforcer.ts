@@ -22,7 +22,7 @@ export async function enforceViewProduct(
   _tx: DbClient,
   productId: number,
 ): Promise<AuthorizationResult> {
-  const allowed = canViewProduct(ctx, { productId, categoryId: 0 });
+  const allowed = canViewProduct(ctx);
   return { allowed, reason: allowed ? undefined : "Not authorized to view this product" };
 }
 

@@ -5,7 +5,7 @@ interface Product {
   categoryId: number;
 }
 
-export function canViewProduct(ctx: AuthContext, product: Product): boolean {
+export function canViewProduct(ctx: AuthContext): boolean {
   return true;
 }
 

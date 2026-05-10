@@ -9,14 +9,14 @@ import { assertAuth, checkAuthz } from "@/modules/ecom/auth/errors";
 
 export async function getAssignedOrders(employeeId: number, auth: unknown) {
   assertAuth(auth);
-  const result = enforceViewAssignedOrders(auth as any);
+  const result = enforceViewAssignedOrders(auth);
   checkAuthz(result);
   return await bind(prisma).findAssignedOrders(employeeId);
 }
 
 export async function getOrderById(orderId: number, auth: unknown) {
   assertAuth(auth);
-  const result = await enforceViewOrder(auth as any, prisma, orderId);
+  const result = await enforceViewOrder(auth, prisma, orderId);
   checkAuthz(result);
   return await bind(prisma).findOrderById(orderId);
 }
@@ -52,7 +52,7 @@ export async function addOrderNotes(
   auth: unknown,
 ) {
   assertAuth(auth);
-  const result = await enforceUpdateOrder(auth as any, prisma, orderId);
+  const result = await enforceUpdateOrder(auth, prisma, orderId);
   checkAuthz(result);
   const db = bind(prisma);
   return await db.updateOrderNotes(orderId, notes);

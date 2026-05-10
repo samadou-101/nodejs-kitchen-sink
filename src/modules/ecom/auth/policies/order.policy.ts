@@ -39,7 +39,7 @@ export function canCancelOrder(ctx: AuthContext, order: Order): boolean {
   return false;
 }
 
-export function canAssignOrder(ctx: AuthContext, order: Order): boolean {
+export function canAssignOrder(ctx: AuthContext): boolean {
   if (ctx.isSuperAdmin) return true;
   if (ctx.roleNames.includes("ADMIN")) return true;
   return false;

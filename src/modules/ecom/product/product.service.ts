@@ -24,7 +24,7 @@ import { assertAuth, checkAuthz } from "@/modules/ecom/auth/errors";
 
 export async function createProduct(data: ProductData, auth: unknown) {
   assertAuth(auth);
-  const result = enforceCreateProduct(auth as any);
+  const result = enforceCreateProduct(auth);
   checkAuthz(result);
   return await insertProduct(data);
 }
@@ -35,7 +35,7 @@ export async function updateProduct(data: ProductData, auth: unknown) {
   const productId = data.id;
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceUpdateProduct(auth as any, tx, productId);
+    const result = await enforceUpdateProduct(auth, tx, productId);
     checkAuthz(result);
     try {
       return await updateProductRepo(data);
@@ -49,7 +49,7 @@ export async function removeProduct(id: number, auth: unknown) {
   assertAuth(auth);
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceDeleteProduct(auth as any, tx, id);
+    const result = await enforceDeleteProduct(auth, tx, id);
     checkAuthz(result);
     try {
       return await deleteProductRepo(id);
@@ -62,7 +62,7 @@ export async function removeProduct(id: number, auth: unknown) {
 export async function getProductById(id: number, auth?: unknown) {
   if (auth) {
     assertAuth(auth);
-    const result = await enforceViewProduct(auth as any, prisma, id);
+    const result = await enforceViewProduct(auth, prisma, id);
     checkAuthz(result);
   }
   return await findProductByIdRepo(id);
@@ -71,7 +71,7 @@ export async function getProductById(id: number, auth?: unknown) {
 export async function getAllProducts(filter?: ProductFilter, auth?: unknown) {
   if (auth) {
     assertAuth(auth);
-    const result = await enforceViewProduct(auth as any, prisma, 0);
+    const result = await enforceViewProduct(auth, prisma, 0);
     checkAuthz(result);
   }
   return await findAllProductsRepo(filter);
@@ -79,7 +79,7 @@ export async function getAllProducts(filter?: ProductFilter, auth?: unknown) {
 
 export async function createCategory(data: CategoryData, auth: unknown) {
   assertAuth(auth);
-  const result = enforceCreateProduct(auth as any);
+  const result = enforceCreateProduct(auth);
   checkAuthz(result);
   return await insertCategory(data);
 }
@@ -87,7 +87,7 @@ export async function createCategory(data: CategoryData, auth: unknown) {
 export async function getCategoryById(id: number, auth?: unknown) {
   if (auth) {
     assertAuth(auth);
-    const result = await enforceViewProduct(auth as any, prisma, 0);
+    const result = await enforceViewProduct(auth, prisma, 0);
     checkAuthz(result);
   }
   return await findCategoryById(id);
@@ -96,7 +96,7 @@ export async function getCategoryById(id: number, auth?: unknown) {
 export async function getAllCategories(auth?: unknown) {
   if (auth) {
     assertAuth(auth);
-    const result = await enforceViewProduct(auth as any, prisma, 0);
+    const result = await enforceViewProduct(auth, prisma, 0);
     checkAuthz(result);
   }
   return await findAllCategories();
@@ -108,7 +108,7 @@ export async function updateCategory(data: CategoryData, auth: unknown) {
   const categoryId = data.categoryId;
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceUpdateProduct(auth as any, tx, categoryId);
+    const result = await enforceUpdateProduct(auth, tx, categoryId);
     checkAuthz(result);
     return await updateCategoryRepo(data);
   });
@@ -118,7 +118,7 @@ export async function removeCategory(id: number, auth: unknown) {
   assertAuth(auth);
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceDeleteProduct(auth as any, tx, id);
+    const result = await enforceDeleteProduct(auth, tx, id);
     checkAuthz(result);
     return await deleteCategory(id);
   });
@@ -127,7 +127,7 @@ export async function removeCategory(id: number, auth: unknown) {
 export async function searchProducts(query: string, auth?: unknown) {
   if (auth) {
     assertAuth(auth);
-    const result = await enforceViewProduct(auth as any, prisma, 0);
+    const result = await enforceViewProduct(auth, prisma, 0);
     checkAuthz(result);
   }
   return await searchProductsRepo(query);
@@ -136,7 +136,7 @@ export async function searchProducts(query: string, auth?: unknown) {
 export async function getProductsByCategory(categoryId: number, auth?: unknown) {
   if (auth) {
     assertAuth(auth);
-    const result = await enforceViewProduct(auth as any, prisma, 0);
+    const result = await enforceViewProduct(auth, prisma, 0);
     checkAuthz(result);
   }
   return await findProductsByCategory(categoryId);

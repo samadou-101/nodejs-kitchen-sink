@@ -69,7 +69,7 @@ async function checkAndDecrementInventory(
 
 export async function placeOrder(orderData: OrderData, auth: unknown) {
   assertAuth(auth);
-  const result = enforceCreateOrder(auth as any);
+  const result = enforceCreateOrder(auth);
   checkAuthz(result);
 
   return await prisma.$transaction(async (tx) => {
@@ -89,7 +89,7 @@ export async function getOrderById(orderId: number, auth: unknown) {
 
   return await prisma.$transaction(async (tx) => {
     const db = bind(tx);
-    const result = await enforceViewOrder(auth as any, tx, orderId);
+    const result = await enforceViewOrder(auth, tx, orderId);
     checkAuthz(result);
 
     const order = await db.findOrderById(orderId);
@@ -105,7 +105,7 @@ export async function updateOrder(orderData: OrderData, auth: unknown) {
 
   return await prisma.$transaction(async (tx) => {
     const db = bind(tx);
-    const result = await enforceUpdateOrder(auth as any, tx, orderData.orderId);
+    const result = await enforceUpdateOrder(auth, tx, orderData.orderId);
     checkAuthz(result);
 
     const existing = await db.findOrderWithCustomer(orderData.orderId);
@@ -137,7 +137,7 @@ export async function updateOrderItems(
   assertAuth(auth);
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceUpdateOrder(auth as any, tx, orderId);
+    const result = await enforceUpdateOrder(auth, tx, orderId);
     checkAuthz(result);
     return await bind(tx).replaceOrderItems(orderId, orderItems);
   });
@@ -147,7 +147,7 @@ export async function deleteOrderById(orderId: number, auth: unknown) {
   assertAuth(auth);
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceDeleteOrder(auth as any);
+    const result = await enforceDeleteOrder(auth);
     checkAuthz(result);
     return await bind(tx).deleteOrder(orderId);
   });
@@ -161,7 +161,7 @@ export async function assignOrderToEmployee(
   assertAuth(auth);
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceAssignOrder(auth as any);
+    const result = await enforceAssignOrder(auth);
     checkAuthz(result);
     return await bind(tx).assignEmployee(orderId, employeeId);
   });
@@ -174,7 +174,7 @@ export async function unassignEmployeeFromOrder(
   assertAuth(auth);
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceAssignOrder(auth as any);
+    const result = await enforceAssignOrder(auth);
     checkAuthz(result);
     return await bind(tx).unassignEmployee(orderId);
   });
@@ -191,7 +191,7 @@ export async function updateOrderStatus(
     return await prisma.$transaction(async (tx) => {
       const db = bind(tx);
 
-      const result = await enforceConfirmOrder(auth as any, tx, orderId);
+      const result = await enforceConfirmOrder(auth, tx, orderId);
       checkAuthz(result);
 
       const order = await db.findOrderById(orderId);
@@ -244,7 +244,7 @@ export async function updateInventory(
   auth: unknown,
 ) {
   assertAuth(auth);
-  const result = enforceUpdateInventory(auth as any);
+  const result = enforceUpdateInventory(auth);
   checkAuthz(result);
 
   const db = bind(prisma);
@@ -283,7 +283,7 @@ export async function listOrders(
   auth: unknown,
 ) {
   assertAuth(auth);
-  const result = enforceViewAllOrders(auth as any);
+  const result = enforceViewAllOrders(auth);
   checkAuthz(result);
   return await bind(prisma).findOrders(filter);
 }

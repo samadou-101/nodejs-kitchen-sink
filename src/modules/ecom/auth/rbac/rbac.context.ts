@@ -19,23 +19,11 @@ export async function authenticate(
       return;
     }
 
-    const cachedSession = await checkCachedSession(sid);
-    let session;
+    const session = await checkCachedSession(sid) ?? await getUseSessionFromDB(sid);
 
-    if (cachedSession) {
-      const cached = await redisClient.get(`session:${sid}`);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        session = parsed;
-      }
-    }
-
-    if (!session) {
-      session = await getUseSessionFromDB(sid);
-      if (!session || session.revoked) {
-        res.status(401).json({ error: "Invalid or expired session" });
-        return;
-      }
+    if (!session || session.revoked) {
+      res.status(401).json({ error: "Invalid or expired session" });
+      return;
     }
 
     const authContext = await resolveAuthContext(session.userId);
@@ -48,17 +36,17 @@ export async function authenticate(
   }
 }
 
-async function checkCachedSession(sid: string): Promise<boolean> {
+async function checkCachedSession(sid: string): Promise<Record<string, any> | null> {
   const key = `session:${sid}`;
   const rawSession = await redisClient.get(key);
-  if (!rawSession) return false;
+  if (!rawSession) return null;
 
   try {
     const session = JSON.parse(rawSession);
     const expiresAt = new Date(session.expires_at);
     if (expiresAt < new Date()) {
       await redisClient.del(key);
-      return false;
+      return null;
     }
 
     const now = Date.now();
@@ -72,10 +60,10 @@ async function checkCachedSession(sid: string): Promise<boolean> {
       await redisClient.expire(key, Math.max(1, newTtl));
     }
 
-    return true;
+    return session;
   } catch {
     await redisClient.del(key);
-    return false;
+    return null;
   }
 }
 

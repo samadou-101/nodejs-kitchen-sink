@@ -1,3 +1,5 @@
+import type { AuthContext } from "./rbac/rbac.types";
+
 export class ForbiddenError extends Error {
   constructor(message: string) {
     super(message);
@@ -19,7 +21,7 @@ export class NotFoundError extends Error {
   }
 }
 
-export function assertAuth(auth: unknown): asserts auth is { userId: number } {
+export function assertAuth(auth: unknown): asserts auth is AuthContext {
   if (!auth) throw new UnauthorizedError("Authentication required");
 }
 
