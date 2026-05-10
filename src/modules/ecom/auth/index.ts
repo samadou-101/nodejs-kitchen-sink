@@ -10,6 +10,8 @@ export * from "./guards/permission.guard";
 export * from "./policies";
 export * from "./enforcers";
 
+export * from "./errors";
+
 export { requireAuth, authenticate } from "./rbac/rbac.context";
 export { resolveAuthContext, getAuthContext, invalidateAuthCache } from "./rbac/rbac.service";
 

@@ -1,6 +1,6 @@
 import { createClient, type RedisClientType } from "redis";
 
-const RedisURL = process.env.REDIS_URL;
+const RedisURL = process.env.REDIS_URL!;
 export const redisClient: RedisClientType = createClient({
   url: RedisURL,
 });

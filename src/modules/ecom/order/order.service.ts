@@ -6,6 +6,14 @@ import {
   InsufficientStockError,
   ProductNotFoundError,
 } from "./order.errors";
+import {
+  enforceCreateOrder,
+  enforceUpdateOrder,
+  enforceDeleteOrder,
+  enforceAssignOrder,
+  enforceViewAllOrders,
+} from "@/modules/ecom/auth";
+import { assertAuth, checkAuthz } from "@/modules/ecom/auth/errors";
 
 async function checkAndDecrementInventory(
   orderItems: OrderItem[],
@@ -56,7 +64,11 @@ async function checkAndDecrementInventory(
   }
 }
 
-export async function placeOrder(orderData: OrderData) {
+export async function placeOrder(orderData: OrderData, auth: unknown) {
+  assertAuth(auth);
+  const result = enforceCreateOrder(auth as any);
+  checkAuthz(result);
+
   return await prisma.$transaction(async (tx) => {
     const db = bind(tx);
     const order = await db.insertOrder(orderData);
@@ -69,13 +81,24 @@ export async function placeOrder(orderData: OrderData) {
   });
 }
 
-export async function getOrderById(orderId: number) {
-  return await bind(prisma).findOrderById(orderId);
+export async function getOrderById(orderId: number, auth: unknown) {
+  assertAuth(auth);
+  const db = bind(prisma);
+  const order = await db.findOrderById(orderId);
+  if (!order) return null;
+
+  return order;
 }
 
-export async function updateOrder(orderData: OrderData) {
+export async function updateOrder(orderData: OrderData, auth: unknown) {
+  assertAuth(auth);
+  if (!orderData.orderId) throw new Error("Order ID required");
+
   return await prisma.$transaction(async (tx) => {
     const db = bind(tx);
+    const result = await enforceUpdateOrder(auth as any, tx, orderData.orderId);
+    checkAuthz(result);
+
     const existing = await db.findOrderWithCustomer(orderData.orderId);
     if (!existing) {
       throw new OrderNotFoundError(orderData.orderId);
@@ -100,29 +123,62 @@ export async function updateOrder(orderData: OrderData) {
 export async function updateOrderItems(
   orderId: number,
   orderItems: OrderItem[],
+  auth: unknown,
 ) {
+  assertAuth(auth);
   return await bind(prisma).replaceOrderItems(orderId, orderItems);
 }
 
-export async function deleteOrderById(orderId: number) {
-  return await bind(prisma).deleteOrder(orderId);
+export async function deleteOrderById(orderId: number, auth: unknown) {
+  assertAuth(auth);
+
+  return await prisma.$transaction(async (tx) => {
+    const result = await enforceDeleteOrder(auth as any);
+    checkAuthz(result);
+    return await bind(tx).deleteOrder(orderId);
+  });
 }
 
 export async function assignOrderToEmployee(
   orderId: number,
   employeeId: number,
+  auth: unknown,
 ) {
-  return await bind(prisma).assignEmployee(orderId, employeeId);
+  assertAuth(auth);
+
+  return await prisma.$transaction(async (tx) => {
+    const result = await enforceAssignOrder(auth as any);
+    checkAuthz(result);
+    return await bind(tx).assignEmployee(orderId, employeeId);
+  });
 }
 
-export async function unassignEmployeeFromOrder(orderId: number) {
-  return await bind(prisma).unassignEmployee(orderId);
+export async function unassignEmployeeFromOrder(
+  orderId: number,
+  auth: unknown,
+) {
+  assertAuth(auth);
+
+  return await prisma.$transaction(async (tx) => {
+    const result = await enforceAssignOrder(auth as any);
+    checkAuthz(result);
+    return await bind(tx).unassignEmployee(orderId);
+  });
 }
 
-export async function updateOrderStatus(orderId: number, statusId: number) {
+export async function updateOrderStatus(
+  orderId: number,
+  statusId: number,
+  auth: unknown,
+) {
+  assertAuth(auth);
+
   try {
     return await prisma.$transaction(async (tx) => {
       const db = bind(tx);
+
+      const result = await enforceAssignOrder(auth as any);
+      checkAuthz(result);
 
       const order = await db.findOrderById(orderId);
       if (!order) {
@@ -198,12 +254,18 @@ export async function updateInventory(
   return result;
 }
 
-export async function listOrders(filter: {
-  statusId?: number;
-  employeeId?: number;
-  page?: number;
-  limit?: number;
-}) {
+export async function listOrders(
+  filter: {
+    statusId?: number;
+    employeeId?: number;
+    page?: number;
+    limit?: number;
+  },
+  auth: unknown,
+) {
+  assertAuth(auth);
+  const result = enforceViewAllOrders(auth as any);
+  checkAuthz(result);
   return await bind(prisma).findOrders(filter);
 }
 

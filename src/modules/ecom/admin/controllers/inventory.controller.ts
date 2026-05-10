@@ -3,6 +3,19 @@ import {
   adjustInventory,
   getLowStockProducts,
 } from "../services/inventory.service";
+import { ForbiddenError, UnauthorizedError } from "@/modules/ecom/auth/errors";
+
+function handleAuthError(res: Response, error: unknown) {
+  if (error instanceof UnauthorizedError) {
+    res.status(401).json({ error: error.message });
+    return true;
+  }
+  if (error instanceof ForbiddenError) {
+    res.status(403).json({ error: error.message });
+    return true;
+  }
+  return false;
+}
 
 export async function inventoryAdminHandler(req: Request, res: Response) {
   const path = req.path;
@@ -23,10 +36,12 @@ export async function inventoryAdminHandler(req: Request, res: Response) {
         res.status(400).json({ message: "action must be 'increase' or 'decrease'" });
         return;
       }
-      await adjustInventory({ productId, action, amount });
+      await adjustInventory({ productId, action, amount }, req.auth);
       res.status(200).json({ message: "Stock adjusted successfully" });
     } catch (error: any) {
-      res.status(400).json({ message: error.message });
+      if (!handleAuthError(res, error)) {
+        res.status(400).json({ message: error.message });
+      }
     }
     return;
   }

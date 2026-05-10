@@ -16,6 +16,19 @@ import {
   getEmployeePerformanceService,
 } from "../services/employee.service";
 import type { PayrollRunStatus } from "../admin.types";
+import { ForbiddenError, UnauthorizedError } from "@/modules/ecom/auth/errors";
+
+function handleAuthError(res: Response, error: unknown) {
+  if (error instanceof UnauthorizedError) {
+    res.status(401).json({ error: error.message });
+    return true;
+  }
+  if (error instanceof ForbiddenError) {
+    res.status(403).json({ error: error.message });
+    return true;
+  }
+  return false;
+}
 
 export async function employeeAdminHandler(req: Request, res: Response) {
   const path = req.path;
@@ -23,13 +36,10 @@ export async function employeeAdminHandler(req: Request, res: Response) {
   const POST_METHOD = "POST";
   const GET_METHOD = "GET";
 
-  // Employee paths
   const EMPLOYEE_ACTIVATION_PATH = "/admin/employee/add";
-  const EMPLOYEE_PAYMENT_TYPE_PATH =
-    /^\/admin\/employees\/(\d+)\/payment-type$/;
+  const EMPLOYEE_PAYMENT_TYPE_PATH = /^\/admin\/employees\/(\d+)\/payment-type$/;
   const EMPLOYEE_PAYMENT_PATH = /^\/admin\/employees\/(\d+)\/payments$/;
 
-  // Payroll paths
   const PAYROLL_PREVIEW_PATH = "/admin/payroll/preview";
   const PAYROLL_CREATE_PATH = "/admin/payroll";
   const PAYROLL_LIST_PATH = "/admin/payroll";
@@ -37,15 +47,12 @@ export async function employeeAdminHandler(req: Request, res: Response) {
   const PAYROLL_CONFIRM_PATH = /^\/admin\/payroll\/(\d+)\/confirm$/;
   const PAYROLL_PAID_PATH = /^\/admin\/payroll\/(\d+)\/paid$/;
 
-  // Payroll Item paths
   const PAYROLL_ITEM_GET_PATH = /^\/admin\/payroll\/(\d+)\/items\/(\d+)$/;
   const PAYROLL_ITEM_CONFIRM_PATH = /^\/admin\/payroll\/(\d+)\/items\/(\d+)\/confirm$/;
   const PAYROLL_ITEM_PAID_PATH = /^\/admin\/payroll\/(\d+)\/items\/(\d+)\/paid$/;
 
-  // Employee Performance
   const EMPLOYEE_PERF_PATH = /^\/admin\/employees\/(\d+)\/performance$/;
 
-  // Employee Activation
   if (path === EMPLOYEE_ACTIVATION_PATH && method === POST_METHOD) {
     try {
       const { email } = req.body ?? null;
@@ -53,17 +60,18 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         res.status(400).send("Empty Data");
         return;
       }
-      await addEmployeeToPendingList(email);
+      await addEmployeeToPendingList(email, req.auth);
       res.status(201).send("Employee activated");
       return;
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Something went wrong");
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).send("Something went wrong");
+      }
     }
     return;
   }
 
-  // Employee Payment Type (salary or per-order rate)
   const paymentTypeMatch = path.match(EMPLOYEE_PAYMENT_TYPE_PATH);
   if (paymentTypeMatch && method === POST_METHOD) {
     try {
@@ -85,28 +93,29 @@ export async function employeeAdminHandler(req: Request, res: Response) {
           employeeId,
           paymentTypeId,
           salaryAmount,
+          undefined,
+          req.auth,
         );
       } else if (paymentTypeId === 2 && perOrderRate) {
-        await assignEmployeeRate(employeeId, perOrderRate);
+        await assignEmployeeRate(employeeId, perOrderRate, req.auth);
       } else {
-        res
-          .status(400)
-          .send(
-            `${paymentTypeId === 1 && !salaryAmount ? "Invalid Salary amount" : "Invalid Per order amount"}`,
-          );
+        res.status(400).send(
+          `${paymentTypeId === 1 && !salaryAmount ? "Invalid Salary amount" : "Invalid Per order amount"}`,
+        );
         return;
       }
 
       res.status(201).json({ success: true, employeeId, paymentTypeId });
       return;
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Something went wrong");
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).send("Something went wrong");
+      }
     }
     return;
   }
 
-  // Employee Manual Payment
   const paymentMatch = path.match(EMPLOYEE_PAYMENT_PATH);
   if (paymentMatch && method === POST_METHOD) {
     try {
@@ -123,17 +132,25 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         return;
       }
 
-      await createPayment(employeeId, amount, paymentPeriodLabel, notes, contractId);
+      await createPayment(
+        employeeId,
+        amount,
+        paymentPeriodLabel,
+        notes,
+        contractId,
+        req.auth,
+      );
       res.status(201).json({ success: true, employeeId, amount });
       return;
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Something went wrong");
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).send("Something went wrong");
+      }
     }
     return;
   }
 
-  // Payroll Preview
   if (path === PAYROLL_PREVIEW_PATH && method === POST_METHOD) {
     try {
       const { startDate, endDate, employeeIds } = req.body ?? {};
@@ -143,22 +160,26 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         return;
       }
 
-      const result = await runPayrollPreview({
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
-        employeeIds,
-      });
+      const result = await runPayrollPreview(
+        {
+          startDate: new Date(startDate),
+          endDate: new Date(endDate),
+          employeeIds,
+        },
+        req.auth,
+      );
 
       res.status(201).json(result);
       return;
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Something went wrong");
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).send("Something went wrong");
+      }
     }
     return;
   }
 
-  // Payroll Create (DRAFT run)
   if (path === PAYROLL_CREATE_PATH && method === POST_METHOD) {
     try {
       const { startDate, endDate, employeeIds } = req.body ?? {};
@@ -168,22 +189,26 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         return;
       }
 
-      const result = await runPayrollPreview({
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
-        employeeIds,
-      });
+      const result = await runPayrollPreview(
+        {
+          startDate: new Date(startDate),
+          endDate: new Date(endDate),
+          employeeIds,
+        },
+        req.auth,
+      );
 
       res.status(201).json(result);
       return;
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Something went wrong");
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).send("Something went wrong");
+      }
     }
     return;
   }
 
-  // Payroll List
   if (path === PAYROLL_LIST_PATH && method === GET_METHOD) {
     try {
       const { status } = req.query ?? {};
@@ -192,17 +217,19 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         : undefined;
       const runs = await getPayrollRunsService(
         uppercasedStatus as PayrollRunStatus | undefined,
+        req.auth,
       );
       res.status(200).json(runs);
       return;
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Something went wrong");
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).send("Something went wrong");
+      }
     }
     return;
   }
 
-  // Payroll Get by ID
   const payrollGetMatch = path.match(PAYROLL_GET_PATH);
   if (payrollGetMatch && method === GET_METHOD) {
     try {
@@ -212,7 +239,7 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         return;
       }
       const payrollRunId = parseInt(payrollRunIdStr, 10);
-      const run = await getPayrollRunByIdService(payrollRunId);
+      const run = await getPayrollRunByIdService(payrollRunId, req.auth);
 
       if (!run) {
         res.status(404).send("Payroll run not found");
@@ -222,13 +249,14 @@ export async function employeeAdminHandler(req: Request, res: Response) {
       res.status(200).json(run);
       return;
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Something went wrong");
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).send("Something went wrong");
+      }
     }
     return;
   }
 
-  // Payroll Confirm
   const payrollConfirmMatch = path.match(PAYROLL_CONFIRM_PATH);
   if (payrollConfirmMatch && method === POST_METHOD) {
     try {
@@ -238,17 +266,18 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         return;
       }
       const payrollRunId = parseInt(payrollRunIdStr, 10);
-      const result = await confirmPayrollRun(payrollRunId);
+      const result = await confirmPayrollRun(payrollRunId, req.auth);
       res.status(200).json(result);
       return;
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Something went wrong");
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).send("Something went wrong");
+      }
     }
     return;
   }
 
-  // Payroll Mark as Paid
   const payrollPaidMatch = path.match(PAYROLL_PAID_PATH);
   if (payrollPaidMatch && method === POST_METHOD) {
     try {
@@ -258,17 +287,18 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         return;
       }
       const payrollRunId = parseInt(payrollRunIdStr, 10);
-      const result = await markPayrollRunAsPaid(payrollRunId);
+      const result = await markPayrollRunAsPaid(payrollRunId, req.auth);
       res.status(200).json(result);
       return;
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Something went wrong");
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).send("Something went wrong");
+      }
     }
     return;
   }
 
-  // Payroll Item Get
   const payrollItemGetMatch = path.match(PAYROLL_ITEM_GET_PATH);
   if (payrollItemGetMatch && method === GET_METHOD) {
     try {
@@ -278,7 +308,7 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         return;
       }
       const payrollRunItemId = parseInt(payrollRunItemIdStr, 10);
-      const item = await getPayrollRunItemByIdService(payrollRunItemId);
+      const item = await getPayrollRunItemByIdService(payrollRunItemId, req.auth);
       if (!item) {
         res.status(404).send("Payroll run item not found");
         return;
@@ -286,13 +316,14 @@ export async function employeeAdminHandler(req: Request, res: Response) {
       res.status(200).json(item);
       return;
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Something went wrong");
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).send("Something went wrong");
+      }
     }
     return;
   }
 
-  // Payroll Item Confirm
   const payrollItemConfirmMatch = path.match(PAYROLL_ITEM_CONFIRM_PATH);
   if (payrollItemConfirmMatch && method === POST_METHOD) {
     try {
@@ -302,17 +333,18 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         return;
       }
       const payrollRunItemId = parseInt(payrollRunItemIdStr, 10);
-      const result = await confirmPayrollItem(payrollRunItemId);
+      const result = await confirmPayrollItem(payrollRunItemId, req.auth);
       res.status(200).json(result);
       return;
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Something went wrong");
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).send("Something went wrong");
+      }
     }
     return;
   }
 
-  // Payroll Item Mark as Paid
   const payrollItemPaidMatch = path.match(PAYROLL_ITEM_PAID_PATH);
   if (payrollItemPaidMatch && method === POST_METHOD) {
     try {
@@ -322,16 +354,17 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         return;
       }
       const payrollRunItemId = parseInt(payrollRunItemIdStr, 10);
-      const result = await payPayrollItem(payrollRunItemId);
+      const result = await payPayrollItem(payrollRunItemId, req.auth);
       res.status(200).json(result);
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Something went wrong");
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).send("Something went wrong");
+      }
     }
     return;
   }
 
-  // Employee Performance
   const perfMatch = path.match(EMPLOYEE_PERF_PATH);
   if (perfMatch && method === GET_METHOD) {
     try {
@@ -341,12 +374,20 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         return;
       }
       const employeeId = parseInt(employeeIdStr, 10);
-      const days = req.query.days ? parseInt(req.query.days as string, 10) : 30;
-      const perf = await getEmployeePerformanceService(employeeId, days);
+      const days = req.query.days
+        ? parseInt(req.query.days as string, 10)
+        : 30;
+      const perf = await getEmployeePerformanceService(
+        employeeId,
+        req.auth,
+        days,
+      );
       res.status(200).json(perf);
     } catch (error) {
-      console.error(error);
-      res.status(500).send("Something went wrong");
+      if (!handleAuthError(res, error)) {
+        console.error(error);
+        res.status(500).send("Something went wrong");
+      }
     }
     return;
   }

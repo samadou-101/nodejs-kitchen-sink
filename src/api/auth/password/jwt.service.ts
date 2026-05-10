@@ -19,7 +19,7 @@ export async function checkAuth(
   try {
     const verifiedAccessToken = jwt.verify(
       accessToken,
-      process.env.ACCESS_TOKEN_SECRET,
+      process.env.ACCESS_TOKEN_SECRET!,
     );
     console.log("access token verfication + ", verifiedAccessToken);
     next();

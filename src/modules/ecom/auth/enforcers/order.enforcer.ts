@@ -90,21 +90,8 @@ export async function enforceCancelOrder(
   return { allowed, reason: allowed ? undefined : "Not authorized to cancel this order" };
 }
 
-export async function enforceAssignOrder(
-  ctx: AuthContext,
-  tx: PrismaClient | Prisma.TransactionClient,
-  orderId: number,
-): Promise<AuthorizationResult> {
-  const order = await tx.order.findUnique({
-    where: { orderId },
-    select: { orderId: true, employeeId: true, customerId: true },
-  });
-
-  if (!order) {
-    return { allowed: false, reason: "Order not found" };
-  }
-
-  const allowed = canAssignOrder(ctx, order);
+export function enforceAssignOrder(ctx: AuthContext): AuthorizationResult {
+  const allowed = canAssignOrder(ctx, { orderId: 0, employeeId: null, customerId: 0 });
   return { allowed, reason: allowed ? undefined : "Not authorized to assign this order" };
 }
 

@@ -14,11 +14,21 @@ import {
   getProductsByCategory,
 } from "./product.service";
 import type { CategoryData, ProductData, ProductFilter } from "./product.types";
+import { ForbiddenError, UnauthorizedError } from "@/modules/ecom/auth/errors";
+
+function handleAuthError(res: Response, error: unknown) {
+  if (error instanceof UnauthorizedError) {
+    res.status(401).json({ error: error.message });
+    return true;
+  }
+  if (error instanceof ForbiddenError) {
+    res.status(403).json({ error: error.message });
+    return true;
+  }
+  return false;
+}
 
 export async function productHandler(req: Request, res: Response) {
-  console.log(req.path);
-
-  // Creating product
   if (req.path === "/product/create" && req.method === "POST") {
     try {
       const productData = (req.body as ProductData) ?? {};
@@ -26,22 +36,22 @@ export async function productHandler(req: Request, res: Response) {
         res.status(409).send("Invalid Data");
         return;
       }
-      const product = await createProduct(productData);
+      const product = await createProduct(productData, req.auth);
       res.status(201).send(product);
     } catch (error: any) {
-      res.status(500).send({ error: error.message });
-      return;
+      if (!handleAuthError(res, error)) {
+        res.status(500).send({ error: error.message });
+      }
     }
+    return;
   }
 
-  // Getting product by id
   if (
     req.method === "GET" &&
     req.path.startsWith("/product/") &&
     req.params.id
   ) {
     const productId = Number(req.path.split("/")[2]);
-    console.log("hit get product");
     if (Number.isNaN(productId)) {
       res.status(400).send("Invalid Product ID ");
       return;
@@ -59,7 +69,6 @@ export async function productHandler(req: Request, res: Response) {
     }
   }
 
-  // getting all products
   if (req.path === "/products" && req.method === "GET") {
     try {
       const filter: Partial<ProductFilter> = {};
@@ -80,7 +89,6 @@ export async function productHandler(req: Request, res: Response) {
     }
   }
 
-  // updating a product
   if (req.path === "/product/update" && req.method === "POST") {
     try {
       const productData = (req.body as ProductData) ?? {};
@@ -88,37 +96,37 @@ export async function productHandler(req: Request, res: Response) {
         res.status(409).send("Invalid Data");
         return;
       }
-      const updated = await updateProduct(productData);
+      const updated = await updateProduct(productData, req.auth);
       res.status(200).send(updated);
     } catch (error: any) {
-      res.status(500).send({ error: error.message });
-      return;
+      if (!handleAuthError(res, error)) {
+        res.status(500).send({ error: error.message });
+      }
     }
+    return;
   }
 
-  // deleting a product
   if (
     req.method === "DELETE" &&
     req.path.startsWith("/product/") &&
     req.params.id
   ) {
-    console.log("delete route hit ");
     const productId = Number(req.params.id);
     try {
-      const deletedProduct = await removeProduct(productId);
+      const deletedProduct = await removeProduct(productId, req.auth);
       if (!deletedProduct) {
         res.status(400).send("No product found");
         return;
       }
       res.status(200).send("Product deleted successfully");
       return;
-    } catch (error) {
-      console.log(error);
-      res.status(500).send("Internal server error");
+    } catch (error: any) {
+      if (!handleAuthError(res, error)) {
+        res.status(500).send({ error: error.message });
+      }
     }
   }
 
-  // Category CRUD
   if (req.path === "/category" && req.method === "POST") {
     try {
       const categoryData = (req.body as CategoryData) ?? {};
@@ -126,10 +134,12 @@ export async function productHandler(req: Request, res: Response) {
         res.status(409).send("Invalid Data");
         return;
       }
-      const category = await createCategory(categoryData);
+      const category = await createCategory(categoryData, req.auth);
       res.status(201).send(category);
     } catch (error: any) {
-      res.status(500).send({ error: error.message });
+      if (!handleAuthError(res, error)) {
+        res.status(500).send({ error: error.message });
+      }
     }
     return;
   }
@@ -170,10 +180,12 @@ export async function productHandler(req: Request, res: Response) {
         res.status(409).send("Invalid Data");
         return;
       }
-      const updated = await updateCategory(categoryData);
+      const updated = await updateCategory(categoryData, req.auth);
       res.status(200).send(updated);
     } catch (error: any) {
-      res.status(500).send({ error: error.message });
+      if (!handleAuthError(res, error)) {
+        res.status(500).send({ error: error.message });
+      }
     }
     return;
   }
@@ -185,10 +197,12 @@ export async function productHandler(req: Request, res: Response) {
       return;
     }
     try {
-      await removeCategory(categoryId);
+      await removeCategory(categoryId, req.auth);
       res.status(200).send("Category deleted successfully");
     } catch (error: any) {
-      res.status(500).send({ error: error.message });
+      if (!handleAuthError(res, error)) {
+        res.status(500).send({ error: error.message });
+      }
     }
     return;
   }

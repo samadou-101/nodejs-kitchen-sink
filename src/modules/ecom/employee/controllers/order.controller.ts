@@ -31,7 +31,7 @@ export async function employeeOrderHandler(req: Request, res: Response) {
   if (confirmMatch && method === "PATCH") {
     try {
       const orderId = parseInt(confirmMatch[1]!, 10);
-      const order = await confirmOrder(orderId);
+      const order = await confirmOrder(orderId, req.auth);
       res.status(200).json({ message: "Order confirmed", order });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -43,7 +43,7 @@ export async function employeeOrderHandler(req: Request, res: Response) {
   if (rejectMatch && method === "PATCH") {
     try {
       const orderId = parseInt(rejectMatch[1]!, 10);
-      const order = await rejectOrder(orderId);
+      const order = await rejectOrder(orderId, req.auth);
       res.status(200).json({ message: "Order rejected", order });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -60,7 +60,7 @@ export async function employeeOrderHandler(req: Request, res: Response) {
         res.status(400).json({ message: "notes is required" });
         return;
       }
-      const order = await addOrderNotes(orderId, notes);
+      const order = await addOrderNotes(orderId, notes, req.auth);
       res.status(200).json({ message: "Notes added", order });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
