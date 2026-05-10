@@ -210,6 +210,7 @@ export type UserWhereInput = {
   password?: Prisma.StringFilter<"User"> | string
   sessions?: Prisma.SessionListRelationFilter
   passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter
+  roles?: Prisma.UserRoleListRelationFilter
   employee?: Prisma.XOR<Prisma.EmployeeNullableScalarRelationFilter, Prisma.EmployeeWhereInput> | null
   customer?: Prisma.XOR<Prisma.CustomerNullableScalarRelationFilter, Prisma.CustomerWhereInput> | null
   pendingAdmins?: Prisma.PendingAdminListRelationFilter
@@ -222,6 +223,7 @@ export type UserOrderByWithRelationInput = {
   password?: Prisma.SortOrder
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   passwordResetTokens?: Prisma.PasswordResetTokenOrderByRelationAggregateInput
+  roles?: Prisma.UserRoleOrderByRelationAggregateInput
   employee?: Prisma.EmployeeOrderByWithRelationInput
   customer?: Prisma.CustomerOrderByWithRelationInput
   pendingAdmins?: Prisma.PendingAdminOrderByRelationAggregateInput
@@ -237,6 +239,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   password?: Prisma.StringFilter<"User"> | string
   sessions?: Prisma.SessionListRelationFilter
   passwordResetTokens?: Prisma.PasswordResetTokenListRelationFilter
+  roles?: Prisma.UserRoleListRelationFilter
   employee?: Prisma.XOR<Prisma.EmployeeNullableScalarRelationFilter, Prisma.EmployeeWhereInput> | null
   customer?: Prisma.XOR<Prisma.CustomerNullableScalarRelationFilter, Prisma.CustomerWhereInput> | null
   pendingAdmins?: Prisma.PendingAdminListRelationFilter
@@ -270,6 +273,7 @@ export type UserCreateInput = {
   password: string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   employee?: Prisma.EmployeeCreateNestedOneWithoutUserInput
   customer?: Prisma.CustomerCreateNestedOneWithoutUserInput
   pendingAdmins?: Prisma.PendingAdminCreateNestedManyWithoutUserInput
@@ -282,6 +286,7 @@ export type UserUncheckedCreateInput = {
   password: string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   employee?: Prisma.EmployeeUncheckedCreateNestedOneWithoutUserInput
   customer?: Prisma.CustomerUncheckedCreateNestedOneWithoutUserInput
   pendingAdmins?: Prisma.PendingAdminUncheckedCreateNestedManyWithoutUserInput
@@ -293,6 +298,7 @@ export type UserUpdateInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   employee?: Prisma.EmployeeUpdateOneWithoutUserNestedInput
   customer?: Prisma.CustomerUpdateOneWithoutUserNestedInput
   pendingAdmins?: Prisma.PendingAdminUpdateManyWithoutUserNestedInput
@@ -305,6 +311,7 @@ export type UserUncheckedUpdateInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   employee?: Prisma.EmployeeUncheckedUpdateOneWithoutUserNestedInput
   customer?: Prisma.CustomerUncheckedUpdateOneWithoutUserNestedInput
   pendingAdmins?: Prisma.PendingAdminUncheckedUpdateManyWithoutUserNestedInput
@@ -328,6 +335,11 @@ export type UserUncheckedUpdateManyInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
+}
+
+export type UserScalarRelationFilter = {
+  is?: Prisma.UserWhereInput
+  isNot?: Prisma.UserWhereInput
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -364,21 +376,18 @@ export type UserNullableScalarRelationFilter = {
   isNot?: Prisma.UserWhereInput | null
 }
 
-export type UserScalarRelationFilter = {
-  is?: Prisma.UserWhereInput
-  isNot?: Prisma.UserWhereInput
+export type UserCreateNestedOneWithoutRolesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRolesInput, Prisma.UserUncheckedCreateWithoutRolesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRolesInput
+  connect?: Prisma.UserWhereUniqueInput
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
-}
-
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
+export type UserUpdateOneRequiredWithoutRolesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRolesInput, Prisma.UserUncheckedCreateWithoutRolesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRolesInput
+  upsert?: Prisma.UserUpsertWithoutRolesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRolesInput, Prisma.UserUpdateWithoutRolesInput>, Prisma.UserUncheckedUpdateWithoutRolesInput>
 }
 
 export type UserCreateNestedOneWithoutPendingAdminsInput = {
@@ -455,12 +464,75 @@ export type UserUpdateOneRequiredWithoutEmployeeNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutEmployeeInput, Prisma.UserUpdateWithoutEmployeeInput>, Prisma.UserUncheckedUpdateWithoutEmployeeInput>
 }
 
+export type UserCreateWithoutRolesInput = {
+  email: string
+  name: string
+  password: string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  employee?: Prisma.EmployeeCreateNestedOneWithoutUserInput
+  customer?: Prisma.CustomerCreateNestedOneWithoutUserInput
+  pendingAdmins?: Prisma.PendingAdminCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutRolesInput = {
+  id?: number
+  email: string
+  name: string
+  password: string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  employee?: Prisma.EmployeeUncheckedCreateNestedOneWithoutUserInput
+  customer?: Prisma.CustomerUncheckedCreateNestedOneWithoutUserInput
+  pendingAdmins?: Prisma.PendingAdminUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutRolesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutRolesInput, Prisma.UserUncheckedCreateWithoutRolesInput>
+}
+
+export type UserUpsertWithoutRolesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutRolesInput, Prisma.UserUncheckedUpdateWithoutRolesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutRolesInput, Prisma.UserUncheckedCreateWithoutRolesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutRolesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutRolesInput, Prisma.UserUncheckedUpdateWithoutRolesInput>
+}
+
+export type UserUpdateWithoutRolesInput = {
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  employee?: Prisma.EmployeeUpdateOneWithoutUserNestedInput
+  customer?: Prisma.CustomerUpdateOneWithoutUserNestedInput
+  pendingAdmins?: Prisma.PendingAdminUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutRolesInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  employee?: Prisma.EmployeeUncheckedUpdateOneWithoutUserNestedInput
+  customer?: Prisma.CustomerUncheckedUpdateOneWithoutUserNestedInput
+  pendingAdmins?: Prisma.PendingAdminUncheckedUpdateManyWithoutUserNestedInput
+}
+
 export type UserCreateWithoutPendingAdminsInput = {
   email: string
   name: string
   password: string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   employee?: Prisma.EmployeeCreateNestedOneWithoutUserInput
   customer?: Prisma.CustomerCreateNestedOneWithoutUserInput
 }
@@ -472,6 +544,7 @@ export type UserUncheckedCreateWithoutPendingAdminsInput = {
   password: string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   employee?: Prisma.EmployeeUncheckedCreateNestedOneWithoutUserInput
   customer?: Prisma.CustomerUncheckedCreateNestedOneWithoutUserInput
 }
@@ -498,6 +571,7 @@ export type UserUpdateWithoutPendingAdminsInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   employee?: Prisma.EmployeeUpdateOneWithoutUserNestedInput
   customer?: Prisma.CustomerUpdateOneWithoutUserNestedInput
 }
@@ -509,6 +583,7 @@ export type UserUncheckedUpdateWithoutPendingAdminsInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   employee?: Prisma.EmployeeUncheckedUpdateOneWithoutUserNestedInput
   customer?: Prisma.CustomerUncheckedUpdateOneWithoutUserNestedInput
 }
@@ -518,6 +593,7 @@ export type UserCreateWithoutSessionsInput = {
   name: string
   password: string
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   employee?: Prisma.EmployeeCreateNestedOneWithoutUserInput
   customer?: Prisma.CustomerCreateNestedOneWithoutUserInput
   pendingAdmins?: Prisma.PendingAdminCreateNestedManyWithoutUserInput
@@ -529,6 +605,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   name: string
   password: string
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   employee?: Prisma.EmployeeUncheckedCreateNestedOneWithoutUserInput
   customer?: Prisma.CustomerUncheckedCreateNestedOneWithoutUserInput
   pendingAdmins?: Prisma.PendingAdminUncheckedCreateNestedManyWithoutUserInput
@@ -555,6 +632,7 @@ export type UserUpdateWithoutSessionsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   employee?: Prisma.EmployeeUpdateOneWithoutUserNestedInput
   customer?: Prisma.CustomerUpdateOneWithoutUserNestedInput
   pendingAdmins?: Prisma.PendingAdminUpdateManyWithoutUserNestedInput
@@ -566,6 +644,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   employee?: Prisma.EmployeeUncheckedUpdateOneWithoutUserNestedInput
   customer?: Prisma.CustomerUncheckedUpdateOneWithoutUserNestedInput
   pendingAdmins?: Prisma.PendingAdminUncheckedUpdateManyWithoutUserNestedInput
@@ -576,6 +655,7 @@ export type UserCreateWithoutPasswordResetTokensInput = {
   name: string
   password: string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   employee?: Prisma.EmployeeCreateNestedOneWithoutUserInput
   customer?: Prisma.CustomerCreateNestedOneWithoutUserInput
   pendingAdmins?: Prisma.PendingAdminCreateNestedManyWithoutUserInput
@@ -587,6 +667,7 @@ export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
   name: string
   password: string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   employee?: Prisma.EmployeeUncheckedCreateNestedOneWithoutUserInput
   customer?: Prisma.CustomerUncheckedCreateNestedOneWithoutUserInput
   pendingAdmins?: Prisma.PendingAdminUncheckedCreateNestedManyWithoutUserInput
@@ -613,6 +694,7 @@ export type UserUpdateWithoutPasswordResetTokensInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   employee?: Prisma.EmployeeUpdateOneWithoutUserNestedInput
   customer?: Prisma.CustomerUpdateOneWithoutUserNestedInput
   pendingAdmins?: Prisma.PendingAdminUpdateManyWithoutUserNestedInput
@@ -624,6 +706,7 @@ export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   password?: Prisma.StringFieldUpdateOperationsInput | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   employee?: Prisma.EmployeeUncheckedUpdateOneWithoutUserNestedInput
   customer?: Prisma.CustomerUncheckedUpdateOneWithoutUserNestedInput
   pendingAdmins?: Prisma.PendingAdminUncheckedUpdateManyWithoutUserNestedInput
@@ -635,6 +718,7 @@ export type UserCreateWithoutCustomerInput = {
   password: string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   employee?: Prisma.EmployeeCreateNestedOneWithoutUserInput
   pendingAdmins?: Prisma.PendingAdminCreateNestedManyWithoutUserInput
 }
@@ -646,6 +730,7 @@ export type UserUncheckedCreateWithoutCustomerInput = {
   password: string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   employee?: Prisma.EmployeeUncheckedCreateNestedOneWithoutUserInput
   pendingAdmins?: Prisma.PendingAdminUncheckedCreateNestedManyWithoutUserInput
 }
@@ -672,6 +757,7 @@ export type UserUpdateWithoutCustomerInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   employee?: Prisma.EmployeeUpdateOneWithoutUserNestedInput
   pendingAdmins?: Prisma.PendingAdminUpdateManyWithoutUserNestedInput
 }
@@ -683,6 +769,7 @@ export type UserUncheckedUpdateWithoutCustomerInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   employee?: Prisma.EmployeeUncheckedUpdateOneWithoutUserNestedInput
   pendingAdmins?: Prisma.PendingAdminUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -693,6 +780,7 @@ export type UserCreateWithoutEmployeeInput = {
   password: string
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput
+  roles?: Prisma.UserRoleCreateNestedManyWithoutUserInput
   customer?: Prisma.CustomerCreateNestedOneWithoutUserInput
   pendingAdmins?: Prisma.PendingAdminCreateNestedManyWithoutUserInput
 }
@@ -704,6 +792,7 @@ export type UserUncheckedCreateWithoutEmployeeInput = {
   password: string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+  roles?: Prisma.UserRoleUncheckedCreateNestedManyWithoutUserInput
   customer?: Prisma.CustomerUncheckedCreateNestedOneWithoutUserInput
   pendingAdmins?: Prisma.PendingAdminUncheckedCreateNestedManyWithoutUserInput
 }
@@ -730,6 +819,7 @@ export type UserUpdateWithoutEmployeeInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput
+  roles?: Prisma.UserRoleUpdateManyWithoutUserNestedInput
   customer?: Prisma.CustomerUpdateOneWithoutUserNestedInput
   pendingAdmins?: Prisma.PendingAdminUpdateManyWithoutUserNestedInput
 }
@@ -741,6 +831,7 @@ export type UserUncheckedUpdateWithoutEmployeeInput = {
   password?: Prisma.StringFieldUpdateOperationsInput | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   passwordResetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+  roles?: Prisma.UserRoleUncheckedUpdateManyWithoutUserNestedInput
   customer?: Prisma.CustomerUncheckedUpdateOneWithoutUserNestedInput
   pendingAdmins?: Prisma.PendingAdminUncheckedUpdateManyWithoutUserNestedInput
 }
@@ -753,12 +844,14 @@ export type UserUncheckedUpdateWithoutEmployeeInput = {
 export type UserCountOutputType = {
   sessions: number
   passwordResetTokens: number
+  roles: number
   pendingAdmins: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   passwordResetTokens?: boolean | UserCountOutputTypeCountPasswordResetTokensArgs
+  roles?: boolean | UserCountOutputTypeCountRolesArgs
   pendingAdmins?: boolean | UserCountOutputTypeCountPendingAdminsArgs
 }
 
@@ -789,6 +882,13 @@ export type UserCountOutputTypeCountPasswordResetTokensArgs<ExtArgs extends runt
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountRolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserRoleWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountPendingAdminsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PendingAdminWhereInput
 }
@@ -801,6 +901,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   password?: boolean
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>
+  roles?: boolean | Prisma.User$rolesArgs<ExtArgs>
   employee?: boolean | Prisma.User$employeeArgs<ExtArgs>
   customer?: boolean | Prisma.User$customerArgs<ExtArgs>
   pendingAdmins?: boolean | Prisma.User$pendingAdminsArgs<ExtArgs>
@@ -832,6 +933,7 @@ export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   passwordResetTokens?: boolean | Prisma.User$passwordResetTokensArgs<ExtArgs>
+  roles?: boolean | Prisma.User$rolesArgs<ExtArgs>
   employee?: boolean | Prisma.User$employeeArgs<ExtArgs>
   customer?: boolean | Prisma.User$customerArgs<ExtArgs>
   pendingAdmins?: boolean | Prisma.User$pendingAdminsArgs<ExtArgs>
@@ -845,6 +947,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     passwordResetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[]
+    roles: Prisma.$UserRolePayload<ExtArgs>[]
     employee: Prisma.$EmployeePayload<ExtArgs> | null
     customer: Prisma.$CustomerPayload<ExtArgs> | null
     pendingAdmins: Prisma.$PendingAdminPayload<ExtArgs>[]
@@ -1250,6 +1353,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   passwordResetTokens<T extends Prisma.User$passwordResetTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$passwordResetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  roles<T extends Prisma.User$rolesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$rolesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserRolePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   employee<T extends Prisma.User$employeeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$employeeArgs<ExtArgs>>): Prisma.Prisma__EmployeeClient<runtime.Types.Result.GetResult<Prisma.$EmployeePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   customer<T extends Prisma.User$customerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$customerArgs<ExtArgs>>): Prisma.Prisma__CustomerClient<runtime.Types.Result.GetResult<Prisma.$CustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   pendingAdmins<T extends Prisma.User$pendingAdminsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$pendingAdminsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PendingAdminPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1724,6 +1828,30 @@ export type User$passwordResetTokensArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.PasswordResetTokenScalarFieldEnum | Prisma.PasswordResetTokenScalarFieldEnum[]
+}
+
+/**
+ * User.roles
+ */
+export type User$rolesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserRole
+   */
+  select?: Prisma.UserRoleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserRole
+   */
+  omit?: Prisma.UserRoleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserRoleInclude<ExtArgs> | null
+  where?: Prisma.UserRoleWhereInput
+  orderBy?: Prisma.UserRoleOrderByWithRelationInput | Prisma.UserRoleOrderByWithRelationInput[]
+  cursor?: Prisma.UserRoleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserRoleScalarFieldEnum | Prisma.UserRoleScalarFieldEnum[]
 }
 
 /**

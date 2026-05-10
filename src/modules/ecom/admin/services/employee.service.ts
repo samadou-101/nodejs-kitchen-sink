@@ -1,5 +1,5 @@
 import {
-  addEmployeeRole,
+  addUserRole,
   addPayrollRunItems,
   closePaymentContract,
   confirmPayrollRunItem,
@@ -17,7 +17,7 @@ import {
   getPayrollRunItemById,
   insertPendingList,
   markPayrollRunItemPaid,
-  removeEmployeeRole,
+  removeUserRole,
   updateEmployeeStatus,
   updatePayrollRunStatus,
   getEmployeePerformance,
@@ -37,8 +37,8 @@ export async function addEmployeeToPendingList(email: string) {
   await insertPendingList(email);
 }
 
-export async function assignEmployeeRole(employeeId: number, roleId: number) {
-  await addEmployeeRole(employeeId, roleId);
+export async function assignUserRole(userId: number, roleId: number) {
+  await addUserRole(userId, roleId);
 }
 
 export async function changeEmployeeStatus(
@@ -52,8 +52,8 @@ export async function getEmployeeById(employeeId: number) {
   await findEmployeeByIdRepo(employeeId);
 }
 
-export async function unassignEmployeeRole(employeeId: number, roleId: number) {
-  await removeEmployeeRole(employeeId, roleId);
+export async function unassignUserRole(userId: number, roleId: number) {
+  await removeUserRole(userId, roleId);
 }
 
 // Employee Payments

@@ -17,16 +17,13 @@ export async function insertPendingList(email: string) {
   });
 }
 
-export async function addEmployeeRole(employeeId: number, roleId: number) {
-  await prisma.employee.update({
-    where: { employeeId },
-    data: {
-      roles: {
-        create: {
-          roleId,
-        },
-      },
+export async function addUserRole(userId: number, roleId: number) {
+  return await prisma.userRole.upsert({
+    where: {
+      userId_roleId: { userId, roleId },
     },
+    create: { userId, roleId },
+    update: {},
   });
 }
 
@@ -50,13 +47,11 @@ export async function updateEmployeeStatus(
   });
 }
 
-export async function removeEmployeeRole(employeeId: number, roleId: number) {
-  await prisma.employeeRoleAssignment.delete({
+export async function removeUserRole(userId: number, roleId: number) {
+  return await prisma.userRole.deleteMany({
     where: {
-      employeeId_roleId: {
-        employeeId,
-        roleId,
-      },
+      userId,
+      roleId,
     },
   });
 }

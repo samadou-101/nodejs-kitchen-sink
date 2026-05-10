@@ -51,6 +51,10 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
+  Role: 'Role',
+  Permission: 'Permission',
+  UserRole: 'UserRole',
+  RolePermission: 'RolePermission',
   User: 'User',
   PendingAdmin: 'PendingAdmin',
   PendingEmployee: 'PendingEmployee',
@@ -65,8 +69,6 @@ export const ModelName = {
   OrderItem: 'OrderItem',
   OrderPayment: 'OrderPayment',
   Employee: 'Employee',
-  EmployeeRole: 'EmployeeRole',
-  EmployeeRoleAssignment: 'EmployeeRoleAssignment',
   EmployeePaymentType: 'EmployeePaymentType',
   EmployeePaymentContract: 'EmployeePaymentContract',
   EmployeePayment: 'EmployeePayment',
@@ -88,6 +90,41 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 } as const)
 
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
+
+
+export const RoleScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description'
+} as const
+
+export type RoleScalarFieldEnum = (typeof RoleScalarFieldEnum)[keyof typeof RoleScalarFieldEnum]
+
+
+export const PermissionScalarFieldEnum = {
+  id: 'id',
+  resource: 'resource',
+  action: 'action'
+} as const
+
+export type PermissionScalarFieldEnum = (typeof PermissionScalarFieldEnum)[keyof typeof PermissionScalarFieldEnum]
+
+
+export const UserRoleScalarFieldEnum = {
+  userId: 'userId',
+  roleId: 'roleId',
+  assignedAt: 'assignedAt'
+} as const
+
+export type UserRoleScalarFieldEnum = (typeof UserRoleScalarFieldEnum)[keyof typeof UserRoleScalarFieldEnum]
+
+
+export const RolePermissionScalarFieldEnum = {
+  roleId: 'roleId',
+  permissionId: 'permissionId'
+} as const
+
+export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
 
 
 export const UserScalarFieldEnum = {
@@ -240,24 +277,6 @@ export const EmployeeScalarFieldEnum = {
 } as const
 
 export type EmployeeScalarFieldEnum = (typeof EmployeeScalarFieldEnum)[keyof typeof EmployeeScalarFieldEnum]
-
-
-export const EmployeeRoleScalarFieldEnum = {
-  roleId: 'roleId',
-  name: 'name',
-  description: 'description'
-} as const
-
-export type EmployeeRoleScalarFieldEnum = (typeof EmployeeRoleScalarFieldEnum)[keyof typeof EmployeeRoleScalarFieldEnum]
-
-
-export const EmployeeRoleAssignmentScalarFieldEnum = {
-  employeeId: 'employeeId',
-  roleId: 'roleId',
-  assignedAt: 'assignedAt'
-} as const
-
-export type EmployeeRoleAssignmentScalarFieldEnum = (typeof EmployeeRoleAssignmentScalarFieldEnum)[keyof typeof EmployeeRoleAssignmentScalarFieldEnum]
 
 
 export const EmployeePaymentTypeScalarFieldEnum = {

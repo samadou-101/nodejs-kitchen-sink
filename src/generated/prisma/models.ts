@@ -8,6 +8,10 @@
  *
  * 🟢 You can import this file directly.
  */
+export type * from './models/Role'
+export type * from './models/Permission'
+export type * from './models/UserRole'
+export type * from './models/RolePermission'
 export type * from './models/User'
 export type * from './models/PendingAdmin'
 export type * from './models/PendingEmployee'
@@ -22,8 +26,6 @@ export type * from './models/Order'
 export type * from './models/OrderItem'
 export type * from './models/OrderPayment'
 export type * from './models/Employee'
-export type * from './models/EmployeeRole'
-export type * from './models/EmployeeRoleAssignment'
 export type * from './models/EmployeePaymentType'
 export type * from './models/EmployeePaymentContract'
 export type * from './models/EmployeePayment'

@@ -13,6 +13,50 @@ datasource db {
 }
 
 //////////////////////
+// 📋 RBAC SYSTEM
+//////////////////////
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  userRoles   UserRole[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id       Int    @id @default(autoincrement())
+  resource String
+  action   String
+
+  roles RolePermission[]
+
+  @@unique([resource, action])
+}
+
+model UserRole {
+  userId     Int
+  roleId     Int
+  assignedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+}
+
+model RolePermission {
+  roleId       Int
+  permissionId Int
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+//////////////////////
 // 🔐 AUTH SYSTEM (NKS)
 //////////////////////
 
@@ -23,6 +67,9 @@ model User {
   password            String
   sessions            Session[]
   passwordResetTokens PasswordResetToken[]
+
+  // RBAC relation
+  roles UserRole[]
 
   // ecommerce relation
   employee      Employee?
@@ -181,29 +228,9 @@ model Employee {
   paymentTypeId Int                 @default(1)
   paymentType   EmployeePaymentType @relation(fields: [paymentTypeId], references: [paymentTypeId])
 
-  roles                    EmployeeRoleAssignment[]
   ordersHandled            Order[]
   payments                 EmployeePayment[]
   employeePaymentContracts EmployeePaymentContract[]
-}
-
-model EmployeeRole {
-  roleId      Int     @id @default(autoincrement())
-  name        String
-  description String?
-
-  employees EmployeeRoleAssignment[]
-}
-
-model EmployeeRoleAssignment {
-  employeeId Int
-  roleId     Int
-  assignedAt DateTime @default(now())
-
-  employee Employee     @relation(fields: [employeeId], references: [employeeId])
-  role     EmployeeRole @relation(fields: [roleId], references: [roleId])
-
-  @@id([employeeId, roleId])
 }
 
 model EmployeePaymentType {
@@ -245,11 +272,11 @@ model EmployeePayment {
 
   employee Employee @relation(fields: [employeeId], references: [employeeId])
 
-  amount              Int
+  amount             Int
   paymentPeriodLabel String?
   paymentPeriodStart DateTime?
   paymentPeriodEnd   DateTime?
-  paymentDate        DateTime @default(now())
+  paymentDate        DateTime  @default(now())
   notes              String?
 
   // optional snapshot for audit
@@ -258,28 +285,28 @@ model EmployeePayment {
 }
 
 model PayrollRun {
-  payrollRunId   Int       @id @default(autoincrement())
-  startDate     DateTime
-  endDate       DateTime
-  status        String    @default("DRAFT")
-  totalAmount   Int?
-  createdAt     DateTime  @default(now())
-  confirmedAt   DateTime?
+  payrollRunId Int       @id @default(autoincrement())
+  startDate    DateTime
+  endDate      DateTime
+  status       String    @default("DRAFT")
+  totalAmount  Int?
+  createdAt    DateTime  @default(now())
+  confirmedAt  DateTime?
 
-  items         PayrollRunItem[]
+  items PayrollRunItem[]
 }
 
 model PayrollRunItem {
-  payrollRunItemId Int        @id @default(autoincrement())
-  payrollRunId     Int
-  employeeId       Int
-  contractId       Int?
-  amount           Int
-  calculationStatus String   @default("PENDING")  // PENDING | INCLUDED | EXCLUDED
-  paymentStatus    String   @default("UNPAID")   // UNPAID | CONFIRMED | PAID
-  warning          String?
-  paidAt           DateTime?
-  confirmedAt      DateTime?
+  payrollRunItemId  Int       @id @default(autoincrement())
+  payrollRunId      Int
+  employeeId        Int
+  contractId        Int?
+  amount            Int
+  calculationStatus String    @default("PENDING") // PENDING | INCLUDED | EXCLUDED
+  paymentStatus     String    @default("UNPAID") // UNPAID | CONFIRMED | PAID
+  warning           String?
+  paidAt            DateTime?
+  confirmedAt       DateTime?
 
-  payrollRun     PayrollRun @relation(fields: [payrollRunId], references: [payrollRunId])
+  payrollRun PayrollRun @relation(fields: [payrollRunId], references: [payrollRunId])
 }

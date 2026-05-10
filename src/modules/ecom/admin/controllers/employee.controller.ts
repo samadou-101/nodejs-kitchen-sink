@@ -2,7 +2,6 @@ import type { Request, Response } from "express";
 import {
   assignEmployeePaymentType,
   assignEmployeeRate,
-  assignEmployeeRole,
   addEmployeeToPendingList,
   confirmPayrollItem,
   createPayment,
