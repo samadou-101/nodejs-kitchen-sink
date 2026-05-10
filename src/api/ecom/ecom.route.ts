@@ -6,71 +6,59 @@ import { employeeOrderHandler } from "@/modules/ecom/employee/controllers/order.
 import { orderHandler } from "@/modules/ecom/order/order.controller";
 import { productHandler } from "@/modules/ecom/product/product.controller";
 import { customerHandler } from "@/modules/ecom/customer/customer.controller";
-import express, { type Router } from "express";
+import { authenticate, requireRole } from "@/modules/ecom/auth";
+import express, { type Router, type RequestHandler } from "express";
 
 const ecomRouter: Router = express.Router();
 
-// product routes
-ecomRouter.post("/product/create", productHandler);
-ecomRouter.post("/product/update", productHandler);
-ecomRouter.get("/product/:id", productHandler);
-ecomRouter.get("/products", productHandler);
-ecomRouter.delete("/product/:id", productHandler);
+const adminAuth: RequestHandler[] = [authenticate, requireRole("ADMIN")];
+const employeeAuth: RequestHandler[] = [authenticate, requireRole("EMPLOYEE")];
 
-// category routes
-ecomRouter.post("/category", productHandler);
-ecomRouter.post("/category/update", productHandler);
+ecomRouter.post("/product/create", ...adminAuth, productHandler);
+ecomRouter.post("/product/update", ...adminAuth, productHandler);
+ecomRouter.delete("/product/:id", ...adminAuth, productHandler);
+
+ecomRouter.get("/products", productHandler);
+ecomRouter.get("/product/:id", productHandler);
 ecomRouter.get("/categories", productHandler);
 ecomRouter.get("/category/:id", productHandler);
-ecomRouter.delete("/category/:id", productHandler);
 
-// order routes
-ecomRouter.post("/order/create", orderHandler);
-ecomRouter.get("/orders", orderHandler);
-ecomRouter.get("/order/:id", orderHandler);
-ecomRouter.delete("/order/:id", orderHandler);
-ecomRouter.patch("/order/:id", orderHandler);
-ecomRouter.patch("/order/:id/status", orderHandler);
-ecomRouter.patch("/order/:id/employee", orderHandler);
-ecomRouter.patch("/order/:id/employee/remove", orderHandler);
+ecomRouter.post("/order/create", ...adminAuth, orderHandler);
+ecomRouter.get("/orders", ...adminAuth, orderHandler);
+ecomRouter.get("/order/:id", ...adminAuth, orderHandler);
+ecomRouter.delete("/order/:id", ...adminAuth, orderHandler);
+ecomRouter.patch("/order/:id", ...adminAuth, orderHandler);
+ecomRouter.patch("/order/:id/status", ...adminAuth, orderHandler);
+ecomRouter.patch("/order/:id/employee", ...adminAuth, orderHandler);
+ecomRouter.patch("/order/:id/employee/remove", ...adminAuth, orderHandler);
 
-// Admin Auth
+ecomRouter.post("/category", ...adminAuth, productHandler);
+ecomRouter.post("/category/update", ...adminAuth, productHandler);
+ecomRouter.delete("/category/:id", ...adminAuth, productHandler);
+
 ecomRouter.post("/admin/signup", adminAuthController);
 ecomRouter.post("/admin/login", adminAuthController);
+ecomRouter.post("/admin/employee/add", ...adminAuth, employeeAdminHandler);
+ecomRouter.post("/admin/employees/:id/payment-type", ...adminAuth, employeeAdminHandler);
+ecomRouter.post("/admin/employees/:id/payments", ...adminAuth, employeeAdminHandler);
+ecomRouter.get("/admin/employees/:id/performance", ...adminAuth, employeeAdminHandler);
+ecomRouter.post("/admin/payroll/preview", ...adminAuth, employeeAdminHandler);
+ecomRouter.post("/admin/payroll", ...adminAuth, employeeAdminHandler);
+ecomRouter.get("/admin/payroll", ...adminAuth, employeeAdminHandler);
+ecomRouter.get("/admin/payroll/:id", ...adminAuth, employeeAdminHandler);
+ecomRouter.post("/admin/payroll/:id/confirm", ...adminAuth, employeeAdminHandler);
+ecomRouter.post("/admin/payroll/:id/paid", ...adminAuth, employeeAdminHandler);
+ecomRouter.post("/admin/inventory/adjust", ...adminAuth, inventoryAdminHandler);
+ecomRouter.get("/admin/inventory/low-stock", ...adminAuth, inventoryAdminHandler);
 
-// Employee Auth
 ecomRouter.post("/employee/signup", employeeAuthController);
 ecomRouter.post("/employee/login", employeeAuthController);
+ecomRouter.get("/employee/orders", ...employeeAuth, employeeOrderHandler);
+ecomRouter.patch("/employee/orders/:id/confirm", ...employeeAuth, employeeOrderHandler);
+ecomRouter.patch("/employee/orders/:id/reject", ...employeeAuth, employeeOrderHandler);
+ecomRouter.post("/employee/orders/:id/notes", ...employeeAuth, employeeOrderHandler);
 
-// Employee Orders
-ecomRouter.get("/employee/orders", employeeOrderHandler);
-ecomRouter.patch("/employee/orders/:id/confirm", employeeOrderHandler);
-ecomRouter.patch("/employee/orders/:id/reject", employeeOrderHandler);
-ecomRouter.post("/employee/orders/:id/notes", employeeOrderHandler);
-
-// Admin Employee
-ecomRouter.post("/admin/employee/add", employeeAdminHandler);
-ecomRouter.post("/admin/employees/:id/payment-type", employeeAdminHandler);
-ecomRouter.post("/admin/employees/:id/payments", employeeAdminHandler);
-ecomRouter.get("/admin/employees/:id/performance", employeeAdminHandler);
-
-// Admin Payroll
-ecomRouter.post("/admin/payroll/preview", employeeAdminHandler);
-ecomRouter.post("/admin/payroll", employeeAdminHandler);
-ecomRouter.get("/admin/payroll", employeeAdminHandler);
-ecomRouter.get("/admin/payroll/:id", employeeAdminHandler);
-ecomRouter.post("/admin/payroll/:id/confirm", employeeAdminHandler);
-ecomRouter.post("/admin/payroll/:id/paid", employeeAdminHandler);
-
-// Admin Inventory
-ecomRouter.post("/admin/inventory/adjust", inventoryAdminHandler);
-ecomRouter.get("/admin/inventory/low-stock", inventoryAdminHandler);
-
-// Customer routes (no auth)
-ecomRouter.get("/products", customerHandler);
 ecomRouter.get("/products/search", customerHandler);
-ecomRouter.get("/product/:id", customerHandler);
-ecomRouter.get("/categories", customerHandler);
 ecomRouter.get("/cart", customerHandler);
 ecomRouter.post("/cart/add", customerHandler);
 ecomRouter.patch("/cart/:itemId", customerHandler);
