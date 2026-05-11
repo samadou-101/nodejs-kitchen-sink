@@ -15,12 +15,12 @@
 
 ## Executive Summary
 
-The e-commerce module implements a **two-layer Role-Based Access Control (RBAC)** system:
+The e-commerce module implements a **centralized policy-based authorization system**:
 
 1. **Authentication** - Session-based via cookies + Redis caching
-2. **Authorization** - Route guards (coarse) + Policy/Enforcer pattern (fine-grained)
+2. **Authorization** - Route guards (coarse) + `authorize()` function with policies (fine-grained)
 
-The system separates concerns well but has several gaps in implementation and security.
+The system uses a single `authorize(auth, policy)` function that applies policies consistently across all services. Enforcements in the service layer are **mandatory and non-optional** - there is no fallback path if authorization is skipped.
 
 ---
 
@@ -33,26 +33,26 @@ The system separates concerns well but has several gaps in implementation and se
 
   ┌──────────┐     ┌──────────────┐     ┌─────────────┐     ┌────────────┐
   │  Client  │────▶│   Middleware │────▶│   Route     │────▶│  Service   │
-  │ Request  │     │  (authenticate)   │   (guards)   │     │(enforcers)│
+  │ Request  │     │  (authenticate)   │   (guards)   │     │(authorize) │
   └──────────┘     └──────────────┘     └─────────────┘     └────────────┘
                        │                     │                   │
                        ▼                     ▼                   ▼
                   ┌─────────┐          ┌──────────┐        ┌──────────┐
-                  │ Session │          │  Roles/  │        │ Policies │
-                  │ Check   │          │Perms Check│        │ + DB     │
+                  │ Session │          │  Roles/  │        │ authorize│
+                  │ Check   │          │Perms Check│        │(mandatory)│
                   └─────────┘          └──────────┘        └──────────┘
                        │                                        │
                        ▼                                        ▼
-                  ┌─────────┐                              ┌──────────┐
-                  │  Redis  │                              │  Order   │
-                  │  Cache  │                              │ Employee │
-                  └─────────┘                              │ Product  │
-                       │                                    └──────────┘
-                       ▼
-                  ┌─────────┐
-                  │  Prisma │
-                  │   DB    │
-                  └─────────┘
+                   ┌─────────┐                              ┌──────────┐
+                   │  Redis  │                              │  Policy  │
+                   │  Cache  │                              │(auth)=>bool│
+                   └─────────┘                              └──────────┘
+                       │                                        │
+                       ▼                                   ┌──────────┐
+                   ┌─────────┐                              │  throws  │
+                   │  Prisma │                              │Forbidden │
+                   │   DB    │                              │  Error   │
+                   └─────────┘                              └──────────┘
 ```
 
 ### Step-by-Step Flow
@@ -70,10 +70,13 @@ The system separates concerns well but has several gaps in implementation and se
 4. **Route guards** (`guards/permission.guard.ts`, `guards/role.guard.ts`):
    - Check if user has required role OR permission
    - Return 401/403 if fails
-5. **Service-level enforcement** (`enforcers/*.ts`):
-   - Fetch resource from DB
-   - Apply policy logic (ownership, role checks)
-   - Throw ForbiddenError if not allowed
+   - **This is defense-in-depth only** - never the sole authorization layer
+5. **Service-level authorization** (`authorize()` function):
+   - Service fetches resource from DB (if needed)
+   - Service passes policy to `authorize(auth, policy)`
+   - Policy is a function `(auth: AuthContext) => boolean`
+   - Throws `AuthorizationError` if policy returns false
+   - **This is MANDATORY and cannot be skipped**
 
 ---
 
@@ -131,7 +134,7 @@ await redisClient.set(key, JSON.stringify(data), {
 
 ## Authorization Layers
 
-### Layer 1: Route Guards (Coarse-Grained)
+### Layer 1: Route Guards (Coarse-Grained - Defense in Depth)
 
 Located in `guards/`:
 
@@ -149,74 +152,170 @@ router.get('/orders', requireRole('ADMIN'), orderHandler);
 router.post('/products', requirePermission('product:create'), productHandler);
 ```
 
-### Layer 2: Policy + Enforcer (Fine-Grained)
+> **IMPORTANT**: Route guards alone are NOT sufficient. They provide quick rejection at routing level but **cannot** check resource-level ownership or fine-grained business logic. The service layer MUST enforce authorization.
 
-Located in `policies/` and `enforcers/`:
+### Layer 2: Centralized `authorize()` Function (Fine-Grained - MANDATORY)
 
-```
-policies/          enforcers/
-├── order.policy.ts    ├── order.enforcer.ts
-├── product.policy.ts  ├── product.enforcer.ts
-├── customer.policy.ts ├── customer.enforcer.ts
-├── employee.policy.ts ├── employee.enforcer.ts
-└── payroll.policy.ts  └── payroll.enforcer.ts
-```
-
-#### Policy Pattern
-Policies define **who can do what** based on:
-- User role (ADMIN, EMPLOYEE, SUPERADMIN)
-- Resource ownership (employeeId match)
-- Resource relationship (customerId, etc.)
+Located in `auth/authorize.ts`:
 
 ```typescript
-// policies/order.policy.ts:9-16
-export function canViewOrder(ctx: AuthContext, order: Order): boolean {
-  if (ctx.isSuperAdmin) return true;
-  if (ctx.roleNames.includes("ADMIN")) return true;
-  if (ctx.roleNames.includes("EMPLOYEE") && order.employeeId === ctx.employeeId) {
-    return true;
+// auth/authorize.ts
+export function authorize(auth: AuthContext, policy: Policy): void {
+  if (!policy(auth)) {
+    throw new AuthorizationError("Access denied");
   }
-  return false;
 }
 ```
 
-#### Enforcer Pattern
-Enforcers wrap policies with database lookups:
+#### Policy Type
+
+A **Policy** is a simple function:
 
 ```typescript
-// enforcers/order.enforcer.ts:23-39
-export async function enforceViewOrder(
-  ctx: AuthContext,
-  tx: PrismaClient | Prisma.TransactionClient,
-  orderId: number,
-): Promise<AuthorizationResult> {
-  const order = await tx.order.findUnique({
-    where: { orderId },
-    select: { orderId: true, employeeId: true, customerId: true },
-  });
-
-  if (!order) {
-    return { allowed: false, reason: "Order not found" };
-  }
-
-  const allowed = canViewOrder(ctx, order);
-  return { allowed, reason: allowed ? undefined : "Not authorized to view this order" };
-}
+// auth/policies/rules.ts
+type Policy = (auth: AuthContext) => boolean;
 ```
 
-#### Integration in Services
+The policy receives only the `AuthContext` - it does not take a resource parameter directly. Instead, services follow this pattern:
+
+1. **Fetch resource first** from the database
+2. **Build context** with relevant resource data
+3. **Pass to policy** which checks authorization
+
+#### Policy Structure: Global vs Resource
+
+Policies are organized into two categories:
+
+```
+auth/policies/
+├── rules.ts              # Rule builders (isSuperAdmin, isRole, and, or, not)
+├── ownership.ts          # Ownership helpers
+├── index.ts              # Exports all policies
+└── resources/
+    ├── order.policy.ts   # create(): Policy (global), view(order): Policy (resource)
+    ├── product.policy.ts
+    ├── customer.policy.ts
+    ├── employee.policy.ts
+    └── payroll.policy.ts
+```
+
+**Global Policies** (no resource context required):
+```typescript
+// Global - no arguments needed
+OrderPolicies.create()    // Can create orders?
+OrderPolicies.delete()    // Can delete orders?
+ProductPolicies.viewAll() // Can view all products?
+```
+
+**Resource Policies** (require resource context):
+```typescript
+// Resource - requires context object
+OrderPolicies.view(orderContext)     // Can view this specific order?
+OrderPolicies.update(orderContext)  // Can update this specific order?
+EmployeePolicies.view(employeeContext) // Can view this employee?
+```
+
+#### Policy Definition Pattern
 
 ```typescript
-// order.service.ts (hypothetical)
-import { enforceViewOrder } from "../auth/enforcers/order.enforcer";
-import { checkAuthz } from "../auth/errors";
+// auth/policies/resources/order.policy.ts
 
-async function getOrderById(orderId: number, auth: AuthContext) {
-  const result = await enforceViewOrder(auth, prisma, orderId);
-  checkAuthz(result); // Throws ForbiddenError if not allowed
-  return prisma.order.findUnique({ where: { orderId } });
+// Global policies - no resource context needed
+export const OrderPolicies = {
+  create: (): Policy => and(isSuperAdmin(), isRole("ADMIN")),
+  delete: (): Policy => or(isSuperAdmin(), isRole("ADMIN")),
+  viewAll: (): Policy => or(isSuperAdmin(), isRole("ADMIN"), isRole("EMPLOYEE")),
+  assign: (): Policy => or(isSuperAdmin(), isRole("ADMIN")),
+
+  // Resource policies - require context
+  view: (order: OrderContext): Policy => or(
+    isSuperAdmin(),
+    and(isRole("ADMIN")),
+    and(isRole("EMPLOYEE"), isOwnedByEmployee(order.employeeId))
+  ),
+  update: (order: OrderContext): Policy => or(
+    isSuperAdmin(),
+    and(isRole("ADMIN")),
+    and(isRole("EMPLOYEE"), isOwnedByEmployee(order.employeeId))
+  ),
+  confirm: (order: OrderContext): Policy => or(
+    isSuperAdmin(),
+    and(isRole("EMPLOYEE"), isOwnedByEmployee(order.employeeId))
+  ),
+} as const;
+```
+
+#### Rule Builders (auth/policies/rules.ts)
+
+```typescript
+// Core rule builders
+isSuperAdmin(): Policy           // True if auth.isSuperAdmin
+isRole(role: string): Policy     // True if auth has this role
+and(...policies: Policy[]): Policy   // All must pass
+or(...policies: Policy[]): Policy    // Any must pass
+not(policy: Policy): Policy      // Negates the policy
+```
+
+#### Integration in Services (MANDATORY)
+
+```typescript
+// order.service.ts
+import { authorize } from "../auth";
+import { OrderPolicies } from "../auth/policies";
+
+export async function getOrderById(orderId: number, auth: unknown) {
+  assertAuth(auth);
+
+  // 1. Fetch the resource
+  const order = await db.findOrderById(orderId);
+  if (!order) throw new OrderNotFoundError(orderId);
+
+  // 2. Build context
+  const orderContext = {
+    orderId: order.orderId,
+    employeeId: order.employeeId,
+    customerId: order.customerId,
+  };
+
+  // 3. MANDATORY authorization - cannot be skipped!
+  authorize(auth, OrderPolicies.view(orderContext));
+
+  return order;
+}
+
+export async function createOrder(data: CreateOrderInput, auth: unknown) {
+  assertAuth(auth);
+
+  // Global policy - no resource needed
+  authorize(auth, OrderPolicies.create());
+
+  // ... create order
 }
 ```
+
+> **CRITICAL**: The `authorize()` call is **MANDATORY and non-optional**. There is no code path that skips authorization. If the service does not call `authorize()`, the request is NOT authorized. This is enforced by design - there is no fallback.
+
+#### Context Types
+
+Each resource policy defines its own context type:
+
+```typescript
+// auth/policies/resources/order.policy.ts
+interface OrderContext {
+  orderId: number;
+  employeeId: number | null;
+  customerId: number;
+}
+
+// auth/policies/resources/employee.policy.ts
+interface EmployeeContext {
+  employeeId: number;
+  userId: number;
+  isActive: boolean;
+}
+```
+
+The service builds these context objects after fetching the resource from the database.
 
 ---
 
@@ -473,7 +572,7 @@ When a user has multiple roles (e.g., ADMIN + EMPLOYEE), policy logic doesn't sp
 
 ## Usage Examples
 
-### Example 1: Guard-Only Authorization (Current - Incomplete)
+### Example 1: Route Guard (Defense-in-Depth)
 
 ```typescript
 // router.ts
@@ -481,59 +580,170 @@ import { requireRole, requirePermission } from "@/modules/ecom/auth";
 
 router.get(
   "/admin/employees",
-  requireRole("ADMIN"),  // Only checks role
+  requireRole("ADMIN"),  // First check - coarse-grained
   employeeController.list
 );
-// Problem: ADMIN can view ANY employee - no ownership check
+
+// Note: Route guard alone is NOT sufficient - ownership cannot be checked here
 ```
 
-### Example 2: Guard + Enforcer (Recommended)
+### Example 2: Service-Level Authorization (MANDATORY)
 
 ```typescript
-// router.ts
-router.get(
-  "/orders",
-  requirePermission("order:read"),  // Defense-in-depth
-  async (req, res) => {
-    try {
-      const orders = await listOrders(req.query, req.auth);
-      res.json(orders);
-    } catch (e) {
-      handleAuthError(res, e);
-    }
-  }
-);
-
 // order.service.ts
-import { enforceViewAllOrders, enforceViewAssignedOrders } from "./enforcers";
+import { authorize } from "../auth";
+import { OrderPolicies } from "../auth/policies";
 
-export async function listOrders(filter: Filter, auth: AuthContext) {
-  const { allowed, reason } = auth.roleNames.includes("ADMIN")
-    ? enforceViewAllOrders(auth)
-    : enforceViewAssignedOrders(auth);
+export async function getOrderById(orderId: number, auth: unknown) {
+  assertAuth(auth);
 
-  if (!allowed) throw new ForbiddenError(reason);
+  // Step 1: Fetch the resource from DB
+  const order = await db.findOrderById(orderId);
+  if (!order) throw new OrderNotFoundError(orderId);
 
-  return prisma.order.findMany({ ... });
+  // Step 2: Build context
+  const orderContext = {
+    orderId: order.orderId,
+    employeeId: order.employeeId,
+    customerId: order.customerId,
+  };
+
+  // Step 3: MANDATORY authorization - throws AuthorizationError if denied
+  authorize(auth, OrderPolicies.view(orderContext));
+
+  return order;
+}
+
+export async function createOrder(data: CreateOrderInput, auth: unknown) {
+  assertAuth(auth);
+
+  // Global policy - no resource needed
+  authorize(auth, OrderPolicies.create());
+
+  // ... create order logic
+}
+
+export async function deleteOrder(orderId: number, auth: unknown) {
+  assertAuth(auth);
+
+  // Global policy for delete
+  authorize(auth, OrderPolicies.delete());
+
+  // ... delete logic
 }
 ```
 
-### Example 3: Direct Policy Usage (Not Recommended)
+### Example 3: Employee Owns Order Check
 
 ```typescript
-// Anti-pattern - never do this
-import { canViewOrder } from "./policies/order.policy";
+// employee/order.service.ts - Employee viewing their assigned orders
+import { authorize } from "../../auth";
+import { OrderPolicies } from "../../auth/policies";
 
-async function getOrder(orderId: number, auth: AuthContext) {
-  // WARNING: No DB lookup for order - policy can't verify ownership!
-  if (!canViewOrder(auth, { orderId, employeeId: null, customerId: 0 })) {
-    throw new ForbiddenError("Not authorized");
-  }
-  // ... but we never actually fetched the order to know employeeId!
+export async function getMyOrders(auth: unknown) {
+  assertAuth(auth);
+
+  // Employee can view orders assigned to them
+  authorize(auth, OrderPolicies.viewAssigned());
+
+  return prisma.order.findMany({
+    where: { employeeId: auth.employeeId },
+  });
+}
+
+export async function confirmOrder(orderId: number, auth: unknown) {
+  assertAuth(auth);
+
+  // Must fetch order first to check ownership
+  const order = await db.findOrderById(orderId);
+  if (!order) throw new OrderNotFoundError(orderId);
+
+  // Employee can only confirm their own orders
+  authorize(auth, OrderPolicies.confirm({
+    orderId: order.orderId,
+    employeeId: order.employeeId,
+    customerId: order.customerId,
+  }));
+
+  // ... confirmation logic
 }
 ```
 
-**Always use enforcers**, not policies directly.
+### Example 4: Complete Flow Diagram
+
+```
+Request: GET /orders/123
+         │
+         ▼
+┌────────────────────────┐
+│  Middleware (auth)    │  - Validates session
+│  req.auth populated   │  - Resolves AuthContext
+└────────────────────────┘
+         │
+         ▼
+┌────────────────────────┐
+│  Route Guard          │  - requirePermission('order:read')
+│  (optional, defense)  │  - Quick rejection if missing permission
+└────────────────────────┘
+         │
+         ▼
+┌────────────────────────┐
+│  Service Layer         │
+│  getOrderById()        │
+│                        │
+│  1. Fetch order from  │
+│     DB (orderId=123)  │
+│                        │
+│  2. Build context:    │
+│     { orderId: 123,   │
+│       employeeId: 5,  │
+│       customerId: 10 }│
+│                        │
+│  3. authorize(auth,   │
+│     OrderPolicies.    │
+│     view(context))    │◄── MANDATORY, non-optional
+│                        │
+│  4. If allowed:       │
+│     return order       │
+│     If denied:        │
+│     throw AuthError   │
+└────────────────────────┘
+         │
+         ▼
+Response: 200 OK with order OR 403 Forbidden
+```
+
+### Example 5: Anti-Pattern (NEVER DO THIS)
+
+```typescript
+// WRONG - Missing authorize() call
+async function getOrder(orderId: number, auth: AuthContext) {
+  const order = await prisma.order.findUnique({ where: { orderId } });
+  return order;  // No authorization! Anyone can view any order
+}
+
+// WRONG - Fetching resource AFTER authorization check
+async function getOrder(orderId: number, auth: AuthContext) {
+  authorize(auth, OrderPolicies.view());  // Policy has no context!
+  const order = await prisma.order.findUnique({ where: { orderId } });
+  return order;  // Policy couldn't check ownership because
+                  // order wasn't fetched yet
+}
+
+// CORRECT - Fetch first, then authorize
+async function getOrder(orderId: number, auth: AuthContext) {
+  const order = await prisma.order.findUnique({ where: { orderId } });
+  if (!order) throw new NotFoundError();
+
+  authorize(auth, OrderPolicies.view({
+    orderId: order.orderId,
+    employeeId: order.employeeId,
+    customerId: order.customerId,
+  }));
+
+  return order;
+}
+```
 
 ---
 
