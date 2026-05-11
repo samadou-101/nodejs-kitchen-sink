@@ -16,6 +16,7 @@ import {
   getPayrollRunById as getPayrollRunByIdRepo,
   getPayrollRuns,
   getPayrollRunItemById,
+  getUserIdByEmployeeId,
   insertPendingList,
   markPayrollRunItemPaid,
   removeUserRole,
@@ -59,11 +60,14 @@ export async function changeEmployeeStatus(
   auth: unknown,
 ) {
   assertAuth(auth);
+  authorize(auth, EmployeePolicies.deactivate());
 
-  return await prisma.$transaction(async (tx) => {
-    authorize(auth, EmployeePolicies.deactivate());
-    await updateEmployeeStatus(employeeId, isActive);
-  });
+  const userId = await getUserIdByEmployeeId(employeeId);
+  await updateEmployeeStatus(employeeId, isActive);
+
+  if (userId) {
+    await invalidateAuthCache(userId);
+  }
 }
 
 export async function getEmployeeById(employeeId: number, auth: unknown) {

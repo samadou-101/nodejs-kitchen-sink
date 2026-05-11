@@ -35,6 +35,14 @@ export async function findEmployeeById(employeeId: number) {
   });
 }
 
+export async function getUserIdByEmployeeId(employeeId: number): Promise<number | null> {
+  const employee = await prisma.employee.findUnique({
+    where: { employeeId },
+    select: { userId: true },
+  });
+  return employee?.userId ?? null;
+}
+
 export async function updateEmployeeStatus(
   employeeId: number,
   isActive: boolean,

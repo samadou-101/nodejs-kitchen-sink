@@ -12,7 +12,7 @@ export * from "./policies";
 export * from "./errors";
 
 export { requireAuth, authenticate } from "./rbac/rbac.context";
-export { resolveAuthContext, getAuthContext, invalidateAuthCache } from "./rbac/rbac.service";
+export { resolveAuthContext, getAuthContext, invalidateAuthCache, invalidateAuthCacheByRole } from "./rbac/rbac.service";
 
 export { requireRole, requireSuperAdmin } from "./guards/role.guard";
 export { requirePermission, requireAnyPermission, requireWildcardPermission } from "./guards/permission.guard";

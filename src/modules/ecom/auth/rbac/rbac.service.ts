@@ -76,6 +76,17 @@ export async function invalidateAuthCache(userId: number): Promise<void> {
   await redisClient.del(key);
 }
 
+export async function invalidateAuthCacheByRole(roleName: RoleName): Promise<void> {
+  const usersWithRole = await prisma.userRole.findMany({
+    where: { role: { name: roleName } },
+    select: { userId: true },
+  });
+
+  await Promise.all(
+    usersWithRole.map((ur) => invalidateAuthCache(ur.userId))
+  );
+}
+
 export function getAuthContext(req: Request): AuthContext | undefined {
   return req.auth;
 }

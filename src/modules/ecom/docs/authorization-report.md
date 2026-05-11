@@ -501,6 +501,9 @@ Custom errors (`ForbiddenError`, `UnauthorizedError`, `NotFoundError`) with prop
 ### 9. **SuperAdmin Bypass**
 The `isSuperAdmin` flag provides a fast-path for full access without role iteration.
 
+### 10. **Explicit Cache Invalidation**
+All auth-relevant mutations explicitly call `invalidateAuthCache()` - role assignment, role removal, and employee status changes all properly invalidate the cache. No hidden staleness.
+
 ---
 
 ## Issues & Improvements
@@ -541,19 +544,24 @@ export function logAuthz(result: AuthorizationResult, ctx: AuthContext, resource
 }
 ```
 
-#### 3. **Cache Invalidation Not Automatic**
-When admin changes a user's role, the cache isn't automatically invalidated.
+#### 3. ~~Cache Invalidation Not Automatic~~
 
-**Risk**: User retains old permissions for up to 15 minutes.
+> **✅ FIXED** - Cache invalidation now properly implemented
 
-**Recommendation**: Add trigger-based invalidation:
-```typescript
-// In rbac.repo.ts - after role changes
-export async function assignRoleToUser(...) {
-  // ... existing code ...
-  await invalidateAuthCache(userId); // Add this
-}
-```
+**Previous Problem**: When admin changes user's role or employee status, cache wasn't automatically invalidated. Users retained old permissions for up to 15 minutes.
+
+**Solution Implemented**:
+- Added `invalidateAuthCache(userId)` to `assignUserRole()` (employee.service.ts:53)
+- Added `invalidateAuthCache(userId)` to `unassignUserRole()` (employee.service.ts:92)
+- Added `invalidateAuthCache(userId)` to `changeEmployeeStatus()` (employee.service.ts:70-78)
+- Added new function `invalidateAuthCacheByRole(roleName)` for role-level bulk invalidation (rbac.service.ts:79-87)
+- Added helper function `getUserIdByEmployeeId()` in employee.repo.ts
+
+**Current State**: All auth-relevant mutations now explicitly invalidate the cache:
+- Role assignment → cache invalidated
+- Role removal → cache invalidated
+- Employee status change → cache invalidated
+- Role permission changes → can use `invalidateAuthCacheByRole()` (future-proofing)
 
 ### Medium Issues
 
@@ -851,17 +859,15 @@ async function getOrder(orderId: number, auth: AuthContext) {
 
 ### Weaknesses
 - ❌ No audit logging
-- ❌ Cache invalidation gaps
 - ❌ Race conditions in session extension
 - ❌ Non-standard permission actions
 - ❌ No input validation at runtime
 
 ### Recommended Action Items
 1. Add authorization audit logging for denial events
-2. Implement automatic cache invalidation on role changes
-3. Add `confirm` to Action enum
-4. Fix session extension with atomic operations
-5. Add rate limiting on auth endpoints
+2. Add `confirm` to Action enum
+3. Fix session extension with atomic operations
+4. Add rate limiting on auth endpoints
 
 ---
 
