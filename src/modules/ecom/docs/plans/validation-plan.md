@@ -286,21 +286,50 @@ Controller (req.body) → Validator (Zod parse) → Service (business logic) →
 - Updated both catch blocks to check `error instanceof z.ZodError` → 400 + `error.issues` before `handleAuthError` / 500 fallthrough
 - Changed `catch (error: any)` to `catch (error: unknown)` for both routes (SAFER type narrowing)
 
-### Phase 6: Employee Module
+### Phase 6: Employee Module ✅ COMPLETED
 
-**Step 6.1: Create Employee Schemas** (`employee.schema.ts`)
-- `EmployeeLoginSchema` - { email, password }
-- `EmployeeOrderUpdateSchema` - { notes? }
+**Step 6.1: Create Employee Schemas** (`employee.schema.ts`) ✅
+- `EmployeeLoginSchema` - `{ email: z.string().email(), password: z.string().min(1) }`
+- `EmployeeOrderUpdateSchema` - `{ notes: z.string().min(1) }`
 
-**Step 6.2: Create Employee Validators** (`employee.validator.ts`)
-- `validateEmployeeLogin(data: unknown): EmployeeLoginData`
-- `validateOrderNote(data: unknown): { notes?: string }`
+**Step 6.2: Create Employee Validators** (`employee.validator.ts`) ✅
+- `validateEmployeeLogin(data: unknown): EmployeeLoginData` — parses email/password, returns full `EmployeeLoginData` with `phoneNumber: null`
+- `validateOrderNote(data: unknown): { notes: string }`
 
-**Step 6.3: Update Controllers**
+**Step 6.3: Update Controllers** ✅
 - `employee/controllers/order.controller.ts`
 - `employee/controllers/auth.controller.ts`
 
+**Files created/updated**:
+- `validation/schemas/employee.schema.ts` - NEW
+- `validation/validators/employee.validator.ts` - NEW
+- `validation/schemas/index.ts` - UPDATED
+- `validation/validators/index.ts` - UPDATED
+- `employee/controllers/auth.controller.ts` - UPDATED
+- `employee/controllers/order.controller.ts` - UPDATED
+
+**Services affected** (validation at boundary, no change needed):
+- `employee/services/auth.service.ts` - already has types
+- `employee/services/order.service.ts` - already has types
+
 ---
+
+**Note**: `EmployeeLoginSchema` only validates `{ email, password }` (the two fields actually used by `loginEmployee`). The validator adds `phoneNumber: null` to satisfy the `EmployeeLoginData` type (`Omit<EmployeeData, "name" | "userId">`) when spreading into the return value.
+
+**Schema Details:**
+- `EmployeeLoginSchema`: email + password required — replaces manual `if (!loginData || Object.keys(loginData).length === 0)` check
+- `EmployeeOrderUpdateSchema`: notes required (z.string().min(1)) — replaces manual `if (!notes)` check
+
+**Controller Updates:**
+- **Auth controller** (`auth.controller.ts`):
+  - Added `z` import and `validateEmployeeLogin` import
+  - `POST /employee/login` — replaced manual `if (!loginData || Object.keys(loginData).length === 0)` with `validateEmployeeLogin(req.body ?? {})`
+  - Added `z.ZodError` catch → 400 + `error.issues` before 500 fallthrough
+- **Order controller** (`order.controller.ts`):
+  - Added `z` import and `validateOrderNote` import
+  - `POST /employee/orders/:id/notes` — replaced `req.body as { notes: string }` + `if (!notes)` with `validateOrderNote(req.body ?? {})`
+  - All 5 catch blocks now check `error instanceof z.ZodError` → 400 + `error.issues` before `handleAuthError` / 500 fallthrough
+  - Changed `catch (error: any)` to `catch (error: unknown)` for all 5 routes (SAFER type narrowing)
 
 ### Phase 7: Cross-Cutting Concerns
 
@@ -383,7 +412,7 @@ This follows the separation of concerns:
 | 3 | Customer | 5 | 5 | 1 | ✅ Complete |
 | 4 | Admin - Employee | 9 | 9 | 1 | ✅ Complete |
 | 5 | Admin - Inventory | 3 | 2 | 1 | ✅ Complete |
-| 6 | Employee | 2 | 2 | 2 | Pending |
+| 6 | Employee | 2 | 2 | 2 | ✅ Complete |
 | 7 | Shared | 3 | 3 | - | Pending |
 
 **Total**: 31 schemas, 31 validators, 7 controllers to update

@@ -1,7 +1,11 @@
 import type { Request, Response } from "express";
+import { z } from "zod";
 import { loginEmployee, registerEmployee } from "../services/auth.service";
-import type { EmployeeLoginData, EmployeeRequestData } from "../employee.types";
+import type { EmployeeRequestData } from "../employee.types";
 import { Prisma } from "@/generated/prisma/client";
+import {
+  validateEmployeeLogin,
+} from "@/modules/ecom/validation/validators/employee.validator";
 
 export async function employeeAuthController(req: Request, res: Response) {
   const path = req.path;
@@ -44,17 +48,17 @@ export async function employeeAuthController(req: Request, res: Response) {
 
   if (path === LOGIN_PATH && method === POST_METHOD) {
     try {
-      const loginData = req.body as EmployeeLoginData;
-      if (!loginData || Object.keys(loginData).length === 0) {
-        res.status(400).send("Invalid Credentials");
-        return;
-      }
+      const loginData = validateEmployeeLogin(req.body ?? {});
       const { name, email, sessionData } = await loginEmployee(loginData);
       res.cookie("sid", sessionData?.sessionId, {
         maxAge: 1000 * 60 * 60 * 24 * 7,
       });
       res.status(200).send({ name, email });
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Validation failed", details: error.issues });
+        return;
+      }
       console.log(error);
       res.status(500).send("Something went wrong");
     }

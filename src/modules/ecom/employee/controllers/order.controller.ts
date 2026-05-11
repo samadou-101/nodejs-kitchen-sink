@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import { z } from "zod";
 import {
   getAssignedOrders,
   getOrderById,
@@ -7,6 +8,9 @@ import {
   addOrderNotes,
 } from "../services/order.service";
 import { ForbiddenError, UnauthorizedError } from "@/modules/ecom/auth/errors";
+import {
+  validateOrderNote,
+} from "@/modules/ecom/validation/validators/employee.validator";
 
 function handleAuthError(res: Response, error: unknown) {
   if (error instanceof UnauthorizedError) {
@@ -33,10 +37,14 @@ export async function employeeOrderHandler(req: Request, res: Response) {
     try {
       const orders = await getAssignedOrders(Number(employeeId), req.auth);
       res.status(200).json(orders);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Validation failed", details: error.issues });
+        return;
+      }
       if (!handleAuthError(res, error)) {
         console.error(error);
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: (error as Error).message });
       }
     }
     return;
@@ -56,9 +64,13 @@ export async function employeeOrderHandler(req: Request, res: Response) {
         return;
       }
       res.status(200).json(order);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Validation failed", details: error.issues });
+        return;
+      }
       if (!handleAuthError(res, error)) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: (error as Error).message });
       }
     }
     return;
@@ -70,9 +82,13 @@ export async function employeeOrderHandler(req: Request, res: Response) {
       const orderId = parseInt(confirmMatch[1]!, 10);
       const order = await confirmOrder(orderId, req.auth);
       res.status(200).json({ message: "Order confirmed", order });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Validation failed", details: error.issues });
+        return;
+      }
       if (!handleAuthError(res, error)) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: (error as Error).message });
       }
     }
     return;
@@ -84,9 +100,13 @@ export async function employeeOrderHandler(req: Request, res: Response) {
       const orderId = parseInt(rejectMatch[1]!, 10);
       const order = await rejectOrder(orderId, req.auth);
       res.status(200).json({ message: "Order rejected", order });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Validation failed", details: error.issues });
+        return;
+      }
       if (!handleAuthError(res, error)) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: (error as Error).message });
       }
     }
     return;
@@ -96,16 +116,16 @@ export async function employeeOrderHandler(req: Request, res: Response) {
   if (notesMatch && method === "POST") {
     try {
       const orderId = parseInt(notesMatch[1]!, 10);
-      const { notes } = req.body as { notes: string };
-      if (!notes) {
-        res.status(400).json({ message: "notes is required" });
-        return;
-      }
+      const { notes } = validateOrderNote(req.body ?? {});
       const order = await addOrderNotes(orderId, notes, req.auth);
       res.status(200).json({ message: "Notes added", order });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Validation failed", details: error.issues });
+        return;
+      }
       if (!handleAuthError(res, error)) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: (error as Error).message });
       }
     }
     return;
