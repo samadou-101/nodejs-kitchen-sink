@@ -1,15 +1,12 @@
 import type { Request, Response } from "express";
+import * as productPublic from "../product/product.public.service";
 import {
-  browseProducts,
-  filterByCategory,
-  searchProducts,
-  getProductById,
-  getCategories,
   checkout,
   trackOrders,
   getOrderForTracking,
 } from "./customer.service";
 import type { CheckoutData } from "./customer.types";
+import type { ProductFilter } from "../product/product.types";
 
 export async function customerHandler(req: Request, res: Response) {
   const path = req.path;
@@ -17,14 +14,11 @@ export async function customerHandler(req: Request, res: Response) {
 
   if (path === "/products" && method === "GET") {
     try {
-      const page = req.query.page ? Number(req.query.page) : 1;
-      const limit = req.query.limit ? Number(req.query.limit) : 20;
-      if (req.query.categoryId) {
-        const products = await filterByCategory(Number(req.query.categoryId));
-        res.status(200).json(products);
-        return;
-      }
-      const products = await browseProducts(page, limit);
+      const filter: ProductFilter = {};
+      if (req.query.categoryId) filter.categoryId = Number(req.query.categoryId);
+      if (req.query.page) filter.page = Number(req.query.page);
+      if (req.query.limit) filter.limit = Number(req.query.limit);
+      const products = await productPublic.getAllProducts(filter);
       res.status(200).json(products);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -39,7 +33,7 @@ export async function customerHandler(req: Request, res: Response) {
         res.status(400).json({ message: "q (search query) is required" });
         return;
       }
-      const products = await searchProducts(query);
+      const products = await productPublic.searchProducts(query);
       res.status(200).json(products);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -54,12 +48,12 @@ export async function customerHandler(req: Request, res: Response) {
   ) {
     try {
       const productId = Number(req.params.id);
-      const product = await getProductById(productId);
-      if (!product || product.length === 0) {
+      const product = await productPublic.getProductById(productId);
+      if (!product) {
         res.status(404).json({ message: "Product not found" });
         return;
       }
-      res.status(200).json(product[0]);
+      res.status(200).json(product);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
@@ -68,7 +62,7 @@ export async function customerHandler(req: Request, res: Response) {
 
   if (path === "/categories" && method === "GET") {
     try {
-      const categories = await getCategories();
+      const categories = await productPublic.getAllCategories();
       res.status(200).json(categories);
     } catch (error: any) {
       res.status(500).json({ message: error.message });

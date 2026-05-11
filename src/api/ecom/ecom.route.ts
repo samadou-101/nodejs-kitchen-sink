@@ -18,10 +18,10 @@ ecomRouter.post("/product/create", ...adminAuth, productHandler);
 ecomRouter.post("/product/update", ...adminAuth, productHandler);
 ecomRouter.delete("/product/:id", ...adminAuth, productHandler);
 
-ecomRouter.get("/products", productHandler);
-ecomRouter.get("/product/:id", productHandler);
-ecomRouter.get("/categories", productHandler);
-ecomRouter.get("/category/:id", productHandler);
+ecomRouter.get("/products", customerHandler);
+ecomRouter.get("/product/:id", customerHandler);
+ecomRouter.get("/categories", customerHandler);
+ecomRouter.get("/category/:id", customerHandler);
 
 ecomRouter.post("/order/create", ...adminAuth, orderHandler);
 ecomRouter.get("/orders", ...adminAuth, orderHandler);

@@ -4,16 +4,11 @@ import {
   findProductById as findProductByIdRepo,
   insertProduct,
   updateProduct as updateProductRepo,
-  findAllProducts as findAllProductsRepo,
-  findCategoryById,
-  findAllCategories,
   insertCategory,
   updateCategory as updateCategoryRepo,
   deleteCategory,
-  searchProducts as searchProductsRepo,
-  findProductsByCategory,
 } from "./product.repo";
-import type { CategoryData, ProductData, ProductFilter } from "./product.types";
+import type { CategoryData, ProductData } from "./product.types";
 import { authorize } from "@/modules/ecom/auth";
 import { ProductPolicies } from "@/modules/ecom/auth/policies";
 import { assertAuth } from "@/modules/ecom/auth/errors";
@@ -55,43 +50,10 @@ export async function removeProduct(id: number, auth: unknown) {
   });
 }
 
-export async function getProductById(id: number, auth?: unknown) {
-  if (auth) {
-    assertAuth(auth);
-    await findProductByIdRepo(id);
-    authorize(auth, ProductPolicies.view());
-  }
-  return await findProductByIdRepo(id);
-}
-
-export async function getAllProducts(filter?: ProductFilter, auth?: unknown) {
-  if (auth) {
-    assertAuth(auth);
-    authorize(auth, ProductPolicies.view());
-  }
-  return await findAllProductsRepo(filter);
-}
-
 export async function createCategory(data: CategoryData, auth: unknown) {
   assertAuth(auth);
   authorize(auth, ProductPolicies.create());
   return await insertCategory(data);
-}
-
-export async function getCategoryById(id: number, auth?: unknown) {
-  if (auth) {
-    assertAuth(auth);
-    authorize(auth, ProductPolicies.view());
-  }
-  return await findCategoryById(id);
-}
-
-export async function getAllCategories(auth?: unknown) {
-  if (auth) {
-    assertAuth(auth);
-    authorize(auth, ProductPolicies.view());
-  }
-  return await findAllCategories();
 }
 
 export async function updateCategory(data: CategoryData, auth: unknown) {
@@ -113,20 +75,4 @@ export async function removeCategory(id: number, auth: unknown) {
   return await prisma.$transaction(async (tx) => {
     return await deleteCategory(id);
   });
-}
-
-export async function searchProducts(query: string, auth?: unknown) {
-  if (auth) {
-    assertAuth(auth);
-    authorize(auth, ProductPolicies.view());
-  }
-  return await searchProductsRepo(query);
-}
-
-export async function getProductsByCategory(categoryId: number, auth?: unknown) {
-  if (auth) {
-    assertAuth(auth);
-    authorize(auth, ProductPolicies.view());
-  }
-  return await findProductsByCategory(categoryId);
 }

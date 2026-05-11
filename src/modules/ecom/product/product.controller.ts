@@ -1,19 +1,13 @@
 import type { Request, Response } from "express";
 import {
   createProduct,
-  getAllProducts,
-  getProductById,
   removeProduct,
   updateProduct,
   createCategory,
-  getAllCategories,
-  getCategoryById,
   updateCategory,
   removeCategory,
-  searchProducts,
-  getProductsByCategory,
-} from "./product.service";
-import type { CategoryData, ProductData, ProductFilter } from "./product.types";
+} from "./product.admin.service";
+import type { CategoryData, ProductData } from "./product.types";
 import { ForbiddenError, UnauthorizedError } from "@/modules/ecom/auth/errors";
 
 function handleAuthError(res: Response, error: unknown) {
@@ -44,49 +38,6 @@ export async function productHandler(req: Request, res: Response) {
       }
     }
     return;
-  }
-
-  if (
-    req.method === "GET" &&
-    req.path.startsWith("/product/") &&
-    req.params.id
-  ) {
-    const productId = Number(req.path.split("/")[2]);
-    if (Number.isNaN(productId)) {
-      res.status(400).send("Invalid Product ID ");
-      return;
-    }
-    try {
-      const product = await getProductById(productId);
-      if (!product) {
-        res.status(400).send("No product found");
-        return;
-      }
-      res.status(200).json(product);
-      return;
-    } catch (error) {
-      res.status(500).send({ message: "Internal server error" });
-    }
-  }
-
-  if (req.path === "/products" && req.method === "GET") {
-    try {
-      const filter: Partial<ProductFilter> = {};
-      if (req.query.search) filter.search = req.query.search as string;
-      if (req.query.categoryId) filter.categoryId = Number(req.query.categoryId);
-      if (req.query.page) filter.page = Number(req.query.page);
-      if (req.query.limit) filter.limit = Number(req.query.limit);
-      const allProducts = await getAllProducts(filter);
-      if (!allProducts) {
-        res.status(400).send("No products found");
-        return;
-      }
-      res.status(200).send(allProducts);
-      return;
-    } catch (error) {
-      console.log(error);
-      res.status(500).send("Internal server error");
-    }
   }
 
   if (req.path === "/product/update" && req.method === "POST") {
@@ -140,35 +91,6 @@ export async function productHandler(req: Request, res: Response) {
       if (!handleAuthError(res, error)) {
         res.status(500).send({ error: error.message });
       }
-    }
-    return;
-  }
-
-  if (req.path === "/categories" && req.method === "GET") {
-    try {
-      const categories = await getAllCategories();
-      res.status(200).send(categories);
-    } catch (error: any) {
-      res.status(500).send({ error: error.message });
-    }
-    return;
-  }
-
-  if (req.path.startsWith("/category/") && req.params.id && req.method === "GET") {
-    const categoryId = Number(req.params.id);
-    if (Number.isNaN(categoryId)) {
-      res.status(400).send("Invalid Category ID");
-      return;
-    }
-    try {
-      const category = await getCategoryById(categoryId);
-      if (!category) {
-        res.status(404).send("Category not found");
-        return;
-      }
-      res.status(200).json(category);
-    } catch (error: any) {
-      res.status(500).send({ error: error.message });
     }
     return;
   }
