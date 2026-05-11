@@ -5,6 +5,7 @@ import apiRouter from "./api/auth/auth.routes";
 import cookieParser from "cookie-parser";
 import { checkAuthSession } from "./api/auth/password/session.service";
 import ecomRouter from "./api/ecom/ecom.route";
+import { errorMiddleware } from "./modules/ecom/shared/error.middleware";
 
 export const app: Express = express();
 
@@ -23,3 +24,5 @@ app.post("/api/test-session", checkAuthSession, (req, res) => {
 app.use((req, res) => {
   res.status(400).json({ message: "Final mmiddleware error" });
 });
+
+app.use(errorMiddleware);
