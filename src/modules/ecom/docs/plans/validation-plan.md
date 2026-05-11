@@ -246,22 +246,45 @@ Controller (req.body) → Validator (Zod parse) → Service (business logic) →
 - `GET /admin/employees/:id/performance` — replaced inline `parseInt` ternary with `validateEmployeeId` + `validateEmployeePerformanceQuery(req.query)`
 - All 13 catch blocks now check `error instanceof z.ZodError` → 400 + `error.issues` before `handleAuthError` / 500 fallthrough
 
-### Phase 5: Admin Module - Inventory Service
+### Phase 5: Admin Module - Inventory Service ✅ COMPLETED
 
-**Step 5.1: Create Inventory Schemas** (`inventory.schema.ts`)
-- `InventoryAdjustDataSchema` - stock adjustment
-- `ProductIdSchema` - product ID validation
-- `ThresholdSchema` - low stock threshold
+**Step 5.1: Create Inventory Schemas** (`inventory.schema.ts`) ✅
+- `InventoryAdjustDataSchema` - stock adjustment: `{ productId, action, amount }`
+- `ProductIdSchema` - reusable product ID: `z.number().int().positive()`
+- `ThresholdSchema` - low stock threshold with coercion: `z.coerce.number().int().positive()`
 
-**Step 5.2: Create Inventory Validators** (`inventory.validator.ts`)
+**Step 5.2: Create Inventory Validators** (`inventory.validator.ts`) ✅
 - `validateInventoryAdjust(data: unknown): InventoryAdjustData`
-- `validateProductId(id: unknown): number`
-- `validateThreshold(threshold: unknown): number`
+- `validateThreshold(threshold: unknown): number | undefined` — returns `undefined` when no threshold filter
 
-**Step 5.3: Update Controllers**
+**Step 5.3: Update Controllers** ✅
 - `admin/controllers/inventory.controller.ts`
 
+**Files created/updated**:
+- `validation/schemas/inventory.schema.ts` - NEW
+- `validation/validators/inventory.validator.ts` - NEW
+- `validation/schemas/index.ts` - UPDATED
+- `validation/validators/index.ts` - UPDATED
+- `admin/controllers/inventory.controller.ts` - UPDATED
+
+**Services affected** (validation at boundary, no change needed):
+- `admin/services/inventory.service.ts` - already has types
+
 ---
+
+**Note**: `validateProductId` was intentionally excluded from the inventory validator because it already exists in `product.validator.ts` with an identical signature. The barrel re-export (`export *`) would cause an ambiguous name collision. `ProductIdSchema` remains in the schema file for composition (it's used inside `InventoryAdjustDataSchema`).
+
+**Schema Details:**
+- `ProductIdSchema`: `z.number().int().positive("Product ID must be a positive integer")` — matches the existing `validateProductId` in `product.validator.ts` pattern but as a schema (non-coerced, since productId comes from JSON body)
+- `InventoryAdjustDataSchema`: Object with `productId` (using `ProductIdSchema`), `action` (`z.enum(["increase", "decrease"])`), and `amount` (`z.number().positive()`)
+- `ThresholdSchema`: `z.coerce.number().int().positive()` — coerces query string to number
+
+**Controller Updates:**
+- Added `z` import and `validateInventoryAdjust` / `validateThreshold` imports
+- `POST /admin/inventory/adjust` — replaced manual `if (!productId || !action || amount === undefined)` + `if (!["increase", "decrease"].includes(action))` with `validateInventoryAdjust(req.body ?? {})` destructured to `{ productId, action, amount }`
+- `GET /admin/inventory/low-stock` — replaced `req.query.threshold ? Number(req.query.threshold) : 10` with `validateThreshold(req.query.threshold) ?? 10`
+- Updated both catch blocks to check `error instanceof z.ZodError` → 400 + `error.issues` before `handleAuthError` / 500 fallthrough
+- Changed `catch (error: any)` to `catch (error: unknown)` for both routes (SAFER type narrowing)
 
 ### Phase 6: Employee Module
 
@@ -359,11 +382,11 @@ This follows the separation of concerns:
 | 2 | Order | 6 | 5 | 1 | ✅ Complete |
 | 3 | Customer | 5 | 5 | 1 | ✅ Complete |
 | 4 | Admin - Employee | 9 | 9 | 1 | ✅ Complete |
-| 5 | Admin - Inventory | 3 | 3 | 1 | Pending |
+| 5 | Admin - Inventory | 3 | 2 | 1 | ✅ Complete |
 | 6 | Employee | 2 | 2 | 2 | Pending |
 | 7 | Shared | 3 | 3 | - | Pending |
 
-**Total**: 31 schemas, 32 validators, 7 controllers to update
+**Total**: 31 schemas, 31 validators, 7 controllers to update
 
 ## Benefits
 
