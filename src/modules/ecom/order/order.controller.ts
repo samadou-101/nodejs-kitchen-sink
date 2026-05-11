@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import { z } from "zod";
 import {
   placeOrder,
   getOrderById,
@@ -11,6 +12,13 @@ import {
   trackOrdersByPhone,
 } from "./order.service";
 import type { OrderData, OrderDTO } from "./order.types";
+import {
+  validateOrderData,
+  validateOrderId,
+  validateOrderFilter,
+  validateOrderStatusUpdate,
+  validateAssignEmployee,
+} from "@/modules/ecom/validation/validators/order.validator";
 import { handleError } from "./order.utils";
 import { ForbiddenError, UnauthorizedError } from "@/modules/ecom/auth/errors";
 
@@ -30,8 +38,8 @@ export async function orderHandler(req: Request, res: Response) {
   const id = req.params.id as string | undefined;
 
   if (req.path === "/order/create" && req.method === "POST") {
-    const orderData = req.body as OrderData;
     try {
+      const orderData = validateOrderData(req.body) as OrderData;
       const order = await placeOrder(orderData, req.auth);
       if (!order) {
         res.status(400).json({ message: "Failed creating order" });
@@ -46,6 +54,10 @@ export async function orderHandler(req: Request, res: Response) {
       };
       res.status(201).json(orderResponse);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Validation failed", details: error.issues });
+        return;
+      }
       if (!handleAuthError(res, error)) {
         handleError(res, error);
       }
@@ -55,19 +67,19 @@ export async function orderHandler(req: Request, res: Response) {
 
   if (req.path === "/orders" && req.method === "GET") {
     try {
-      const filter: {
+      const filter = validateOrderFilter(req.query) as {
         statusId?: number;
         employeeId?: number;
         page?: number;
         limit?: number;
-      } = {};
-      if (req.query.status) filter.statusId = Number(req.query.status);
-      if (req.query.employee) filter.employeeId = Number(req.query.employee);
-      if (req.query.page) filter.page = Number(req.query.page);
-      if (req.query.limit) filter.limit = Number(req.query.limit);
+      };
       const orders = await listOrders(filter, req.auth);
       res.status(200).json(orders);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Validation failed", details: error.issues });
+        return;
+      }
       if (!handleAuthError(res, error)) {
         handleError(res, error);
       }
@@ -79,15 +91,15 @@ export async function orderHandler(req: Request, res: Response) {
     const statusMatch = req.path.match(/^\/order\/(\d+)\/status$/);
     if (statusMatch) {
       try {
-        const orderId = parseInt(statusMatch[1]!, 10);
-        const { statusId } = req.body as { statusId: number };
-        if (isNaN(orderId) || !statusId) {
-          res.status(400).json({ message: "Invalid order ID or status ID" });
-          return;
-        }
+        const orderId = validateOrderId(statusMatch[1]!);
+        const { statusId } = validateOrderStatusUpdate(req.body);
         const updated = await updateOrderStatus(orderId, statusId, req.auth);
         res.status(200).json(updated);
       } catch (error) {
+        if (error instanceof z.ZodError) {
+          res.status(400).json({ error: "Validation failed", details: error.issues });
+          return;
+        }
         if (!handleAuthError(res, error)) {
           handleError(res, error);
         }
@@ -98,15 +110,15 @@ export async function orderHandler(req: Request, res: Response) {
     const employeeMatch = req.path.match(/^\/order\/(\d+)\/employee$/);
     if (employeeMatch) {
       try {
-        const orderId = parseInt(employeeMatch[1]!, 10);
-        const { employeeId } = req.body as { employeeId: number };
-        if (isNaN(orderId)) {
-          res.status(400).json({ message: "Invalid order ID" });
-          return;
-        }
+        const orderId = validateOrderId(employeeMatch[1]!);
+        const { employeeId } = validateAssignEmployee(req.body);
         const updated = await assignOrderToEmployee(orderId, employeeId, req.auth);
         res.status(200).json(updated);
       } catch (error) {
+        if (error instanceof z.ZodError) {
+          res.status(400).json({ error: "Validation failed", details: error.issues });
+          return;
+        }
         if (!handleAuthError(res, error)) {
           handleError(res, error);
         }
@@ -117,14 +129,14 @@ export async function orderHandler(req: Request, res: Response) {
     const unassignMatch = req.path.match(/^\/order\/(\d+)\/employee\/remove$/);
     if (unassignMatch) {
       try {
-        const orderId = parseInt(unassignMatch[1]!, 10);
-        if (isNaN(orderId)) {
-          res.status(400).json({ message: "Invalid order ID" });
-          return;
-        }
+        const orderId = validateOrderId(unassignMatch[1]!);
         const updated = await unassignEmployeeFromOrder(orderId, req.auth);
         res.status(200).json(updated);
       } catch (error) {
+        if (error instanceof z.ZodError) {
+          res.status(400).json({ error: "Validation failed", details: error.issues });
+          return;
+        }
         if (!handleAuthError(res, error)) {
           handleError(res, error);
         }
@@ -135,11 +147,7 @@ export async function orderHandler(req: Request, res: Response) {
 
   if (id && req.method === "GET") {
     try {
-      const orderId = parseInt(id, 10);
-      if (isNaN(orderId)) {
-        res.status(400).json({ message: "Invalid order ID" });
-        return;
-      }
+      const orderId = validateOrderId(id);
       const order = await getOrderById(orderId, req.auth);
       if (!order) {
         res.status(404).json({ message: "Order not found" });
@@ -147,6 +155,10 @@ export async function orderHandler(req: Request, res: Response) {
       }
       res.status(200).json(order);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Validation failed", details: error.issues });
+        return;
+      }
       if (!handleAuthError(res, error)) {
         handleError(res, error);
       }
@@ -156,16 +168,16 @@ export async function orderHandler(req: Request, res: Response) {
 
   if (id && req.method === "PATCH") {
     try {
-      const orderId = parseInt(id, 10);
-      if (isNaN(orderId)) {
-        res.status(400).json({ message: "Invalid order ID" });
-        return;
-      }
-      const orderData = req.body as OrderData;
+      const orderId = validateOrderId(id);
+      const orderData = validateOrderData(req.body) as OrderData;
       orderData.orderId = orderId;
       const updated = await updateOrder(orderData, req.auth);
       res.status(200).json(updated);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Validation failed", details: error.issues });
+        return;
+      }
       if (!handleAuthError(res, error)) {
         handleError(res, error);
       }
@@ -175,14 +187,14 @@ export async function orderHandler(req: Request, res: Response) {
 
   if (id && req.method === "DELETE") {
     try {
-      const orderId = parseInt(id, 10);
-      if (isNaN(orderId)) {
-        res.status(400).json({ message: "Invalid order ID" });
-        return;
-      }
+      const orderId = validateOrderId(id);
       await deleteOrderById(orderId, req.auth);
       res.status(204).send();
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Validation failed", details: error.issues });
+        return;
+      }
       if (!handleAuthError(res, error)) {
         handleError(res, error);
       }

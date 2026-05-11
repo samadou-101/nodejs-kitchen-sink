@@ -80,24 +80,53 @@ Controller (req.body) → Validator (Zod parse) → Service (business logic) →
 
 ---
 
-### Phase 2: Order Module
+### Phase 2: Order Module ✅ COMPLETED
 
-**Step 2.1: Create Order Schemas** (`order.schema.ts`)
+**Step 2.1: Create Order Schemas** (`order.schema.ts`) ✅
 - `OrderCustomerSchema` - nested customer object
 - `OrderItemSchema` - individual order item
 - `OrderDataSchema` - complete order input
 - `OrderFilterSchema` - query params for listing
 - `OrderStatusUpdateSchema` - status change payload
+- `AssignEmployeeSchema` - employee assignment body
 
-**Step 2.2: Create Order Validators** (`order.validator.ts`)
+**Step 2.2: Create Order Validators** (`order.validator.ts`) ✅
 - `validateOrderData(data: unknown): OrderData`
 - `validateOrderId(id: unknown): number`
 - `validateOrderFilter(data: unknown): OrderFilter`
 - `validateOrderStatusUpdate(data: unknown): { statusId: number }`
 - `validateAssignEmployee(data: unknown): { employeeId: number }`
 
-**Step 2.3: Update Controllers**
+**Step 2.3: Update Controllers** ✅
 - `order/order.controller.ts`
+
+**Files created/updated**:
+- `validation/schemas/order.schema.ts` - NEW
+- `validation/validators/order.validator.ts` - NEW
+- `validation/schemas/index.ts` - UPDATED
+- `validation/validators/index.ts` - UPDATED
+- `validation/index.ts` - already existed
+- `order/order.controller.ts` - UPDATED
+
+**Services affected** (validation at boundary, no change needed):
+- `order/order.service.ts` - already has types
+
+---
+
+**Schema Details:**
+- `OrderCustomerSchema`: Validates customer object with name, phone, address, email
+- `OrderItemSchema`: Validates order item with productId, price, quantity, optional orderItemId
+- `OrderDataSchema`: Validates complete order with nested customer, orderItems array (min 1), orderDate (coerced), orderStatusId, optional employeeId and notes
+- `OrderFilterSchema`: Validates query params with statusId, employeeId, page (default 1), limit (default 20, max 100)
+- `OrderStatusUpdateSchema`: Validates statusId for status changes
+- `AssignEmployeeSchema`: Validates employeeId for employee assignment
+
+**Controller Updates:**
+- Added Zod import and validation error handler
+- Replaced all manual `parseInt`/`isNaN` checks with `validateOrderId`
+- Replaced manual type casting with Zod validators for body and query data
+- Added proper 400 response with validation error details on failure
+- Cast validated data to existing types for service compatibility
 
 ---
 
@@ -233,7 +262,7 @@ try {
   if (error instanceof z.ZodError) {
     res.status(400).json({
       error: "Validation failed",
-      details: error.errors,
+      details: error.issues,  // Zod v4 uses .issues (not .errors)
     });
     return;
   }
@@ -255,7 +284,7 @@ This follows the separation of concerns:
 | Phase | Module | Schemas | Validators | Controllers | Status |
 |-------|--------|---------|------------|-------------|--------|
 | 1 | Product | 3 | 5 | 1 | ✅ Complete |
-| 2 | Order | 5 | 5 | 1 | Pending |
+| 2 | Order | 6 | 5 | 1 | ✅ Complete |
 | 3 | Customer | 3 | 3 | 1 | Pending |
 | 4 | Admin - Employee | 9 | 6 | 1 | Pending |
 | 5 | Admin - Inventory | 3 | 3 | 1 | Pending |
