@@ -1,5 +1,12 @@
 export * from "./rbac/rbac.types";
-export * from "./rbac/rbac.matcher";
+export {
+  hasPermission,
+  hasAnyPermission,
+  hasAllPermissions,
+  hasWildcard,
+  matchesPermission,
+  parsePermissionString,
+} from "./rbac/rbac.matcher";
 export * from "./rbac/rbac.repo";
 export * from "./rbac/rbac.service";
 export * from "./rbac/rbac.context";

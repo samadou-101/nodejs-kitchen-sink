@@ -27,16 +27,13 @@ export const Action = {
 
 export type Action = (typeof Action)[keyof typeof Action];
 
-export interface Permission {
-  resource: Resource | "*";
-  action: Action | "*";
-}
+export type Permission = string;
 
 export interface AuthContext {
   userId: number;
   employeeId: number | null;
   roleNames: RoleName[];
-  permissions: string[];
+  permissions: Permission[];
   isSuperAdmin: boolean;
 }
 

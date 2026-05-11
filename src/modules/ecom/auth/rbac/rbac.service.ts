@@ -4,7 +4,7 @@ import { prisma } from "@/config/db.config";
 import type { AuthContext, RoleName } from "./rbac.types";
 import { RoleName as RoleEnum } from "./rbac.types";
 import { getUserRolePermissions, getEmployeeIdByUserId } from "./rbac.repo";
-import { resolvePermissions } from "./rbac.matcher";
+
 
 const AUTH_CACHE_TTL = 60 * 15;
 
@@ -42,7 +42,7 @@ function buildAuthContext(
     userId,
     employeeId: data.employeeId,
     roleNames: data.roles,
-    permissions: resolvePermissions(data.permissions),
+    permissions: data.permissions,
     isSuperAdmin: data.roles.includes(RoleEnum.SUPERADMIN),
   };
 }

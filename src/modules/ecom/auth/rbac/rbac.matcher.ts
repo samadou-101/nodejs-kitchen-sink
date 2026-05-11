@@ -1,69 +1,82 @@
-export function matchesPermission(
-  required: string,
-  granted: string,
-): boolean {
-  if (granted === "*") return true;
+// permissions.matcher.ts
 
-  if (granted.endsWith(":*")) {
-    const resource = granted.slice(0, -2);
-    const [reqResource] = required.split(":");
-    return resource === reqResource;
+
+
+/**
+ * Core permission matching engine
+ * No expansion, no preprocessing
+ * Direct evaluation
+ */
+
+import type { Permission } from "./rbac.types";
+
+export function matchesPermission(required: string, granted: string): boolean {
+  // Full system wildcard
+  if (granted === "*" || granted === "*:*") return true;
+
+  const [reqResource, reqAction] = required.split(":");
+  const [grantedResource, grantedAction] = granted.split(":");
+
+  // Resource-level wildcard: order:*
+  if (grantedAction === "*") {
+    return grantedResource === reqResource;
   }
 
+  // Exact match fallback
   return required === granted;
 }
 
-export function resolvePermissions(permissions: string[]): string[] {
-  const resolved: string[] = [];
-
-  for (const perm of permissions) {
-    if (perm === "*") {
-      resolved.push("*");
-      continue;
-    }
-
-    if (perm.endsWith(":*")) {
-      const resource = perm.slice(0, -2);
-      resolved.push(`${resource}:create`);
-      resolved.push(`${resource}:read`);
-      resolved.push(`${resource}:update`);
-      resolved.push(`${resource}:delete`);
-      continue;
-    }
-
-    resolved.push(perm);
-  }
-
-  return resolved;
-}
-
+/**
+ * Checks if user has a specific permission
+ */
 export function hasPermission(
-  permissions: string[],
+  permissions: Permission[],
   required: string,
 ): boolean {
-  const resolved = resolvePermissions(permissions);
-  return resolved.some((p) => matchesPermission(required, p));
+  return permissions.some((p) => matchesPermission(required, p));
 }
 
+/**
+ * At least one permission matches
+ */
 export function hasAnyPermission(
-  permissions: string[],
+  permissions: Permission[],
   required: string[],
 ): boolean {
   return required.some((r) => hasPermission(permissions, r));
 }
 
+/**
+ * All permissions must match
+ */
 export function hasAllPermissions(
-  permissions: string[],
+  permissions: Permission[],
   required: string[],
 ): boolean {
   return required.every((r) => hasPermission(permissions, r));
 }
 
-export function hasWildcard(resource: string, permissions: string[]): boolean {
+/**
+ * Shortcut for resource wildcard check
+ */
+export function hasWildcard(
+  resource: string,
+  permissions: Permission[],
+): boolean {
   return hasPermission(permissions, `${resource}:*`);
 }
 
-export function parsePermissionString(permission: string): { resource: string; action: string } {
+/**
+ * Parse permission string into structured form
+ */
+export function parsePermissionString(permission: string): {
+  resource: string;
+  action: string;
+} {
   const parts = permission.split(":");
-  return { resource: parts[0] ?? "", action: parts[1] ?? "*" };
+
+  return {
+    resource: parts[0] ?? "",
+    action: parts[1] ?? "*",
+  };
 }

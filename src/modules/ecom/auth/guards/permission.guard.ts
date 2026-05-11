@@ -1,5 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
-import { hasPermission, hasAnyPermission, hasAllPermissions } from "../rbac/rbac.matcher";
+import {
+  hasPermission,
+  hasAnyPermission,
+  hasAllPermissions,
+} from "../rbac/rbac.matcher";
 
 export function requirePermission(...requiredPermissions: string[]) {
   return (req: Request, res: Response, next: NextFunction): void => {
