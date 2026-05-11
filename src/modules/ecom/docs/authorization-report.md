@@ -132,6 +132,96 @@ await redisClient.set(key, JSON.stringify(data), {
 
 ---
 
+## Service Architecture: Public vs Protected
+
+The system now enforces a clear separation between **public** and **protected** services. There is no optional auth - every service explicitly requires auth or doesn't accept it at all.
+
+### Public Services (No Auth)
+
+Public services have **no `auth` parameter** - they are completely unauthenticated:
+
+```typescript
+// product.public.service.ts - no auth parameter
+export async function getProductById(productId: number) { ... }
+export async function getAllProducts(filter?: ProductFilter) { ... }
+export async function getCategories() { ... }
+export async function searchProducts(query: string) { ... }
+
+// customer.service.ts - no auth parameter
+export async function checkout(data: CheckoutData) { ... }
+export async function trackOrders(phone: string) { ... }
+```
+
+Public endpoints use **no route guards** - they are fully open:
+
+```typescript
+// ecom.route.ts - public routes, no guards
+ecomRouter.get("/products", customerHandler);        // no guard
+ecomRouter.get("/product/:id", customerHandler);    // no guard
+ecomRouter.get("/categories", customerHandler);      // no guard
+ecomRouter.get("/products/search", customerHandler); // no guard
+ecomRouter.post("/checkout", customerHandler);      // no guard
+ecomRouter.get("/orders/track", customerHandler);    // no guard
+```
+
+### Protected Services (Auth Required)
+
+Protected services require `auth: unknown` as a **mandatory** parameter:
+
+```typescript
+// product.admin.service.ts - auth REQUIRED
+export async function createProduct(data: ProductData, auth: unknown) {
+  assertAuth(auth);  // Throws if not provided
+  authorize(auth, ProductPolicies.create());
+  // ...
+}
+
+// order.service.ts - auth REQUIRED
+export async function getOrderById(orderId: number, auth: unknown) {
+  assertAuth(auth);
+  authorize(auth, OrderPolicies.view(context));
+  // ...
+}
+```
+
+Protected endpoints use **guards as optimization** (defense-in-depth):
+
+```typescript
+// ecom.route.ts - protected routes with guards
+const adminAuth = [authenticate, requireRole("ADMIN")];
+ecomRouter.post("/product/create", ...adminAuth, productHandler);
+ecomRouter.get("/orders", ...adminAuth, orderHandler);
+ecomRouter.get("/employee/orders", ...employeeAuth, employeeOrderHandler);
+```
+
+### Core Rules
+
+1. **No optional auth** (`auth?` is forbidden) - creates hidden bypass paths
+2. **No conditional authorization** - services are either fully public or fully protected
+3. **Guards are only for protected routes** - public routes have no guards
+4. **Service `authorize()` is mandatory** for all protected operations
+
+### Service File Structure
+
+```
+src/modules/ecom/
+├── product/
+│   ├── product.public.service.ts   // 6 functions - no auth
+│   ├── product.admin.service.ts     // 6 functions - auth required
+│   └── product.controller.ts        // admin operations only
+├── order/
+│   └── order.service.ts             // auth required
+├── admin/services/
+│   ├── employee.service.ts          // auth required
+│   └── inventory.service.ts         // auth required
+├── customer/
+│   └── customer.service.ts          // no auth (checkout, tracking)
+└── employee/
+    └── controllers/order.controller.ts // auth required
+```
+
+---
+
 ## Authorization Layers
 
 ### Layer 1: Route Guards (Coarse-Grained - Defense in Depth)
@@ -380,55 +470,56 @@ export function resolvePermissions(permissions: string[]): string[] {
 
 ## What We're Doing Right
 
-### 1. **Two-Layer Authorization**
+### 1. **Clear Public vs Protected Service Separation**
+Services are now explicitly either public (no auth parameter) or protected (auth required). No more optional auth (`auth?`) that creates hidden bypass paths. This makes authorization behavior predictable and auditable.
+
+### 2. **Two-Layer Authorization**
 Separating coarse route guards from fine-grained resource policies is a solid pattern. It allows:
 - Quick rejection at routing level
 - Business-logic-aware checks at service level
 
-### 2. **Wildcard Permission Support**
+### 3. **Wildcard Permission Support**
 The `resolvePermissions` function properly expands `resource:*` into individual actions, enabling ADMIN to have full CRUD without listing each action.
 
-### 3. **Ownership-Based Policies**
+### 4. **Ownership-Based Policies**
 Policies like `canViewOrder` check not just role but also `employeeId` match, preventing employees from viewing each other's orders.
 
-### 4. **Session Auto-Extension**
+### 5. **Session Auto-Extension**
 The session cache logic extends TTL automatically when nearing expiry, providing better UX without compromising security significantly.
 
-### 5. **Caching Strategy**
+### 6. **Caching Strategy**
 - 15-minute auth cache reduces DB load
 - Session cache in Redis with fallback to DB
 - Proper cache invalidation function available
 
-### 6. **Transaction Support**
+### 7. **Transaction Support**
 Enforcers accept `PrismaClient | Prisma.TransactionClient`, allowing authorization checks within transactions.
 
-### 7. **Error Hierarchy**
+### 8. **Error Hierarchy**
 Custom errors (`ForbiddenError`, `UnauthorizedError`, `NotFoundError`) with proper handling in controllers.
 
-### 8. **SuperAdmin Bypass**
+### 9. **SuperAdmin Bypass**
 The `isSuperAdmin` flag provides a fast-path for full access without role iteration.
 
 ---
 
 ## Issues & Improvements
 
+### ✅ FIXED - Issue 1: Inconsistent Authorization
+
+**Previous Problem**: Mixed auth handling - some services had optional auth (`auth?`), creating bypass paths. Public and protected operations were mixed in the same service.
+
+**Solution Implemented**:
+- Split `product.service.ts` into `product.public.service.ts` (no auth) and `product.admin.service.ts` (auth required)
+- Removed all optional auth (`auth?`) - every protected function requires `auth: unknown`
+- Clear separation: public services have no auth parameter, protected services require auth
+- Guards now only apply to protected routes, not public endpoints
+
+**Current State**: Every service either has no auth (public) or requires auth (protected). No middle ground, no bypass paths.
+
+---
+
 ### Critical Issues
-
-#### 1. **Inconsistent Use of Guards vs Enforcers**
-Some routes use guards only, some use enforcers, some use neither.
-
-```typescript
-// order.controller.ts - mixes approaches
-router.post('/order/create', /* no guard */, orderHandler);  // Relies on enforcer inside service
-router.get('/orders', /* no guard */, orderHandler);        // Relies on enforcer inside service
-```
-
-**Risk**: If service forgets to call enforcer, unauthorized access occurs.
-
-**Recommendation**: Add guards at route level as defense-in-depth:
-```typescript
-router.get('/orders', requirePermission('order:read'), orderHandler);
-```
 
 #### 2. **No Audit Logging**
 Authorization decisions (especially denials) are not logged anywhere.
@@ -751,13 +842,14 @@ async function getOrder(orderId: number, auth: AuthContext) {
 
 ### Strengths
 - ✅ Two-layer authorization architecture
+- ✅ Clear public vs protected service separation
+- ✅ No optional auth - explicit no-auth or required-auth
 - ✅ Ownership-based fine-grained controls
 - ✅ Wildcard permission expansion
 - ✅ Caching for performance
 - ✅ Clear error hierarchy
 
 ### Weaknesses
-- ❌ Inconsistent application of guards vs enforcers
 - ❌ No audit logging
 - ❌ Cache invalidation gaps
 - ❌ Race conditions in session extension
@@ -765,12 +857,11 @@ async function getOrder(orderId: number, auth: AuthContext) {
 - ❌ No input validation at runtime
 
 ### Recommended Action Items
-1. Audit all routes to ensure both guards AND enforcers are used
-2. Add authorization audit logging
-3. Implement automatic cache invalidation on role changes
-4. Add `confirm` to Action enum
-5. Fix session extension with atomic operations
-6. Add rate limiting on auth endpoints
+1. Add authorization audit logging for denial events
+2. Implement automatic cache invalidation on role changes
+3. Add `confirm` to Action enum
+4. Fix session extension with atomic operations
+5. Add rate limiting on auth endpoints
 
 ---
 
