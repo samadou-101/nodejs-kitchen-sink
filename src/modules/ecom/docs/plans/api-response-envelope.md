@@ -20,7 +20,7 @@
 - Catch blocks: delegate to `next(error)` instead of inline handling
 - Non-error conditions (business logic failures like "not found") use `sendError` directly
 
-**Next: Batch 4 — Customer & Employee Order Controllers**
+**Next: Batch 5 — Order Controller**
 
 ---
 
@@ -131,7 +131,7 @@ interface PaginationMeta {
 
 ---
 
-## Batch 4 — Customer & Employee Order Controllers
+## Batch 4 — Customer & Employee Order Controllers `✅ DONE`
 
 **Files to modify:**
 

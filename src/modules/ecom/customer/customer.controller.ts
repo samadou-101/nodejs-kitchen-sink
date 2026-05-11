@@ -1,17 +1,33 @@
-import type { Request, Response } from "express";
-import { z } from "zod";
+import type { Request, Response, NextFunction } from "express";
 import * as productPublic from "../product/product.public.service";
 import {
   checkout,
   trackOrders,
   getOrderForTracking,
 } from "./customer.service";
-import { validateCheckoutData, validatePhone, validateTrackingOrderId, validateSearchQuery } from "../validation/validators/customer.validator";
-import { validateProductFilter, validateProductId } from "../validation/validators/product.validator";
+import {
+  validateCheckoutData,
+  validatePhone,
+  validateTrackingOrderId,
+  validateSearchQuery,
+} from "../validation/validators/customer.validator";
+import {
+  validateProductFilter,
+  validateProductId,
+} from "../validation/validators/product.validator";
 import type { CheckoutData } from "./customer.types";
 import type { ProductFilter } from "../product/product.types";
+import {
+  sendSuccess,
+  sendCreated,
+  sendError,
+} from "@/modules/ecom/shared/response";
 
-export async function customerHandler(req: Request, res: Response) {
+export async function customerHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   const path = req.path;
   const method = req.method;
 
@@ -19,13 +35,10 @@ export async function customerHandler(req: Request, res: Response) {
     try {
       const filter = validateProductFilter(req.query) as ProductFilter;
       const products = await productPublic.getAllProducts(filter);
-      res.status(200).json(products);
+      sendSuccess(res, products);
     } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      res.status(500).json({ message: error.message });
+      next(error);
+      return;
     }
     return;
   }
@@ -34,36 +47,26 @@ export async function customerHandler(req: Request, res: Response) {
     try {
       const query = validateSearchQuery(req.query.q);
       const products = await productPublic.searchProducts(query);
-      res.status(200).json(products);
+      sendSuccess(res, products);
     } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      res.status(500).json({ message: error.message });
+      next(error);
+      return;
     }
     return;
   }
 
-  if (
-    method === "GET" &&
-    path.startsWith("/product/") &&
-    req.params.id
-  ) {
+  if (method === "GET" && path.startsWith("/product/") && req.params.id) {
     try {
       const productId = validateProductId(req.params.id);
       const product = await productPublic.getProductById(productId);
       if (!product) {
-        res.status(404).json({ message: "Product not found" });
+        sendError(res, 404, "NOT_FOUND", "Product not found");
         return;
       }
-      res.status(200).json(product);
+      sendSuccess(res, product);
     } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      res.status(500).json({ message: error.message });
+      next(error);
+      return;
     }
     return;
   }
@@ -71,9 +74,10 @@ export async function customerHandler(req: Request, res: Response) {
   if (path === "/categories" && method === "GET") {
     try {
       const categories = await productPublic.getAllCategories();
-      res.status(200).json(categories);
+      sendSuccess(res, categories);
     } catch (error: any) {
-      res.status(500).json({ message: error.message });
+      next(error);
+      return;
     }
     return;
   }
@@ -82,13 +86,13 @@ export async function customerHandler(req: Request, res: Response) {
     try {
       const data = validateCheckoutData(req.body) as CheckoutData;
       const order = await checkout(data);
-      res.status(201).json({ message: "Order placed successfully", orderId: order.orderId });
+      sendCreated(res, {
+        message: "Order placed successfully",
+        orderId: order.orderId,
+      });
     } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      res.status(400).json({ message: error.message });
+      next(error);
+      return;
     }
     return;
   }
@@ -97,39 +101,29 @@ export async function customerHandler(req: Request, res: Response) {
     try {
       const phone = validatePhone(req.query.phone);
       const orders = await trackOrders(phone);
-      res.status(200).json(orders);
+      sendSuccess(res, orders);
     } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      res.status(500).json({ message: error.message });
+      next(error);
+      return;
     }
     return;
   }
 
-  if (
-    method === "GET" &&
-    path.startsWith("/orders/") &&
-    req.params.id
-  ) {
+  if (method === "GET" && path.startsWith("/orders/") && req.params.id) {
     try {
       const orderId = validateTrackingOrderId(req.params.id);
       const order = await getOrderForTracking(orderId);
       if (!order) {
-        res.status(404).json({ message: "Order not found" });
+        sendError(res, 404, "NOT_FOUND", "Order not found");
         return;
       }
-      res.status(200).json(order);
+      sendSuccess(res, order);
     } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      res.status(500).json({ message: error.message });
+      next(error);
+      return;
     }
     return;
   }
 
-  res.status(404).json({ message: "Route not found" });
+  sendError(res, 404, "NOT_FOUND", "Route not found");
 }
