@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type { Request, Response } from "express";
 import {
   createProduct,
@@ -9,6 +10,23 @@ import {
 } from "./product.admin.service";
 import type { CategoryData, ProductData } from "./product.types";
 import { ForbiddenError, UnauthorizedError } from "@/modules/ecom/auth/errors";
+import {
+  validateProductData,
+  validateCategoryData,
+  validateProductId,
+  validateCategoryId,
+} from "../validation";
+
+function handleValidationError(res: Response, error: unknown): boolean {
+  if (error instanceof z.ZodError) {
+    res.status(400).json({
+      error: "Validation failed",
+      details: error.issues,
+    });
+    return true;
+  }
+  return false;
+}
 
 function handleAuthError(res: Response, error: unknown) {
   if (error instanceof UnauthorizedError) {
@@ -25,16 +43,12 @@ function handleAuthError(res: Response, error: unknown) {
 export async function productHandler(req: Request, res: Response) {
   if (req.path === "/product/create" && req.method === "POST") {
     try {
-      const productData = (req.body as ProductData) ?? {};
-      if (!productData) {
-        res.status(409).send("Invalid Data");
-        return;
-      }
+      const productData = validateProductData(req.body) as ProductData;
       const product = await createProduct(productData, req.auth);
       res.status(201).send(product);
-    } catch (error: any) {
-      if (!handleAuthError(res, error)) {
-        res.status(500).send({ error: error.message });
+    } catch (error: unknown) {
+      if (!handleValidationError(res, error) && !handleAuthError(res, error)) {
+        res.status(500).send({ error: (error as Error).message });
       }
     }
     return;
@@ -42,16 +56,12 @@ export async function productHandler(req: Request, res: Response) {
 
   if (req.path === "/product/update" && req.method === "POST") {
     try {
-      const productData = (req.body as ProductData) ?? {};
-      if (!productData || !productData.id) {
-        res.status(409).send("Invalid Data");
-        return;
-      }
+      const productData = validateProductData(req.body) as ProductData;
       const updated = await updateProduct(productData, req.auth);
       res.status(200).send(updated);
-    } catch (error: any) {
-      if (!handleAuthError(res, error)) {
-        res.status(500).send({ error: error.message });
+    } catch (error: unknown) {
+      if (!handleValidationError(res, error) && !handleAuthError(res, error)) {
+        res.status(500).send({ error: (error as Error).message });
       }
     }
     return;
@@ -62,8 +72,8 @@ export async function productHandler(req: Request, res: Response) {
     req.path.startsWith("/product/") &&
     req.params.id
   ) {
-    const productId = Number(req.params.id);
     try {
+      const productId = validateProductId(req.params.id);
       const deletedProduct = await removeProduct(productId, req.auth);
       if (!deletedProduct) {
         res.status(400).send("No product found");
@@ -71,25 +81,21 @@ export async function productHandler(req: Request, res: Response) {
       }
       res.status(200).send("Product deleted successfully");
       return;
-    } catch (error: any) {
-      if (!handleAuthError(res, error)) {
-        res.status(500).send({ error: error.message });
+    } catch (error: unknown) {
+      if (!handleValidationError(res, error) && !handleAuthError(res, error)) {
+        res.status(500).send({ error: (error as Error).message });
       }
     }
   }
 
   if (req.path === "/category" && req.method === "POST") {
     try {
-      const categoryData = (req.body as CategoryData) ?? {};
-      if (!categoryData || !categoryData.name) {
-        res.status(409).send("Invalid Data");
-        return;
-      }
+      const categoryData = validateCategoryData(req.body) as CategoryData;
       const category = await createCategory(categoryData, req.auth);
       res.status(201).send(category);
-    } catch (error: any) {
-      if (!handleAuthError(res, error)) {
-        res.status(500).send({ error: error.message });
+    } catch (error: unknown) {
+      if (!handleValidationError(res, error) && !handleAuthError(res, error)) {
+        res.status(500).send({ error: (error as Error).message });
       }
     }
     return;
@@ -97,33 +103,25 @@ export async function productHandler(req: Request, res: Response) {
 
   if (req.path === "/category/update" && req.method === "POST") {
     try {
-      const categoryData = (req.body as CategoryData) ?? {};
-      if (!categoryData || !categoryData.categoryId) {
-        res.status(409).send("Invalid Data");
-        return;
-      }
+      const categoryData = validateCategoryData(req.body) as CategoryData;
       const updated = await updateCategory(categoryData, req.auth);
       res.status(200).send(updated);
-    } catch (error: any) {
-      if (!handleAuthError(res, error)) {
-        res.status(500).send({ error: error.message });
+    } catch (error: unknown) {
+      if (!handleValidationError(res, error) && !handleAuthError(res, error)) {
+        res.status(500).send({ error: (error as Error).message });
       }
     }
     return;
   }
 
   if (req.path.startsWith("/category/") && req.params.id && req.method === "DELETE") {
-    const categoryId = Number(req.params.id);
-    if (Number.isNaN(categoryId)) {
-      res.status(400).send("Invalid Category ID");
-      return;
-    }
     try {
+      const categoryId = validateCategoryId(req.params.id);
       await removeCategory(categoryId, req.auth);
       res.status(200).send("Category deleted successfully");
-    } catch (error: any) {
-      if (!handleAuthError(res, error)) {
-        res.status(500).send({ error: error.message });
+    } catch (error: unknown) {
+      if (!handleValidationError(res, error) && !handleAuthError(res, error)) {
+        res.status(500).send({ error: (error as Error).message });
       }
     }
     return;
