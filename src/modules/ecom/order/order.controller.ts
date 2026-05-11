@@ -1,5 +1,4 @@
-import type { Request, Response } from "express";
-import { z } from "zod";
+import type { Request, Response, NextFunction } from "express";
 import {
   placeOrder,
   getOrderById,
@@ -19,22 +18,18 @@ import {
   validateOrderStatusUpdate,
   validateAssignEmployee,
 } from "@/modules/ecom/validation/validators/order.validator";
-import { handleError } from "./order.utils";
-import { ForbiddenError, UnauthorizedError } from "@/modules/ecom/auth/errors";
+import {
+  sendSuccess,
+  sendCreated,
+  sendNoContent,
+  sendError,
+} from "@/modules/ecom/shared/response";
 
-function handleAuthError(res: Response, error: unknown) {
-  if (error instanceof UnauthorizedError) {
-    res.status(401).json({ error: error.message });
-    return true;
-  }
-  if (error instanceof ForbiddenError) {
-    res.status(403).json({ error: error.message });
-    return true;
-  }
-  return false;
-}
-
-export async function orderHandler(req: Request, res: Response) {
+export async function orderHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   const id = req.params.id as string | undefined;
 
   if (req.path === "/order/create" && req.method === "POST") {
@@ -42,7 +37,7 @@ export async function orderHandler(req: Request, res: Response) {
       const orderData = validateOrderData(req.body) as OrderData;
       const order = await placeOrder(orderData, req.auth);
       if (!order) {
-        res.status(400).json({ message: "Failed creating order" });
+        sendError(res, 400, "VALIDATION_ERROR", "Failed creating order");
         return;
       }
       const orderResponse: OrderDTO = {
@@ -52,15 +47,10 @@ export async function orderHandler(req: Request, res: Response) {
         orderDate: order.orderDate,
         orderStatusId: order.orderStatusId,
       };
-      res.status(201).json(orderResponse);
+      sendCreated(res, orderResponse);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        handleError(res, error);
-      }
+      next(error);
+      return;
     }
     return;
   }
@@ -74,15 +64,10 @@ export async function orderHandler(req: Request, res: Response) {
         limit?: number;
       };
       const orders = await listOrders(filter, req.auth);
-      res.status(200).json(orders);
+      sendSuccess(res, orders);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        handleError(res, error);
-      }
+      next(error);
+      return;
     }
     return;
   }
@@ -94,15 +79,10 @@ export async function orderHandler(req: Request, res: Response) {
         const orderId = validateOrderId(statusMatch[1]!);
         const { statusId } = validateOrderStatusUpdate(req.body);
         const updated = await updateOrderStatus(orderId, statusId, req.auth);
-        res.status(200).json(updated);
+        sendSuccess(res, updated);
       } catch (error) {
-        if (error instanceof z.ZodError) {
-          res.status(400).json({ error: "Validation failed", details: error.issues });
-          return;
-        }
-        if (!handleAuthError(res, error)) {
-          handleError(res, error);
-        }
+        next(error);
+        return;
       }
       return;
     }
@@ -112,34 +92,30 @@ export async function orderHandler(req: Request, res: Response) {
       try {
         const orderId = validateOrderId(employeeMatch[1]!);
         const { employeeId } = validateAssignEmployee(req.body);
-        const updated = await assignOrderToEmployee(orderId, employeeId, req.auth);
-        res.status(200).json(updated);
+        const updated = await assignOrderToEmployee(
+          orderId,
+          employeeId,
+          req.auth,
+        );
+        sendSuccess(res, updated);
       } catch (error) {
-        if (error instanceof z.ZodError) {
-          res.status(400).json({ error: "Validation failed", details: error.issues });
-          return;
-        }
-        if (!handleAuthError(res, error)) {
-          handleError(res, error);
-        }
+        next(error);
+        return;
       }
       return;
     }
 
-    const unassignMatch = req.path.match(/^\/order\/(\d+)\/employee\/remove$/);
+    const unassignMatch = req.path.match(
+      /^\/order\/(\d+)\/employee\/remove$/,
+    );
     if (unassignMatch) {
       try {
         const orderId = validateOrderId(unassignMatch[1]!);
         const updated = await unassignEmployeeFromOrder(orderId, req.auth);
-        res.status(200).json(updated);
+        sendSuccess(res, updated);
       } catch (error) {
-        if (error instanceof z.ZodError) {
-          res.status(400).json({ error: "Validation failed", details: error.issues });
-          return;
-        }
-        if (!handleAuthError(res, error)) {
-          handleError(res, error);
-        }
+        next(error);
+        return;
       }
       return;
     }
@@ -150,18 +126,13 @@ export async function orderHandler(req: Request, res: Response) {
       const orderId = validateOrderId(id);
       const order = await getOrderById(orderId, req.auth);
       if (!order) {
-        res.status(404).json({ message: "Order not found" });
+        sendError(res, 404, "NOT_FOUND", "Order not found");
         return;
       }
-      res.status(200).json(order);
+      sendSuccess(res, order);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        handleError(res, error);
-      }
+      next(error);
+      return;
     }
     return;
   }
@@ -172,15 +143,10 @@ export async function orderHandler(req: Request, res: Response) {
       const orderData = validateOrderData(req.body) as OrderData;
       orderData.orderId = orderId;
       const updated = await updateOrder(orderData, req.auth);
-      res.status(200).json(updated);
+      sendSuccess(res, updated);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        handleError(res, error);
-      }
+      next(error);
+      return;
     }
     return;
   }
@@ -189,18 +155,13 @@ export async function orderHandler(req: Request, res: Response) {
     try {
       const orderId = validateOrderId(id);
       await deleteOrderById(orderId, req.auth);
-      res.status(204).send();
+      sendNoContent(res);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        handleError(res, error);
-      }
+      next(error);
+      return;
     }
     return;
   }
 
-  res.status(404).json({ message: "Route not found" });
+  sendError(res, 404, "NOT_FOUND", "Route not found");
 }

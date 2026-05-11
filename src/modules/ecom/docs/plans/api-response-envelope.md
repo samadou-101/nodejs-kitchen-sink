@@ -20,7 +20,7 @@
 - Catch blocks: delegate to `next(error)` instead of inline handling
 - Non-error conditions (business logic failures like "not found") use `sendError` directly
 
-**Next: Batch 5 — Order Controller**
+**Next: Batch 6 — Employee Admin Controller**
 
 ---
 
@@ -85,7 +85,7 @@ interface PaginationMeta {
 
 **Cleaned up:**
 - Deleted empty files: `admin/admin.utils.ts`, `employee/employee.utils.ts`, `product/product.utils.ts`
-- *Kept but will delete after controller migration:* `validation/utils.ts`, `order/order.utils.ts`
+- *Cleaned up after controller migration:* `validation/utils.ts`, `order/order.utils.ts`
 
 ---
 
@@ -164,7 +164,7 @@ interface PaginationMeta {
 
 ---
 
-## Batch 5 — Order Controller (medium complexity)
+## Batch 5 — Order Controller `✅ DONE`
 
 **Files to modify:**
 
