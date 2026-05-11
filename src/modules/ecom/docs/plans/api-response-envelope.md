@@ -5,6 +5,25 @@
 
 ---
 
+## Anchor (last updated: Batch 2 Complete)
+
+**Done:**
+- Batch 1 — Created `src/modules/ecom/shared/` with response types, helpers, error classes, error middleware, barrel exports; rewired `auth/errors.ts` and `order/order.errors.ts` to extend shared base classes; wired error middleware in `app.ts`; deleted empty utils files
+- Batch 2 — Refactored `admin/controllers/auth.controller.ts` and `employee/controllers/auth.controller.ts` to use `sendCreated`/`sendSuccess`/`sendError`, delegate errors to `next(error)`, remove inline Prisma/Zod handling
+
+**Pattern decisions (from conversation):**
+- Error classes consolidated into `shared/errors.ts` (avoid circular deps with auth middleware)
+- 204 responses keep empty body (no envelope)
+- Mixed response style: `{ message: "..." }` inside `data` for actions, bare payload for data queries
+- Zod errors caught globally in middleware (throw from validators, catch in middleware)
+- Scope: response envelope only, not router refactor (keep existing router files)
+- Catch blocks: delegate to `next(error)` instead of inline handling
+- Non-error conditions (business logic failures like "not found") use `sendError` directly
+
+**Next: Batch 4 — Customer & Employee Order Controllers**
+
+---
+
 ## Envelope Contract
 
 ```typescript
@@ -70,7 +89,7 @@ interface PaginationMeta {
 
 ---
 
-## Batch 2 — Auth Controllers (smallest, simplest)
+## Batch 2 — Auth Controllers `✅ DONE`
 
 **Files to modify:**
 
@@ -87,7 +106,7 @@ interface PaginationMeta {
 
 ---
 
-## Batch 3 — Product & Inventory Controllers
+## Batch 3 — Product & Inventory Controllers `✅ DONE`
 
 **Files to modify:**
 

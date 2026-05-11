@@ -1,44 +1,32 @@
-import type { Request, Response } from "express";
-import { z } from "zod";
+import type { Request, Response, NextFunction } from "express";
 import {
   adjustInventory,
   getLowStockProducts,
 } from "../services/inventory.service";
-import { ForbiddenError, UnauthorizedError } from "@/modules/ecom/auth/errors";
 import {
   validateInventoryAdjust,
   validateThreshold,
 } from "@/modules/ecom/validation/validators/inventory.validator";
+import { sendSuccess, sendError } from "@/modules/ecom/shared/response";
 
-function handleAuthError(res: Response, error: unknown) {
-  if (error instanceof UnauthorizedError) {
-    res.status(401).json({ error: error.message });
-    return true;
-  }
-  if (error instanceof ForbiddenError) {
-    res.status(403).json({ error: error.message });
-    return true;
-  }
-  return false;
-}
-
-export async function inventoryAdminHandler(req: Request, res: Response) {
+export async function inventoryAdminHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   const path = req.path;
   const method = req.method;
 
   if (path === "/admin/inventory/adjust" && method === "POST") {
     try {
-      const { productId, action, amount } = validateInventoryAdjust(req.body ?? {});
+      const { productId, action, amount } = validateInventoryAdjust(
+        req.body ?? {},
+      );
       await adjustInventory({ productId, action, amount }, req.auth);
-      res.status(200).json({ message: "Stock adjusted successfully" });
+      sendSuccess(res, { message: "Stock adjusted successfully" });
     } catch (error: unknown) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        res.status(400).json({ message: (error as Error).message });
-      }
+      next(error);
+      return;
     }
     return;
   }
@@ -47,18 +35,13 @@ export async function inventoryAdminHandler(req: Request, res: Response) {
     try {
       const threshold = validateThreshold(req.query.threshold) ?? 10;
       const products = await getLowStockProducts(threshold, req.auth);
-      res.status(200).json(products);
+      sendSuccess(res, products);
     } catch (error: unknown) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        res.status(500).json({ message: (error as Error).message });
-      }
+      next(error);
+      return;
     }
     return;
   }
 
-  res.status(404).json({ message: "Route not found" });
+  sendError(res, 404, "NOT_FOUND", "Route not found");
 }

@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import {
   createProduct,
   removeProduct,
@@ -8,37 +8,27 @@ import {
   removeCategory,
 } from "./product.admin.service";
 import type { CategoryData, ProductData } from "./product.types";
-import { ForbiddenError, UnauthorizedError } from "@/modules/ecom/auth/errors";
 import {
   validateProductData,
   validateCategoryData,
   validateProductId,
   validateCategoryId,
 } from "../validation";
-import { handleValidationError } from "../validation";
+import { sendCreated, sendSuccess, sendError } from "@/modules/ecom/shared/response";
 
-function handleAuthError(res: Response, error: unknown) {
-  if (error instanceof UnauthorizedError) {
-    res.status(401).json({ error: error.message });
-    return true;
-  }
-  if (error instanceof ForbiddenError) {
-    res.status(403).json({ error: error.message });
-    return true;
-  }
-  return false;
-}
-
-export async function productHandler(req: Request, res: Response) {
+export async function productHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   if (req.path === "/product/create" && req.method === "POST") {
     try {
       const productData = validateProductData(req.body) as ProductData;
       const product = await createProduct(productData, req.auth);
-      res.status(201).send(product);
+      sendCreated(res, product);
     } catch (error: unknown) {
-      if (!handleValidationError(res, error) && !handleAuthError(res, error)) {
-        res.status(500).send({ error: (error as Error).message });
-      }
+      next(error);
+      return;
     }
     return;
   }
@@ -47,11 +37,10 @@ export async function productHandler(req: Request, res: Response) {
     try {
       const productData = validateProductData(req.body) as ProductData;
       const updated = await updateProduct(productData, req.auth);
-      res.status(200).send(updated);
+      sendSuccess(res, updated);
     } catch (error: unknown) {
-      if (!handleValidationError(res, error) && !handleAuthError(res, error)) {
-        res.status(500).send({ error: (error as Error).message });
-      }
+      next(error);
+      return;
     }
     return;
   }
@@ -65,15 +54,14 @@ export async function productHandler(req: Request, res: Response) {
       const productId = validateProductId(req.params.id);
       const deletedProduct = await removeProduct(productId, req.auth);
       if (!deletedProduct) {
-        res.status(400).send("No product found");
+        sendError(res, 404, "NOT_FOUND", "No product found");
         return;
       }
-      res.status(200).send("Product deleted successfully");
+      sendSuccess(res, { message: "Product deleted successfully" });
       return;
     } catch (error: unknown) {
-      if (!handleValidationError(res, error) && !handleAuthError(res, error)) {
-        res.status(500).send({ error: (error as Error).message });
-      }
+      next(error);
+      return;
     }
   }
 
@@ -81,11 +69,10 @@ export async function productHandler(req: Request, res: Response) {
     try {
       const categoryData = validateCategoryData(req.body) as CategoryData;
       const category = await createCategory(categoryData, req.auth);
-      res.status(201).send(category);
+      sendCreated(res, category);
     } catch (error: unknown) {
-      if (!handleValidationError(res, error) && !handleAuthError(res, error)) {
-        res.status(500).send({ error: (error as Error).message });
-      }
+      next(error);
+      return;
     }
     return;
   }
@@ -94,27 +81,29 @@ export async function productHandler(req: Request, res: Response) {
     try {
       const categoryData = validateCategoryData(req.body) as CategoryData;
       const updated = await updateCategory(categoryData, req.auth);
-      res.status(200).send(updated);
+      sendSuccess(res, updated);
     } catch (error: unknown) {
-      if (!handleValidationError(res, error) && !handleAuthError(res, error)) {
-        res.status(500).send({ error: (error as Error).message });
-      }
+      next(error);
+      return;
     }
     return;
   }
 
-  if (req.path.startsWith("/category/") && req.params.id && req.method === "DELETE") {
+  if (
+    req.path.startsWith("/category/") &&
+    req.params.id &&
+    req.method === "DELETE"
+  ) {
     try {
       const categoryId = validateCategoryId(req.params.id);
       await removeCategory(categoryId, req.auth);
-      res.status(200).send("Category deleted successfully");
+      sendSuccess(res, { message: "Category deleted successfully" });
     } catch (error: unknown) {
-      if (!handleValidationError(res, error) && !handleAuthError(res, error)) {
-        res.status(500).send({ error: (error as Error).message });
-      }
+      next(error);
+      return;
     }
     return;
   }
 
-  res.status(404).json({ message: "Route not found" });
+  sendError(res, 404, "NOT_FOUND", "Route not found");
 }
