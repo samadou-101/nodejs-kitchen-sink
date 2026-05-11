@@ -47,29 +47,26 @@ interface PaginationMeta {
 
 ---
 
-## Batch 1 — Foundation (`src/modules/ecom/shared/`)
+## Batch 1 — Foundation `✅ DONE`
 
-**Files to create:**
+**Created `src/modules/ecom/shared/`:**
 
 | File | Contents |
 |------|----------|
 | `shared/response.types.ts` | `ApiResponse<T>`, `ApiError`, `PaginationMeta` type definitions |
 | `shared/response.ts` | Helper functions: `sendSuccess`, `sendCreated`, `sendNoContent`, `sendPaginated`, `sendError` |
-| `shared/errors.ts` | Consolidated error classes — `AppError` (base + `statusCode`), `NotFoundError`(404), `UnauthorizedError`(401), `ForbiddenError`(403), `ValidationError`(400), `ConflictError`(409) |
+| `shared/errors.ts` | Consolidated error classes — `AppError` (base + `statusCode`), `NotFoundError`(404), `UnauthorizedError`(401), `ForbiddenError`(403), `AuthorizationError`(403), `ValidationError`(400), `ConflictError`(409) |
 | `shared/error.middleware.ts` | Global Express error handler — maps error classes to envelope, catches ZodErrors, catches Prisma `P2002` |
 | `shared/index.ts` | Barrel exports |
 
-**Integration:**
-- Add `app.use(errorMiddleware)` to `src/app.ts`
-- Rewrite `auth/errors.ts` as re-exports from `shared/errors.ts`
-- Rewrite `order/order.errors.ts` as re-exports from `shared/errors.ts`
+**Integration done:**
+- `app.use(errorMiddleware)` added to `src/app.ts`
+- `auth/errors.ts` rewritten — imports from shared + re-exports, keeps `assertAuth`/`checkAuthz`
+- `order/order.errors.ts` rewritten — `OrderNotFoundError extends NotFoundError`, `InsufficientStockError`/`ProductNotFoundError extend AppError`
 
-**Files to delete:**
-- `validation/utils.ts` — replaced by error middleware
-- `order/order.utils.ts` — replaced by error middleware
-- `admin/admin.utils.ts` — empty
-- `employee/employee.utils.ts` — empty
-- `product/product.utils.ts` — empty
+**Cleaned up:**
+- Deleted empty files: `admin/admin.utils.ts`, `employee/employee.utils.ts`, `product/product.utils.ts`
+- *Kept but will delete after controller migration:* `validation/utils.ts`, `order/order.utils.ts`
 
 ---
 
