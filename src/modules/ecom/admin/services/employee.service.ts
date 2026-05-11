@@ -45,6 +45,7 @@ import {
   enforceFinalizePayroll,
   enforceViewPayrollItem,
   enforceUpdatePayrollItem,
+  invalidateAuthCache,
 } from "@/modules/ecom/auth";
 import { assertAuth, checkAuthz } from "@/modules/ecom/auth/errors";
 
@@ -64,6 +65,7 @@ export async function assignUserRole(
   const result = await enforceUpdateEmployee(auth, prisma, 0);
   checkAuthz(result);
   await addUserRole(userId, roleId);
+  await invalidateAuthCache(userId);
 }
 
 export async function changeEmployeeStatus(
@@ -100,6 +102,7 @@ export async function unassignUserRole(
   const result = await enforceUpdateEmployee(auth, prisma, 0);
   checkAuthz(result);
   await removeUserRole(userId, roleId);
+  await invalidateAuthCache(userId);
 }
 
 export async function assignEmployeePaymentType(

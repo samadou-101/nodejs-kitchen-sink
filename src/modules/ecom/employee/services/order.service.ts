@@ -4,8 +4,11 @@ import {
   enforceViewAssignedOrders,
   enforceUpdateOrder,
   enforceViewOrder,
+  enforceConfirmOrder,
+  enforceRejectOrder,
 } from "@/modules/ecom/auth";
 import { assertAuth, checkAuthz } from "@/modules/ecom/auth/errors";
+import { updateOrderStatus } from "@/modules/ecom/order/order.service";
 
 export async function getAssignedOrders(employeeId: number, auth: unknown) {
   assertAuth(auth);
@@ -22,28 +25,40 @@ export async function getOrderById(orderId: number, auth: unknown) {
 }
 
 export async function confirmOrder(orderId: number, auth: unknown) {
-  const db = bind(prisma);
-  const order = await db.findOrderById(orderId);
-  if (!order) {
-    throw new Error("Order not found");
-  }
-  if (order.orderStatusId === 1) {
-    const { updateOrderStatus } =
-      await import("@/modules/ecom/order/order.service");
+  assertAuth(auth);
+
+  return await prisma.$transaction(async (tx) => {
+    const result = await enforceConfirmOrder(auth, tx, orderId);
+    checkAuthz(result);
+
+    const order = await bind(tx).findOrderById(orderId);
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    if (order.orderStatusId !== 1) {
+      // Already confirmed or beyond — return current state
+      return order;
+    }
+
     return updateOrderStatus(orderId, 2, auth);
-  }
-  return order;
+  });
 }
 
 export async function rejectOrder(orderId: number, auth: unknown) {
-  const db = bind(prisma);
-  const order = await db.findOrderById(orderId);
-  if (!order) {
-    throw new Error("Order not found");
-  }
-  const { updateOrderStatus } =
-    await import("@/modules/ecom/order/order.service");
-  return updateOrderStatus(orderId, 5, auth);
+  assertAuth(auth);
+
+  return await prisma.$transaction(async (tx) => {
+    const result = await enforceRejectOrder(auth, tx, orderId);
+    checkAuthz(result);
+
+    const order = await bind(tx).findOrderById(orderId);
+    if (!order) {
+      throw new Error("Order not found");
+    }
+
+    return updateOrderStatus(orderId, 5, auth);
+  });
 }
 
 export async function addOrderNotes(

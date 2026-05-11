@@ -5,6 +5,7 @@ import {
   canViewOrder,
   canUpdateOrder,
   canConfirmOrder,
+  canRejectOrder,
   canCancelOrder,
   canAssignOrder,
   canViewAllOrders,
@@ -111,7 +112,38 @@ export function enforceCreateOrder(ctx: AuthContext): AuthorizationResult {
   return { allowed, reason: allowed ? undefined : "Not authorized to create orders" };
 }
 
-export function enforceDeleteOrder(ctx: AuthContext): AuthorizationResult {
+export async function enforceDeleteOrder(
+  ctx: AuthContext,
+  tx: PrismaClient | Prisma.TransactionClient,
+  orderId: number,
+): Promise<AuthorizationResult> {
+  const order = await tx.order.findUnique({
+    where: { orderId },
+    select: { orderId: true, employeeId: true, customerId: true },
+  });
+
+  if (!order) {
+    return { allowed: false, reason: "Order not found" };
+  }
+
   const allowed = canDeleteOrder(ctx);
   return { allowed, reason: allowed ? undefined : "Not authorized to delete orders" };
+}
+
+export async function enforceRejectOrder(
+  ctx: AuthContext,
+  tx: PrismaClient | Prisma.TransactionClient,
+  orderId: number,
+): Promise<AuthorizationResult> {
+  const order = await tx.order.findUnique({
+    where: { orderId },
+    select: { orderId: true, employeeId: true, customerId: true },
+  });
+
+  if (!order) {
+    return { allowed: false, reason: "Order not found" };
+  }
+
+  const allowed = canRejectOrder(ctx, order);
+  return { allowed, reason: allowed ? undefined : "Not authorized to reject this order" };
 }

@@ -42,6 +42,28 @@ export async function employeeOrderHandler(req: Request, res: Response) {
     return;
   }
 
+  const orderByIdMatch = path.match(/^\/employee\/orders\/(\d+)$/);
+  if (orderByIdMatch && method === "GET") {
+    try {
+      const orderId = parseInt(orderByIdMatch[1]!, 10);
+      if (isNaN(orderId)) {
+        res.status(400).json({ message: "Invalid order ID" });
+        return;
+      }
+      const order = await getOrderById(orderId, req.auth);
+      if (!order) {
+        res.status(404).json({ message: "Order not found" });
+        return;
+      }
+      res.status(200).json(order);
+    } catch (error: any) {
+      if (!handleAuthError(res, error)) {
+        res.status(500).json({ message: error.message });
+      }
+    }
+    return;
+  }
+
   const confirmMatch = path.match(/^\/employee\/orders\/(\d+)\/confirm$/);
   if (confirmMatch && method === "PATCH") {
     try {

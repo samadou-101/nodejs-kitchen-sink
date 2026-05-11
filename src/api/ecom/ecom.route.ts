@@ -54,6 +54,7 @@ ecomRouter.get("/admin/inventory/low-stock", ...adminAuth, inventoryAdminHandler
 ecomRouter.post("/employee/signup", employeeAuthController);
 ecomRouter.post("/employee/login", employeeAuthController);
 ecomRouter.get("/employee/orders", ...employeeAuth, employeeOrderHandler);
+ecomRouter.get("/employee/orders/:id", ...employeeAuth, employeeOrderHandler);
 ecomRouter.patch("/employee/orders/:id/confirm", ...employeeAuth, employeeOrderHandler);
 ecomRouter.patch("/employee/orders/:id/reject", ...employeeAuth, employeeOrderHandler);
 ecomRouter.post("/employee/orders/:id/notes", ...employeeAuth, employeeOrderHandler);

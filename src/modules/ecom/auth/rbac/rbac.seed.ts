@@ -32,6 +32,7 @@ const ROLE_SEEDS: RoleSeed[] = [
     permissions: [
       { resource: "order", action: "read" },
       { resource: "order", action: "update" },
+      { resource: "order", action: "confirm" },
     ],
   },
 ];
@@ -99,30 +100,4 @@ export async function seedRoles(): Promise<void> {
   }
 
   console.log("RBAC roles and permissions seeded successfully");
-}
-
-export async function assignRoleToUser(
-  userId: number,
-  roleName: RoleName,
-): Promise<void> {
-  const role = await prisma.role.findUnique({ where: { name: roleName } });
-  if (!role) throw new Error(`Role ${roleName} not found`);
-
-  await prisma.userRole.upsert({
-    where: { userId_roleId: { userId, roleId: role.id } },
-    create: { userId, roleId: role.id },
-    update: {},
-  });
-}
-
-export async function removeRoleFromUser(
-  userId: number,
-  roleName: RoleName,
-): Promise<void> {
-  const role = await prisma.role.findUnique({ where: { name: roleName } });
-  if (!role) return;
-
-  await prisma.userRole.deleteMany({
-    where: { userId, roleId: role.id },
-  });
 }

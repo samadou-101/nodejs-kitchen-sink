@@ -147,7 +147,7 @@ export async function deleteOrderById(orderId: number, auth: unknown) {
   assertAuth(auth);
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceDeleteOrder(auth);
+    const result = await enforceDeleteOrder(auth, tx, orderId);
     checkAuthz(result);
     return await bind(tx).deleteOrder(orderId);
   });
