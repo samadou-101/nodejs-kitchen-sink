@@ -130,22 +130,60 @@ Controller (req.body) → Validator (Zod parse) → Service (business logic) →
 
 ---
 
-### Phase 3: Customer Module (Public)
+### Phase 3: Customer Module ✅ COMPLETED
 
-**Step 3.1: Create Customer Schemas** (`customer.schema.ts`)
+**Step 3.1: Create Customer Schemas** (`customer.schema.ts`) ✅
 - `CartItemSchema` - cart item validation
-- `CheckoutDataSchema` - checkout payload
-- `PhoneQuerySchema` - phone number for tracking
+- `CheckoutDataSchema` - checkout payload validation
+- `PhoneSchema` - phone number for tracking
+- `TrackingOrderIdSchema` - order ID for public tracking route
+- `SearchQuerySchema` - product search query param
 
-**Step 3.2: Create Customer Validators** (`customer.validator.ts`)
+**Step 3.2: Create Customer Validators** (`customer.validator.ts`) ✅
 - `validateCheckoutData(data: unknown): CheckoutData`
 - `validateCartItem(data: unknown): CartItem`
 - `validatePhone(phone: unknown): string`
+- `validateTrackingOrderId(id: unknown): number` — named to avoid barrel collision with `order.validator.ts`
+- `validateSearchQuery(query: unknown): string`
 
-**Step 3.3: Update Controllers**
+**Step 3.3: Update Controllers** ✅
 - `customer/customer.controller.ts`
 
+**Files created/updated**:
+- `validation/schemas/customer.schema.ts` - NEW
+- `validation/validators/customer.validator.ts` - NEW
+- `validation/schemas/index.ts` - UPDATED
+- `validation/validators/index.ts` - UPDATED
+- `customer/customer.controller.ts` - UPDATED
+
+**Services affected** (validation at boundary, no change needed):
+- `customer/customer.service.ts` - already has types
+
 ---
+
+**Reused Validators** (from other modules):
+- `validateProductFilter` (product module) — `GET /products`
+- `validateProductId` (product module) — `GET /product/:id`
+
+**Schema Details:**
+- `CartItemSchema`: Validates cart item with productId (positive int), quantity (positive int)
+- `CheckoutDataSchema`: Validates checkout with name, phone, address, city (required strings), optional notes, items array (min 1)
+- `PhoneSchema`: Validates phone query param as non-empty string
+- `TrackingOrderIdSchema`: Coerces order ID route param to positive int
+- `SearchQuerySchema`: Validates search query as non-empty string
+
+**Controller Updates:**
+- Added Zod import and validation error handler with `error instanceof z.ZodError` → 400 + `error.issues`
+- `GET /products` — replaced manual `Number()` casts with `validateProductFilter(req.query)`
+- `GET /products/search` — replaced `req.query.q as string` + bare `if (!query)` with `validateSearchQuery(req.query.q)`
+- `GET /product/:id` — replaced `Number(req.params.id)` with `validateProductId(req.params.id)`
+- `POST /checkout` — replaced `req.body as CheckoutData` + manual field checks with `validateCheckoutData(req.body)`
+- `GET /orders/track` — replaced `req.query.phone as string` + bare check with `validatePhone(req.query.phone)`
+- `GET /orders/:id` — replaced `Number(req.params.id)` with `validateTrackingOrderId(req.params.id)`
+
+---
+
+**Barrel Export Note**: `validateTrackingOrderId` renamed from `validateOrderId` because `order.validator.ts` already exports a `validateOrderId`, causing an ambiguous re-export error. This may occur in future phases — use unique names or explicit re-exports to resolve conflicts.
 
 ### Phase 4: Admin Module - Employee Service
 
@@ -285,13 +323,13 @@ This follows the separation of concerns:
 |-------|--------|---------|------------|-------------|--------|
 | 1 | Product | 3 | 5 | 1 | ✅ Complete |
 | 2 | Order | 6 | 5 | 1 | ✅ Complete |
-| 3 | Customer | 3 | 3 | 1 | Pending |
+| 3 | Customer | 5 | 5 | 1 | ✅ Complete |
 | 4 | Admin - Employee | 9 | 6 | 1 | Pending |
 | 5 | Admin - Inventory | 3 | 3 | 1 | Pending |
 | 6 | Employee | 2 | 2 | 2 | Pending |
 | 7 | Shared | 3 | 3 | - | Pending |
 
-**Total**: 28 schemas, 27 validators, 7 controllers to update
+**Total**: 32 schemas, 29 validators, 7 controllers to update
 
 ## Benefits
 
