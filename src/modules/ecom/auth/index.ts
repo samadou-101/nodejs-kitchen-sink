@@ -8,7 +8,6 @@ export * from "./guards/role.guard";
 export * from "./guards/permission.guard";
 
 export * from "./policies";
-export * from "./enforcers";
 
 export * from "./errors";
 
@@ -17,3 +16,5 @@ export { resolveAuthContext, getAuthContext, invalidateAuthCache } from "./rbac/
 
 export { requireRole, requireSuperAdmin } from "./guards/role.guard";
 export { requirePermission, requireAnyPermission, requireWildcardPermission } from "./guards/permission.guard";
+
+export { authorize } from "./authorize";

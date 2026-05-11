@@ -28,7 +28,7 @@ export async function addUserRole(userId: number, roleId: number) {
 }
 
 export async function findEmployeeById(employeeId: number) {
-  await prisma.employee.findUnique({
+  return await prisma.employee.findUnique({
     where: {
       employeeId,
     },

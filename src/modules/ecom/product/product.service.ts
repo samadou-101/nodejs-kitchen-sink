@@ -14,29 +14,24 @@ import {
   findProductsByCategory,
 } from "./product.repo";
 import type { CategoryData, ProductData, ProductFilter } from "./product.types";
-import {
-  enforceCreateProduct,
-  enforceUpdateProduct,
-  enforceDeleteProduct,
-  enforceViewProduct,
-} from "@/modules/ecom/auth";
-import { assertAuth, checkAuthz } from "@/modules/ecom/auth/errors";
+import { authorize } from "@/modules/ecom/auth";
+import { ProductPolicies } from "@/modules/ecom/auth/policies";
+import { assertAuth } from "@/modules/ecom/auth/errors";
 
 export async function createProduct(data: ProductData, auth: unknown) {
   assertAuth(auth);
-  const result = enforceCreateProduct(auth);
-  checkAuthz(result);
+  authorize(auth, ProductPolicies.create());
   return await insertProduct(data);
 }
 
 export async function updateProduct(data: ProductData, auth: unknown) {
   assertAuth(auth);
   if (!data.id) throw new Error("Product ID required");
-  const productId = data.id;
+
+  await findProductByIdRepo(data.id);
+  authorize(auth, ProductPolicies.update());
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceUpdateProduct(auth, tx, productId);
-    checkAuthz(result);
     try {
       return await updateProductRepo(data);
     } catch (error) {
@@ -48,9 +43,10 @@ export async function updateProduct(data: ProductData, auth: unknown) {
 export async function removeProduct(id: number, auth: unknown) {
   assertAuth(auth);
 
+  await findProductByIdRepo(id);
+  authorize(auth, ProductPolicies.delete());
+
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceDeleteProduct(auth, tx, id);
-    checkAuthz(result);
     try {
       return await deleteProductRepo(id);
     } catch (error) {
@@ -62,8 +58,8 @@ export async function removeProduct(id: number, auth: unknown) {
 export async function getProductById(id: number, auth?: unknown) {
   if (auth) {
     assertAuth(auth);
-    const result = await enforceViewProduct(auth, prisma, id);
-    checkAuthz(result);
+    await findProductByIdRepo(id);
+    authorize(auth, ProductPolicies.view());
   }
   return await findProductByIdRepo(id);
 }
@@ -71,24 +67,21 @@ export async function getProductById(id: number, auth?: unknown) {
 export async function getAllProducts(filter?: ProductFilter, auth?: unknown) {
   if (auth) {
     assertAuth(auth);
-    const result = await enforceViewProduct(auth, prisma, 0);
-    checkAuthz(result);
+    authorize(auth, ProductPolicies.view());
   }
   return await findAllProductsRepo(filter);
 }
 
 export async function createCategory(data: CategoryData, auth: unknown) {
   assertAuth(auth);
-  const result = enforceCreateProduct(auth);
-  checkAuthz(result);
+  authorize(auth, ProductPolicies.create());
   return await insertCategory(data);
 }
 
 export async function getCategoryById(id: number, auth?: unknown) {
   if (auth) {
     assertAuth(auth);
-    const result = await enforceViewProduct(auth, prisma, 0);
-    checkAuthz(result);
+    authorize(auth, ProductPolicies.view());
   }
   return await findCategoryById(id);
 }
@@ -96,8 +89,7 @@ export async function getCategoryById(id: number, auth?: unknown) {
 export async function getAllCategories(auth?: unknown) {
   if (auth) {
     assertAuth(auth);
-    const result = await enforceViewProduct(auth, prisma, 0);
-    checkAuthz(result);
+    authorize(auth, ProductPolicies.view());
   }
   return await findAllCategories();
 }
@@ -105,11 +97,10 @@ export async function getAllCategories(auth?: unknown) {
 export async function updateCategory(data: CategoryData, auth: unknown) {
   assertAuth(auth);
   if (!data.categoryId) throw new Error("Category ID required");
-  const categoryId = data.categoryId;
+
+  authorize(auth, ProductPolicies.update());
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceUpdateProduct(auth, tx, categoryId);
-    checkAuthz(result);
     return await updateCategoryRepo(data);
   });
 }
@@ -117,9 +108,9 @@ export async function updateCategory(data: CategoryData, auth: unknown) {
 export async function removeCategory(id: number, auth: unknown) {
   assertAuth(auth);
 
+  authorize(auth, ProductPolicies.delete());
+
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceDeleteProduct(auth, tx, id);
-    checkAuthz(result);
     return await deleteCategory(id);
   });
 }
@@ -127,8 +118,7 @@ export async function removeCategory(id: number, auth: unknown) {
 export async function searchProducts(query: string, auth?: unknown) {
   if (auth) {
     assertAuth(auth);
-    const result = await enforceViewProduct(auth, prisma, 0);
-    checkAuthz(result);
+    authorize(auth, ProductPolicies.view());
   }
   return await searchProductsRepo(query);
 }
@@ -136,8 +126,7 @@ export async function searchProducts(query: string, auth?: unknown) {
 export async function getProductsByCategory(categoryId: number, auth?: unknown) {
   if (auth) {
     assertAuth(auth);
-    const result = await enforceViewProduct(auth, prisma, 0);
-    checkAuthz(result);
+    authorize(auth, ProductPolicies.view());
   }
   return await findProductsByCategory(categoryId);
 }

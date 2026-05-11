@@ -5,16 +5,16 @@ import {
   getInventoryByProductId,
 } from "../repo/inventory.repo";
 import type { InventoryAdjustData } from "../repo/inventory.repo";
-import { enforceManageInventory, enforceViewInventory } from "@/modules/ecom/auth";
-import { assertAuth, checkAuthz } from "@/modules/ecom/auth/errors";
+import { authorize } from "@/modules/ecom/auth";
+import { ProductPolicies } from "@/modules/ecom/auth/policies";
+import { assertAuth } from "@/modules/ecom/auth/errors";
 
 export async function adjustInventory(
   data: InventoryAdjustData,
   auth: unknown,
 ) {
   assertAuth(auth);
-  const manageResult = enforceManageInventory(auth);
-  checkAuthz(manageResult);
+  authorize(auth, ProductPolicies.manageInventory());
 
   return await prisma.$transaction(async (tx) => {
     return await adjustStock(data);
@@ -26,8 +26,7 @@ export async function getLowStockProducts(
   auth: unknown,
 ) {
   assertAuth(auth);
-  const result = enforceViewInventory(auth);
-  checkAuthz(result);
+  authorize(auth, ProductPolicies.viewInventory());
   return await getLowStock(threshold);
 }
 
@@ -36,7 +35,6 @@ export async function getProductInventory(
   auth: unknown,
 ) {
   assertAuth(auth);
-  const result = enforceViewInventory(auth);
-  checkAuthz(result);
+  authorize(auth, ProductPolicies.viewInventory());
   return await getInventoryByProductId(productId);
 }

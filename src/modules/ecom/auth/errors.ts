@@ -1,5 +1,12 @@
 import type { AuthContext } from "./rbac/rbac.types";
 
+export class AuthorizationError extends Error {
+  constructor(message: string, public code?: string) {
+    super(message);
+    this.name = "AuthorizationError";
+  }
+}
+
 export class ForbiddenError extends Error {
   constructor(message: string) {
     super(message);

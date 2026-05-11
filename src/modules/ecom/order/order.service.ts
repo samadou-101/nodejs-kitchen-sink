@@ -6,17 +6,18 @@ import {
   InsufficientStockError,
   ProductNotFoundError,
 } from "./order.errors";
-import {
-  enforceCreateOrder,
-  enforceViewOrder,
-  enforceUpdateOrder,
-  enforceDeleteOrder,
-  enforceAssignOrder,
-  enforceConfirmOrder,
-  enforceViewAllOrders,
-  enforceUpdateInventory,
-} from "@/modules/ecom/auth";
-import { assertAuth, checkAuthz } from "@/modules/ecom/auth/errors";
+import { authorize } from "@/modules/ecom/auth";
+import { OrderPolicies, ProductPolicies } from "@/modules/ecom/auth/policies";
+import type { OrderContext } from "@/modules/ecom/auth/policies";
+import { assertAuth } from "@/modules/ecom/auth/errors";
+
+function toOrderContext(order: { orderId: number; employeeId: number | null; customerId: number }): OrderContext {
+  return {
+    orderId: order.orderId,
+    employeeId: order.employeeId,
+    customerId: order.customerId,
+  };
+}
 
 async function checkAndDecrementInventory(
   orderItems: OrderItem[],
@@ -69,8 +70,7 @@ async function checkAndDecrementInventory(
 
 export async function placeOrder(orderData: OrderData, auth: unknown) {
   assertAuth(auth);
-  const result = enforceCreateOrder(auth);
-  checkAuthz(result);
+  authorize(auth, OrderPolicies.create());
 
   return await prisma.$transaction(async (tx) => {
     const db = bind(tx);
@@ -89,11 +89,11 @@ export async function getOrderById(orderId: number, auth: unknown) {
 
   return await prisma.$transaction(async (tx) => {
     const db = bind(tx);
-    const result = await enforceViewOrder(auth, tx, orderId);
-    checkAuthz(result);
 
     const order = await db.findOrderById(orderId);
     if (!order) return null;
+
+    authorize(auth, OrderPolicies.view(toOrderContext(order)));
 
     return order;
   });
@@ -105,13 +105,13 @@ export async function updateOrder(orderData: OrderData, auth: unknown) {
 
   return await prisma.$transaction(async (tx) => {
     const db = bind(tx);
-    const result = await enforceUpdateOrder(auth, tx, orderData.orderId);
-    checkAuthz(result);
 
-    const existing = await db.findOrderWithCustomer(orderData.orderId);
+    const existing = await db.findOrderById(orderData.orderId);
     if (!existing) {
       throw new OrderNotFoundError(orderData.orderId);
     }
+
+    authorize(auth, OrderPolicies.update(toOrderContext(existing)));
 
     const updated = await db.updateOrder(orderData.orderId, {
       statusId: orderData.orderStatusId,
@@ -137,9 +137,12 @@ export async function updateOrderItems(
   assertAuth(auth);
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceUpdateOrder(auth, tx, orderId);
-    checkAuthz(result);
-    return await bind(tx).replaceOrderItems(orderId, orderItems);
+    const db = bind(tx);
+    const order = await db.findOrderById(orderId);
+    if (!order) throw new OrderNotFoundError(orderId);
+
+    authorize(auth, OrderPolicies.update(toOrderContext(order)));
+    return await db.replaceOrderItems(orderId, orderItems);
   });
 }
 
@@ -147,9 +150,12 @@ export async function deleteOrderById(orderId: number, auth: unknown) {
   assertAuth(auth);
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceDeleteOrder(auth, tx, orderId);
-    checkAuthz(result);
-    return await bind(tx).deleteOrder(orderId);
+    const db = bind(tx);
+    const order = await db.findOrderById(orderId);
+    if (!order) throw new OrderNotFoundError(orderId);
+
+    authorize(auth, OrderPolicies.delete());
+    return await db.deleteOrder(orderId);
   });
 }
 
@@ -159,11 +165,11 @@ export async function assignOrderToEmployee(
   auth: unknown,
 ) {
   assertAuth(auth);
+  authorize(auth, OrderPolicies.assign());
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceAssignOrder(auth);
-    checkAuthz(result);
-    return await bind(tx).assignEmployee(orderId, employeeId);
+    const db = bind(tx);
+    return await db.assignEmployee(orderId, employeeId);
   });
 }
 
@@ -172,11 +178,11 @@ export async function unassignEmployeeFromOrder(
   auth: unknown,
 ) {
   assertAuth(auth);
+  authorize(auth, OrderPolicies.assign());
 
   return await prisma.$transaction(async (tx) => {
-    const result = await enforceAssignOrder(auth);
-    checkAuthz(result);
-    return await bind(tx).unassignEmployee(orderId);
+    const db = bind(tx);
+    return await db.unassignEmployee(orderId);
   });
 }
 
@@ -191,13 +197,12 @@ export async function updateOrderStatus(
     return await prisma.$transaction(async (tx) => {
       const db = bind(tx);
 
-      const result = await enforceConfirmOrder(auth, tx, orderId);
-      checkAuthz(result);
-
       const order = await db.findOrderById(orderId);
       if (!order) {
         throw new OrderNotFoundError(orderId);
       }
+
+      authorize(auth, OrderPolicies.confirm(toOrderContext(order)));
 
       const previousStatusId = order.orderStatusId;
       const isConfirming = previousStatusId !== 2 && statusId === 2;
@@ -244,8 +249,7 @@ export async function updateInventory(
   auth: unknown,
 ) {
   assertAuth(auth);
-  const result = enforceUpdateInventory(auth);
-  checkAuthz(result);
+  authorize(auth, ProductPolicies.updateInventory());
 
   const db = bind(prisma);
 
@@ -283,8 +287,7 @@ export async function listOrders(
   auth: unknown,
 ) {
   assertAuth(auth);
-  const result = enforceViewAllOrders(auth);
-  checkAuthz(result);
+  authorize(auth, OrderPolicies.viewAll());
   return await bind(prisma).findOrders(filter);
 }
 
