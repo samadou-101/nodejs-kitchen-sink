@@ -331,16 +331,38 @@ Controller (req.body) → Validator (Zod parse) → Service (business logic) →
   - All 5 catch blocks now check `error instanceof z.ZodError` → 400 + `error.issues` before `handleAuthError` / 500 fallthrough
   - Changed `catch (error: any)` to `catch (error: unknown)` for all 5 routes (SAFER type narrowing)
 
-### Phase 7: Cross-Cutting Concerns
+### Phase 7: Cross-Cutting Concerns ✅ COMPLETED
 
-**Step 7.1: Create Shared Validators**
-- `validateId(id: unknown): number` - reusable ID validator
-- `validatePagination(data: unknown): { page?: number, limit?: number }`
-- `validateDateRange(data: unknown): { startDate: Date, endDate: Date }`
+**Step 7.1: Create Shared Validators** ✅
+- `validateId(id: unknown): number` — reusable ID validator using `z.coerce.number().int().positive()`
+- `validatePagination(data: unknown): { page: number; limit: number }` — defaults to `{ page: 1, limit: 20 }`, max limit 100
+- `validateDateRange(data: unknown): { startDate: Date; endDate: Date }`
 
-**Step 7.2: Error Handling**
-- Create standardized error format for validation errors
-- Update all controllers to use consistent error responses
+**Step 7.2: Error Handling** ✅
+- Created centralized `handleValidationError(res: Response, error: unknown): boolean` in `validation/utils.ts`
+- Standardized format: `{ error: "Validation failed", details: error.issues }` — already consistent across all controllers
+- Refactored `product.controller.ts` — replaced local `handleValidationError` helper with shared import
+- Removed unused `z` import from product controller
+
+**Files created/updated**:
+- `validation/schemas/shared.schema.ts` - NEW (IdSchema, PaginationSchema, DateRangeSchema)
+- `validation/validators/shared.validator.ts` - NEW (validateId, validatePagination, validateDateRange)
+- `validation/utils.ts` - NEW (handleValidationError)
+- `validation/schemas/index.ts` - UPDATED (added shared export)
+- `validation/validators/index.ts` - UPDATED (added shared export)
+- `validation/index.ts` - UPDATED (added handleValidationError export)
+- `product/product.controller.ts` - UPDATED (switched to shared handleValidationError)
+
+**All 7 Phases Complete** 🎉
+
+---
+
+**Phase 7 Notes:**
+- `IdSchema` uses `z.coerce.number()` to accept both string (route params) and number values
+- `PaginationSchema` defaults to `page: 1, limit: 20` with `max(100)` cap — matches the `ProductFilterSchema` pattern from Phase 1
+- `DateRangeSchema` uses `z.coerce.date()` to accept ISO string or Date objects
+- `handleValidationError` follows the exact response format already used across all controllers: `{ error: "Validation failed", details: error.issues }` (Zod v4 format)
+- The error format was already consistent across 7 of 8 controllers; admin auth controller intentionally omitted (no Zod validation per Phase 4 scope)
 
 ## Zod Schema Guidelines
 
@@ -413,9 +435,9 @@ This follows the separation of concerns:
 | 4 | Admin - Employee | 9 | 9 | 1 | ✅ Complete |
 | 5 | Admin - Inventory | 3 | 2 | 1 | ✅ Complete |
 | 6 | Employee | 2 | 2 | 2 | ✅ Complete |
-| 7 | Shared | 3 | 3 | - | Pending |
+| 7 | Shared | 3 | 3 | - | ✅ Complete |
 
-**Total**: 31 schemas, 31 validators, 7 controllers to update
+**Total**: 31 schemas, 31 validators, 7 controllers updated
 
 ## Benefits
 

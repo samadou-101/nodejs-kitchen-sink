@@ -1,4 +1,3 @@
-import { z } from "zod";
 import type { Request, Response } from "express";
 import {
   createProduct,
@@ -16,17 +15,7 @@ import {
   validateProductId,
   validateCategoryId,
 } from "../validation";
-
-function handleValidationError(res: Response, error: unknown): boolean {
-  if (error instanceof z.ZodError) {
-    res.status(400).json({
-      error: "Validation failed",
-      details: error.issues,
-    });
-    return true;
-  }
-  return false;
-}
+import { handleValidationError } from "../validation";
 
 function handleAuthError(res: Response, error: unknown) {
   if (error instanceof UnauthorizedError) {
