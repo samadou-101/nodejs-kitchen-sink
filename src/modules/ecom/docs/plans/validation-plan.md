@@ -185,32 +185,66 @@ Controller (req.body) → Validator (Zod parse) → Service (business logic) →
 
 **Barrel Export Note**: `validateTrackingOrderId` renamed from `validateOrderId` because `order.validator.ts` already exports a `validateOrderId`, causing an ambiguous re-export error. This may occur in future phases — use unique names or explicit re-exports to resolve conflicts.
 
-### Phase 4: Admin Module - Employee Service
+### Phase 4: Admin Module - Employee Service ✅ COMPLETED
 
-**Step 4.1: Create Admin Schemas** (`admin.schema.ts`)
+**Step 4.1: Create Admin Schemas** (`admin.schema.ts`) ✅
 - `AddEmployeeEmailSchema` - email for pending list
-- `AssignRoleSchema` - { userId, roleId }
-- `EmployeeStatusSchema` - { employeeId, isActive }
-- `PaymentTypeSchema` - { paymentTypeId, salaryAmount?, perOrderRate? }
-- `SalaryUpdateSchema` - { salaryAmount }
-- `RateUpdateSchema` - { perOrderRate }
-- `CreatePaymentSchema` - payment creation
-- `PayrollRunInputSchema` - payroll preview/create
-- `PayrollRunIdSchema` - route param validation
-- `EmployeePerformanceQuerySchema` - { days? }
+- `PaymentTypeSchema` - discriminated union: `{ paymentTypeId: 1, salaryAmount } | { paymentTypeId: 2, perOrderRate }`
+- `CreatePaymentSchema` - payment creation body
+- `PayrollRunInputSchema` - payroll preview/create with `z.coerce.date()`
+- `PayrollRunStatusSchema` - enum `DRAFT | CONFIRMED | PAID` for query filter
+- `PayrollRunIdSchema` - route param coercion
+- `PayrollRunItemIdSchema` - route param coercion for item routes
+- `EmployeeIdSchema` - route param coercion for employee routes
+- `EmployeePerformanceQuerySchema` - `{ days? }` with coercion
 
-**Step 4.2: Create Admin Validators** (`admin.validator.ts`)
-- `validateEmail(email: unknown): string`
-- `validateAssignRole(data: unknown): { userId: number, roleId: number }`
-- `validateEmployeeStatus(data: unknown): { employeeId: number, isActive: boolean }`
-- `validatePaymentType(data: unknown): PaymentTypeInput`
+**Step 4.2: Create Admin Validators** (`admin.validator.ts`) ✅
+- `validateEmail(data: unknown): { email: string }`
+- `validatePaymentType(data: unknown): PaymentTypeData` (discriminated union)
+- `validateCreatePayment(data: unknown): CreatePaymentData`
 - `validatePayrollRunInput(data: unknown): PayrollRunInput`
+- `validatePayrollRunStatus(status: unknown): PayrollRunStatus | undefined` — returns `undefined` when no status filter
 - `validatePayrollRunId(id: unknown): number`
+- `validatePayrollRunItemId(id: unknown): number`
+- `validateEmployeeId(id: unknown): number`
+- `validateEmployeePerformanceQuery(data: unknown): { days?: number }`
 
-**Step 4.3: Update Controllers**
+**Step 4.3: Update Controllers** ✅
 - `admin/controllers/employee.controller.ts`
 
+**Files created/updated**:
+- `validation/schemas/admin.schema.ts` - NEW
+- `validation/validators/admin.validator.ts` - NEW
+- `validation/schemas/index.ts` - UPDATED
+- `validation/validators/index.ts` - UPDATED
+- `admin/controllers/employee.controller.ts` - UPDATED
+
+**Services affected** (validation at boundary, no change needed):
+- `admin/services/employee.service.ts` - already has types
+
 ---
+
+**Note**: 4 schemas from the original plan (`AssignRoleSchema`, `EmployeeStatusSchema`, `SalaryUpdateSchema`, `RateUpdateSchema`) were skipped because the controller has no corresponding routes for role assignment, employee status toggle, salary-only update, or rate-only update. The service exports these functions but they are not wired to any HTTP handler.
+
+**Schema Details:**
+- `AddEmployeeEmailSchema`: Validates body with `email: z.string().email()`
+- `PaymentTypeSchema`: Uses `z.discriminatedUnion("paymentTypeId", [...])` — type 1 requires `salaryAmount`, type 2 requires `perOrderRate`. Eliminates the manual if-else branching in the controller via TypeScript narrowing.
+- `CreatePaymentSchema`: Validates `amount` (positive number), optional `paymentPeriodLabel`, `notes`, `contractId`
+- `PayrollRunInputSchema`: Uses `z.coerce.date()` for `startDate` and `endDate` (replaces manual `new Date()` casts), optional `employeeIds` array
+- `PayrollRunStatusSchema`: `z.enum(["DRAFT", "CONFIRMED", "PAID"])` — validates query param, validator returns `undefined` when param is absent
+- `PayrollRunIdSchema` / `PayrollRunItemIdSchema` / `EmployeeIdSchema`: `z.coerce.number().int().positive()` — each is a separate schema type for clear error messages
+- `EmployeePerformanceQuerySchema`: Coerced `days` (positive int), optional
+
+**Controller Updates:**
+- Added `z` import and 9 validator imports
+- Replaced all 13 manual `parseInt` + `if (!idStr)` checks with `validateEmployeeId` / `validatePayrollRunId` / `validatePayrollRunItemId`
+- `POST /admin/employee/add` — replaced `if (!email)` with `validateEmail(req.body)`
+- `POST /admin/employees/:id/payment-type` — replaced `parseInt` + 4 conditionals with `validateEmployeeId` + `validatePaymentType` (discriminated union narrows the branch automatically)
+- `POST /admin/employees/:id/payments` — replaced `parseInt` + `if (!amount)` with `validateEmployeeId` + `validateCreatePayment`
+- `POST /admin/payroll/preview` + `POST /admin/payroll` — replaced `if (!startDate || !endDate)` + `new Date()` with `validatePayrollRunInput(req.body)` + `as PayrollRunInput` cast
+- `GET /admin/payroll` — replaced `status as string` + `.toUpperCase()` + `as PayrollRunStatus` with `validatePayrollRunStatus(req.query.status)`
+- `GET /admin/employees/:id/performance` — replaced inline `parseInt` ternary with `validateEmployeeId` + `validateEmployeePerformanceQuery(req.query)`
+- All 13 catch blocks now check `error instanceof z.ZodError` → 400 + `error.issues` before `handleAuthError` / 500 fallthrough
 
 ### Phase 5: Admin Module - Inventory Service
 
@@ -324,12 +358,12 @@ This follows the separation of concerns:
 | 1 | Product | 3 | 5 | 1 | ✅ Complete |
 | 2 | Order | 6 | 5 | 1 | ✅ Complete |
 | 3 | Customer | 5 | 5 | 1 | ✅ Complete |
-| 4 | Admin - Employee | 9 | 6 | 1 | Pending |
+| 4 | Admin - Employee | 9 | 9 | 1 | ✅ Complete |
 | 5 | Admin - Inventory | 3 | 3 | 1 | Pending |
 | 6 | Employee | 2 | 2 | 2 | Pending |
 | 7 | Shared | 3 | 3 | - | Pending |
 
-**Total**: 32 schemas, 29 validators, 7 controllers to update
+**Total**: 31 schemas, 32 validators, 7 controllers to update
 
 ## Benefits
 
