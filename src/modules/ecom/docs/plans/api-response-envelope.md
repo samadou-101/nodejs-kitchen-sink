@@ -5,7 +5,7 @@
 
 ---
 
-## Anchor (last updated: Batch 7 Complete)
+## Anchor ✅ All Batches Complete
 
 **Done:**
 - Batch 1 — Created `src/modules/ecom/shared/` (response types, helpers, error classes, error middleware, barrel exports); rewired `auth/errors.ts` and `order/order.errors.ts`; wired error middleware in `app.ts`; deleted empty utils files
@@ -22,7 +22,7 @@
 - Success responses use `sendCreated`/`sendSuccess`/`sendNoContent`/`sendError`
 - Business-logic failures (e.g., "not found") use `sendError` directly with appropriate status/code
 
-**Next: — (all batches complete)**
+**All 7 batches complete — API response envelope is fully standardized across the ecom module.**
 
 ---
 
