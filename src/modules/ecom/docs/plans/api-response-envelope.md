@@ -5,7 +5,7 @@
 
 ---
 
-## Anchor (last updated: Batch 5 Complete)
+## Anchor (last updated: Batch 6 Complete)
 
 **Done:**
 - Batch 1 — Created `src/modules/ecom/shared/` (response types, helpers, error classes, error middleware, barrel exports); rewired `auth/errors.ts` and `order/order.errors.ts`; wired error middleware in `app.ts`; deleted empty utils files
@@ -13,6 +13,7 @@
 - Batch 3 — Refactored `product/product.controller.ts` and `admin/controllers/inventory.controller.ts`
 - Batch 4 — Refactored `customer/customer.controller.ts` and `employee/controllers/order.controller.ts`
 - Batch 5 — Refactored `order/order.controller.ts`; deleted orphaned `order.utils.ts`, `validation/utils.ts`, cleaned up `validation/index.ts`
+- Batch 6 — Refactored `admin/controllers/employee.controller.ts`; removed `handleAuthError`, inline ZodError checks, console.error calls; replaced all response calls with envelope helpers; added `NextFunction` signature and route-not-found fallback
 
 **All controllers now follow a consistent pattern:**
 - `NextFunction` in handler signature; errors delegated via `next(error)`
@@ -20,7 +21,7 @@
 - Success responses use `sendCreated`/`sendSuccess`/`sendNoContent`/`sendError`
 - Business-logic failures (e.g., "not found") use `sendError` directly with appropriate status/code
 
-**Next: Batch 6 — Employee Admin Controller**
+**Next: Batch 7 — Pagination Metadata**
 
 ---
 
