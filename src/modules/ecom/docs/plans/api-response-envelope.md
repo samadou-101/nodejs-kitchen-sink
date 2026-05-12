@@ -5,7 +5,7 @@
 
 ---
 
-## Anchor (last updated: Batch 6 Complete)
+## Anchor (last updated: Batch 7 Complete)
 
 **Done:**
 - Batch 1 — Created `src/modules/ecom/shared/` (response types, helpers, error classes, error middleware, barrel exports); rewired `auth/errors.ts` and `order/order.errors.ts`; wired error middleware in `app.ts`; deleted empty utils files
@@ -14,6 +14,7 @@
 - Batch 4 — Refactored `customer/customer.controller.ts` and `employee/controllers/order.controller.ts`
 - Batch 5 — Refactored `order/order.controller.ts`; deleted orphaned `order.utils.ts`, `validation/utils.ts`, cleaned up `validation/index.ts`
 - Batch 6 — Refactored `admin/controllers/employee.controller.ts`; removed `handleAuthError`, inline ZodError checks, console.error calls; replaced all response calls with envelope helpers; added `NextFunction` signature and route-not-found fallback
+- Batch 7 — Added pagination metadata to `GET /orders` endpoint; `findOrders` repo returns `{ data, total }`; controller uses `sendPaginated`
 
 **All controllers now follow a consistent pattern:**
 - `NextFunction` in handler signature; errors delegated via `next(error)`
@@ -21,7 +22,7 @@
 - Success responses use `sendCreated`/`sendSuccess`/`sendNoContent`/`sendError`
 - Business-logic failures (e.g., "not found") use `sendError` directly with appropriate status/code
 
-**Next: Batch 7 — Pagination Metadata**
+**Next: — (all batches complete)**
 
 ---
 
@@ -202,14 +203,17 @@ interface PaginationMeta {
 
 ---
 
-## Batch 7 — Pagination Metadata
+## Batch 7 — Pagination Metadata `✅ DONE`
 
-After envelope is live across all endpoints:
+**Files modified:**
+
+### `order/order.repo.ts`
+- `findOrders` now returns `{ data, total }` via parallel `Promise.all([findMany, count])`
+- Added `async` to the function
 
 ### `order/order.controller.ts`
-- `listOrders` already accepts `page`/`limit` query params
-- Service needs to return `{ data, total }` instead of raw array
-- Response: `sendPaginated(res, orders, { page, limit, total, totalPages })`
+- Added `sendPaginated` import
+- `GET /orders` handler: destructures `{ data: orders, total }`, computes `totalPages`, calls `sendPaginated`
 
 ### Future list endpoints
 Same pattern for any new list endpoints added later.

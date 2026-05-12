@@ -168,7 +168,7 @@ export const orderRepo = {
         ),
       ),
 
-  findOrders: (tx: DbClient) => (filter: {
+  findOrders: (tx: DbClient) => async (filter: {
     statusId?: number;
     employeeId?: number;
     page?: number;
@@ -176,21 +176,26 @@ export const orderRepo = {
   }) => {
     const { statusId, employeeId, page = 1, limit = 20 } = filter;
     const skip = (page - 1) * limit;
-    return getClient(tx).order.findMany({
-      where: {
-        ...(statusId ? { orderStatusId: statusId } : {}),
-        ...(employeeId ? { employeeId } : {}),
-      },
-      include: {
-        customer: true,
-        status: true,
-        employee: { include: { user: { select: { name: true } } } },
-        orderItems: { include: { product: true } },
-      },
-      orderBy: { orderDate: "desc" },
-      skip,
-      take: limit,
-    });
+    const where = {
+      ...(statusId ? { orderStatusId: statusId } : {}),
+      ...(employeeId ? { employeeId } : {}),
+    };
+    const [data, total] = await Promise.all([
+      getClient(tx).order.findMany({
+        where,
+        include: {
+          customer: true,
+          status: true,
+          employee: { include: { user: { select: { name: true } } } },
+          orderItems: { include: { product: true } },
+        },
+        orderBy: { orderDate: "desc" },
+        skip,
+        take: limit,
+      }),
+      getClient(tx).order.count({ where }),
+    ]);
+    return { data, total };
   },
 
   findOrdersByPhone: (tx: DbClient) => (phone: string) =>

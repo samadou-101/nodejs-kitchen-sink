@@ -23,6 +23,7 @@ import {
   sendCreated,
   sendNoContent,
   sendError,
+  sendPaginated,
 } from "@/modules/ecom/shared/response";
 
 export async function orderHandler(
@@ -60,11 +61,17 @@ export async function orderHandler(
       const filter = validateOrderFilter(req.query) as {
         statusId?: number;
         employeeId?: number;
-        page?: number;
-        limit?: number;
+        page: number;
+        limit: number;
       };
-      const orders = await listOrders(filter, req.auth);
-      sendSuccess(res, orders);
+      const { data: orders, total } = await listOrders(filter, req.auth);
+      const totalPages = Math.ceil(total / filter.limit);
+      sendPaginated(res, orders, {
+        page: filter.page,
+        limit: filter.limit,
+        total,
+        totalPages,
+      });
     } catch (error) {
       next(error);
       return;
