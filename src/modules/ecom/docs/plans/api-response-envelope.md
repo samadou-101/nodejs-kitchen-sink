@@ -5,20 +5,20 @@
 
 ---
 
-## Anchor (last updated: Batch 2 Complete)
+## Anchor (last updated: Batch 5 Complete)
 
 **Done:**
-- Batch 1 — Created `src/modules/ecom/shared/` with response types, helpers, error classes, error middleware, barrel exports; rewired `auth/errors.ts` and `order/order.errors.ts` to extend shared base classes; wired error middleware in `app.ts`; deleted empty utils files
-- Batch 2 — Refactored `admin/controllers/auth.controller.ts` and `employee/controllers/auth.controller.ts` to use `sendCreated`/`sendSuccess`/`sendError`, delegate errors to `next(error)`, remove inline Prisma/Zod handling
+- Batch 1 — Created `src/modules/ecom/shared/` (response types, helpers, error classes, error middleware, barrel exports); rewired `auth/errors.ts` and `order/order.errors.ts`; wired error middleware in `app.ts`; deleted empty utils files
+- Batch 2 — Refactored `admin/controllers/auth.controller.ts` and `employee/controllers/auth.controller.ts`
+- Batch 3 — Refactored `product/product.controller.ts` and `admin/controllers/inventory.controller.ts`
+- Batch 4 — Refactored `customer/customer.controller.ts` and `employee/controllers/order.controller.ts`
+- Batch 5 — Refactored `order/order.controller.ts`; deleted orphaned `order.utils.ts`, `validation/utils.ts`, cleaned up `validation/index.ts`
 
-**Pattern decisions (from conversation):**
-- Error classes consolidated into `shared/errors.ts` (avoid circular deps with auth middleware)
-- 204 responses keep empty body (no envelope)
-- Mixed response style: `{ message: "..." }` inside `data` for actions, bare payload for data queries
-- Zod errors caught globally in middleware (throw from validators, catch in middleware)
-- Scope: response envelope only, not router refactor (keep existing router files)
-- Catch blocks: delegate to `next(error)` instead of inline handling
-- Non-error conditions (business logic failures like "not found") use `sendError` directly
+**All controllers now follow a consistent pattern:**
+- `NextFunction` in handler signature; errors delegated via `next(error)`
+- No inline `handleAuthError`, `handleValidationError`, `handleError`, or `instanceof z.ZodError` checks (all moved to global middleware)
+- Success responses use `sendCreated`/`sendSuccess`/`sendNoContent`/`sendError`
+- Business-logic failures (e.g., "not found") use `sendError` directly with appropriate status/code
 
 **Next: Batch 6 — Employee Admin Controller**
 

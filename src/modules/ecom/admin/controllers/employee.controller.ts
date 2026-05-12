@@ -1,5 +1,4 @@
-import type { Request, Response } from "express";
-import { z } from "zod";
+import type { Request, Response, NextFunction } from "express";
 import {
   assignEmployeePaymentType,
   assignEmployeeRate,
@@ -17,7 +16,6 @@ import {
   getEmployeePerformanceService,
 } from "../services/employee.service";
 import type { PayrollRunInput } from "../admin.types";
-import { ForbiddenError, UnauthorizedError } from "@/modules/ecom/auth/errors";
 import {
   validateEmail,
   validatePaymentType,
@@ -29,20 +27,17 @@ import {
   validateEmployeeId,
   validateEmployeePerformanceQuery,
 } from "@/modules/ecom/validation/validators/admin.validator";
+import {
+  sendSuccess,
+  sendCreated,
+  sendError,
+} from "@/modules/ecom/shared/response";
 
-function handleAuthError(res: Response, error: unknown) {
-  if (error instanceof UnauthorizedError) {
-    res.status(401).json({ error: error.message });
-    return true;
-  }
-  if (error instanceof ForbiddenError) {
-    res.status(403).json({ error: error.message });
-    return true;
-  }
-  return false;
-}
-
-export async function employeeAdminHandler(req: Request, res: Response) {
+export async function employeeAdminHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   const path = req.path;
   const method = req.method;
   const POST_METHOD = "POST";
@@ -69,19 +64,12 @@ export async function employeeAdminHandler(req: Request, res: Response) {
     try {
       const { email } = validateEmail(req.body ?? {});
       await addEmployeeToPendingList(email, req.auth);
-      res.status(201).send("Employee activated");
+      sendCreated(res, { message: "Employee activated" });
       return;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        console.error(error);
-        res.status(500).send("Something went wrong");
-      }
+      next(error);
+      return;
     }
-    return;
   }
 
   const paymentTypeMatch = path.match(EMPLOYEE_PAYMENT_TYPE_PATH);
@@ -102,19 +90,12 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         await assignEmployeeRate(employeeId, paymentType.perOrderRate, req.auth);
       }
 
-      res.status(201).json({ success: true, employeeId, paymentTypeId: paymentType.paymentTypeId });
+      sendCreated(res, { employeeId, paymentTypeId: paymentType.paymentTypeId });
       return;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        console.error(error);
-        res.status(500).send("Something went wrong");
-      }
+      next(error);
+      return;
     }
-    return;
   }
 
   const paymentMatch = path.match(EMPLOYEE_PAYMENT_PATH);
@@ -131,19 +112,12 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         payment.notes,
         payment.contractId,
       );
-      res.status(201).json({ success: true, employeeId, amount: payment.amount });
+      sendCreated(res, { employeeId, amount: payment.amount });
       return;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        console.error(error);
-        res.status(500).send("Something went wrong");
-      }
+      next(error);
+      return;
     }
-    return;
   }
 
   if (path === PAYROLL_PREVIEW_PATH && method === POST_METHOD) {
@@ -151,19 +125,12 @@ export async function employeeAdminHandler(req: Request, res: Response) {
       const input = validatePayrollRunInput(req.body ?? {}) as PayrollRunInput;
       const result = await runPayrollPreview(input, req.auth);
 
-      res.status(201).json(result);
+      sendCreated(res, result);
       return;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        console.error(error);
-        res.status(500).send("Something went wrong");
-      }
+      next(error);
+      return;
     }
-    return;
   }
 
   if (path === PAYROLL_CREATE_PATH && method === POST_METHOD) {
@@ -171,38 +138,24 @@ export async function employeeAdminHandler(req: Request, res: Response) {
       const input = validatePayrollRunInput(req.body ?? {}) as PayrollRunInput;
       const result = await runPayrollPreview(input, req.auth);
 
-      res.status(201).json(result);
+      sendCreated(res, result);
       return;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        console.error(error);
-        res.status(500).send("Something went wrong");
-      }
+      next(error);
+      return;
     }
-    return;
   }
 
   if (path === PAYROLL_LIST_PATH && method === GET_METHOD) {
     try {
       const status = validatePayrollRunStatus(req.query.status);
       const runs = await getPayrollRunsService(status, req.auth);
-      res.status(200).json(runs);
+      sendSuccess(res, runs);
       return;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        console.error(error);
-        res.status(500).send("Something went wrong");
-      }
+      next(error);
+      return;
     }
-    return;
   }
 
   const payrollGetMatch = path.match(PAYROLL_GET_PATH);
@@ -212,23 +165,16 @@ export async function employeeAdminHandler(req: Request, res: Response) {
       const run = await getPayrollRunByIdService(payrollRunId, req.auth);
 
       if (!run) {
-        res.status(404).send("Payroll run not found");
+        sendError(res, 404, "NOT_FOUND", "Payroll run not found");
         return;
       }
 
-      res.status(200).json(run);
+      sendSuccess(res, run);
       return;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        console.error(error);
-        res.status(500).send("Something went wrong");
-      }
+      next(error);
+      return;
     }
-    return;
   }
 
   const payrollConfirmMatch = path.match(PAYROLL_CONFIRM_PATH);
@@ -236,19 +182,12 @@ export async function employeeAdminHandler(req: Request, res: Response) {
     try {
       const payrollRunId = validatePayrollRunId(payrollConfirmMatch[1]);
       const result = await confirmPayrollRun(payrollRunId, req.auth);
-      res.status(200).json(result);
+      sendSuccess(res, result);
       return;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        console.error(error);
-        res.status(500).send("Something went wrong");
-      }
+      next(error);
+      return;
     }
-    return;
   }
 
   const payrollPaidMatch = path.match(PAYROLL_PAID_PATH);
@@ -256,19 +195,12 @@ export async function employeeAdminHandler(req: Request, res: Response) {
     try {
       const payrollRunId = validatePayrollRunId(payrollPaidMatch[1]);
       const result = await markPayrollRunAsPaid(payrollRunId, req.auth);
-      res.status(200).json(result);
+      sendSuccess(res, result);
       return;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        console.error(error);
-        res.status(500).send("Something went wrong");
-      }
+      next(error);
+      return;
     }
-    return;
   }
 
   const payrollItemGetMatch = path.match(PAYROLL_ITEM_GET_PATH);
@@ -277,22 +209,15 @@ export async function employeeAdminHandler(req: Request, res: Response) {
       const payrollRunItemId = validatePayrollRunItemId(payrollItemGetMatch[2]);
       const item = await getPayrollRunItemByIdService(payrollRunItemId, req.auth);
       if (!item) {
-        res.status(404).send("Payroll run item not found");
+        sendError(res, 404, "NOT_FOUND", "Payroll run item not found");
         return;
       }
-      res.status(200).json(item);
+      sendSuccess(res, item);
       return;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        console.error(error);
-        res.status(500).send("Something went wrong");
-      }
+      next(error);
+      return;
     }
-    return;
   }
 
   const payrollItemConfirmMatch = path.match(PAYROLL_ITEM_CONFIRM_PATH);
@@ -300,19 +225,12 @@ export async function employeeAdminHandler(req: Request, res: Response) {
     try {
       const payrollRunItemId = validatePayrollRunItemId(payrollItemConfirmMatch[2]);
       const result = await confirmPayrollItem(payrollRunItemId, req.auth);
-      res.status(200).json(result);
+      sendSuccess(res, result);
       return;
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        console.error(error);
-        res.status(500).send("Something went wrong");
-      }
+      next(error);
+      return;
     }
-    return;
   }
 
   const payrollItemPaidMatch = path.match(PAYROLL_ITEM_PAID_PATH);
@@ -320,18 +238,11 @@ export async function employeeAdminHandler(req: Request, res: Response) {
     try {
       const payrollRunItemId = validatePayrollRunItemId(payrollItemPaidMatch[2]);
       const result = await payPayrollItem(payrollRunItemId, req.auth);
-      res.status(200).json(result);
+      sendSuccess(res, result);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        console.error(error);
-        res.status(500).send("Something went wrong");
-      }
+      next(error);
+      return;
     }
-    return;
   }
 
   const perfMatch = path.match(EMPLOYEE_PERF_PATH);
@@ -344,17 +255,12 @@ export async function employeeAdminHandler(req: Request, res: Response) {
         req.auth,
         query.days ?? 30,
       );
-      res.status(200).json(perf);
+      sendSuccess(res, perf);
     } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({ error: "Validation failed", details: error.issues });
-        return;
-      }
-      if (!handleAuthError(res, error)) {
-        console.error(error);
-        res.status(500).send("Something went wrong");
-      }
+      next(error);
+      return;
     }
-    return;
   }
+
+  sendError(res, 404, "NOT_FOUND", "Route not found");
 }
