@@ -1,5 +1,4 @@
-import { Ability } from '@casl/ability';
-import type { AbilityClass } from '@casl/ability';
+import type { MongoAbility } from '@casl/ability';
 
 export const AppActions = [
   'create', 'read', 'update', 'delete', 'manage',
@@ -53,5 +52,4 @@ export type AppSubject =
   | PayrollSubject
   | Record<string, unknown>;
 
-export type AppAbility = Ability<[AppAction, AppSubject]>;
-export const AppAbilityConstructor = Ability as AbilityClass<AppAbility>;
+export type AppAbility = MongoAbility<[AppAction, AppSubject]>;

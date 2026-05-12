@@ -1,11 +1,10 @@
-import { AbilityBuilder } from '@casl/ability';
+import { AbilityBuilder, createMongoAbility } from '@casl/ability';
 import type { AuthContext } from '../rbac/rbac.types';
 import { RoleName } from '../rbac/rbac.types';
 import type { AppAbility, AppAction, AppSubjects } from './types';
-import { AppAbilityConstructor } from './types';
 
 export function buildAbility(auth: AuthContext): AppAbility {
-  const { can, build } = new AbilityBuilder(AppAbilityConstructor);
+  const { can, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
 
   if (auth.isSuperAdmin) {
     can('manage', 'all');
@@ -35,7 +34,7 @@ export function buildAbilityFromPermissions(
   permissions: string[],
   employeeId: number | null,
 ): AppAbility {
-  const { can, build } = new AbilityBuilder(AppAbilityConstructor);
+  const { can, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
 
   if (roles.includes('SUPERADMIN')) {
     can('manage', 'all');

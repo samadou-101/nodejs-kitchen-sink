@@ -9,7 +9,7 @@ export type {
   CustomerSubject,
   PayrollSubject,
 } from './types';
-export { AppActions, AppAbilityConstructor } from './types';
+export { AppActions } from './types';
 
 export { buildAbility, buildAbilityFromPermissions } from './ability.factory';
 
