@@ -1,24 +1,40 @@
-import type { MongoAbility } from '@casl/ability';
+import type { MongoAbility } from "@casl/ability";
 
 export const AppActions = [
-  'create', 'read', 'update', 'delete', 'manage',
-  'confirm', 'reject', 'cancel', 'assign',
-  'view', 'viewAll', 'viewAssigned', 'viewOwn',
-  'manageInventory', 'updateInventory', 'viewInventory',
-  'deactivate', 'viewPerformance', 'managePayment',
-  'finalize', 'viewItem', 'updateItem',
+  "create",
+  "read",
+  "update",
+  "delete",
+  "manage",
+  "confirm",
+  "reject",
+  "cancel",
+  "assign",
+  "view",
+  "viewAll",
+  "viewAssigned",
+  "viewOwn",
+  "manageInventory",
+  "updateInventory",
+  "viewInventory",
+  "deactivate",
+  "viewPerformance",
+  "managePayment",
+  "finalize",
+  "viewItem",
+  "updateItem",
 ] as const;
 
 export type AppAction = (typeof AppActions)[number];
 
 export type AppSubjects =
-  | 'Order'
-  | 'Product'
-  | 'Employee'
-  | 'Customer'
-  | 'Payroll'
-  | 'Inventory'
-  | 'all';
+  | "Order"
+  | "Product"
+  | "Employee"
+  | "Customer"
+  | "Payroll"
+  | "Inventory"
+  | "all";
 
 export interface OrderSubject {
   employeeId: number | null;

@@ -59,12 +59,9 @@ Routes defined (`GET /cart`, `POST /cart/add`, `PATCH /cart/:itemId`, `DELETE /c
 
 | Gap | Details |
 |-----|---------|
-| **No standardized API response envelope** | Each controller returns ad-hoc JSON — no consistent `{ success, data, error, meta }` wrapper. |
-| **No standardized error format** | Zod errors, domain errors, auth errors all return different shapes. |
-| **No pagination metadata** | `listOrders` returns data but no `total`, `page`, `totalPages` in a consistent envelope. |
 | **Controllers use manual path matching** | Regex and `req.path` switches instead of Express Router params — fragile and hard to maintain. |
 | **No API versioning** | All routes under `/api/ecom` with no version prefix (`/api/v1/ecom`). |
-| **No OpenAPI / Swagger docs** | No auto-generated or maintained API documentation. |
+| **OpenAPI spec exists but not served** | Static OpenAPI 3.0.3 YAML at `src/api/ecom/ecom-api-spec.yaml` but no Swagger UI runtime serving. |
 | **No API health check endpoint** | No `GET /api/health` or `/api/ready`. |
 
 ---
@@ -73,10 +70,9 @@ Routes defined (`GET /cart`, `POST /cart/add`, `PATCH /cart/:itemId`, `DELETE /c
 
 | Gap | Details |
 |-----|---------|
-| **No global error handler** | Unhandled errors may leak stack traces to clients. Need a centralized Express error middleware. |
 | **No request ID / correlation ID** | Impossible to trace a request across logs without a unique request identifier. |
 | **No request logging middleware** | No structured logging of method, path, status, duration per request. |
-| **No graceful shutdown** | `SIGTERM`/`SIGINT` handlers to drain connections and complete in-flight requests. |
+| **Graceful shutdown is incomplete** | `SIGTERM` handler exists but no `SIGINT` handler or connection draining for DB/Redis. |
 | **No database migration strategy** | Using `prisma db push` (dev-only) — no migration pipeline for production. Should use `prisma migrate deploy`. |
 | **No connection pool tuning** | Prisma + Redis use defaults — may need pool sizing for production load. |
 
@@ -136,7 +132,6 @@ These are particularly important for a real COD operation:
 ### Tier 1 — Ship-blockers (do before launch)
 - [ ] Fix logout stubs (invalidate sessions)
 - [ ] Add rate limiting on auth routes
-- [ ] Implement global error handler + standardize error responses
 - [ ] Add request ID + request logging middleware
 - [ ] Set up structured logging (pino/winston)
 - [ ] Add health check endpoint
@@ -146,8 +141,6 @@ These are particularly important for a real COD operation:
 - [ ] Add basic audit logging for sensitive operations
 
 ### Tier 2 — Production quality
-- [ ] Standardize API response envelope (`{ success, data, error, meta }`)
-- [ ] Add pagination metadata to all list endpoints
 - [ ] Implement soft deletes for orders and products
 - [ ] Add account lockout + password policy
 - [ ] Add CSRF protection
