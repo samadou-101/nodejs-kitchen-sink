@@ -13,7 +13,6 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoPrismaRouteImport } from './routes/demo/prisma'
-import { Route as ApiResumeChatRouteImport } from './routes/api.resume-chat'
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -35,23 +34,16 @@ const DemoPrismaRoute = DemoPrismaRouteImport.update({
   path: '/demo/prisma',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiResumeChatRoute = ApiResumeChatRouteImport.update({
-  id: '/api/resume-chat',
-  path: '/api/resume-chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/api/resume-chat': typeof ApiResumeChatRoute
   '/demo/prisma': typeof DemoPrismaRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/api/resume-chat': typeof ApiResumeChatRoute
   '/demo/prisma': typeof DemoPrismaRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
@@ -59,38 +51,20 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/api/resume-chat': typeof ApiResumeChatRoute
   '/demo/prisma': typeof DemoPrismaRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/about'
-    | '/api/resume-chat'
-    | '/demo/prisma'
-    | '/demo/tanstack-query'
+  fullPaths: '/' | '/about' | '/demo/prisma' | '/demo/tanstack-query'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/about'
-    | '/api/resume-chat'
-    | '/demo/prisma'
-    | '/demo/tanstack-query'
-  id:
-    | '__root__'
-    | '/'
-    | '/about'
-    | '/api/resume-chat'
-    | '/demo/prisma'
-    | '/demo/tanstack-query'
+  to: '/' | '/about' | '/demo/prisma' | '/demo/tanstack-query'
+  id: '__root__' | '/' | '/about' | '/demo/prisma' | '/demo/tanstack-query'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  ApiResumeChatRoute: typeof ApiResumeChatRoute
   DemoPrismaRoute: typeof DemoPrismaRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
 }
@@ -125,20 +99,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoPrismaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/resume-chat': {
-      id: '/api/resume-chat'
-      path: '/api/resume-chat'
-      fullPath: '/api/resume-chat'
-      preLoaderRoute: typeof ApiResumeChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  ApiResumeChatRoute: ApiResumeChatRoute,
   DemoPrismaRoute: DemoPrismaRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
 }
