@@ -3,10 +3,11 @@ import { z } from "zod";
 import { Prisma } from "@/generated/prisma/client";
 import { AppError } from "./errors";
 import { sendError } from "./response";
+import { logger } from "./logger";
 
 export function errorMiddleware(
   err: Error,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction,
 ): void {
@@ -27,6 +28,6 @@ export function errorMiddleware(
     }
   }
 
-  console.error("[ErrorMiddleware]", err);
+  (req.log ?? logger).error({ err }, "Unhandled error");
   sendError(res, 500, "INTERNAL_ERROR", "Internal server error");
 }

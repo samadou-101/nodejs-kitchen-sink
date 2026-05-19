@@ -10,6 +10,7 @@ import { authorize } from "@/modules/ecom/auth";
 import { OrderPolicies, ProductPolicies } from "@/modules/ecom/auth/policies";
 import type { OrderContext } from "@/modules/ecom/auth/policies";
 import { assertAuth } from "@/modules/ecom/auth/errors";
+import { logger } from "@/modules/ecom/shared/logger";
 
 function toOrderContext(order: { orderId: number; employeeId: number | null; customerId: number }): OrderContext {
   return {
@@ -237,7 +238,7 @@ export async function updateOrderStatus(
       return db.setOrderStatus(orderId, statusId);
     });
   } catch (error) {
-    console.error("[updateOrderStatus] Error:", error);
+    logger.error({ err: error, orderId }, "[updateOrderStatus] Error");
     throw error;
   }
 }

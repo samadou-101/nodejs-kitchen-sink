@@ -6,6 +6,9 @@ import cookieParser from "cookie-parser";
 import { checkAuthSession } from "./api/auth/password/session.service";
 import ecomRouter from "./api/ecom/ecom.route";
 import { errorMiddleware } from "./modules/ecom/shared/error.middleware";
+import { requestContext } from "./modules/ecom/shared/request-context.middleware";
+import pinoHttp from "pino-http";
+import { logger } from "./modules/ecom/shared/logger";
 
 export const app: Express = express();
 
@@ -14,6 +17,15 @@ initRedis();
 
 app.use(cookieParser());
 app.use(express.json());
+
+app.use(requestContext);
+app.use(pinoHttp({
+  logger,
+  customProps: (req) => ({ reqId: (req as any).id }),
+  autoLogging: {
+    ignore: (req) => req.url === "/api/health",
+  },
+}));
 
 app.use("/api", apiRouter);
 app.use("/api/ecom", ecomRouter);

@@ -1,6 +1,7 @@
 import { prisma } from "@/config/db.config";
 import type { RoleName } from "./rbac.types";
 import { Resource, Action } from "./rbac.types";
+import { logger } from "@/modules/ecom/shared/logger";
 
 interface RoleSeed {
   name: RoleName;
@@ -85,7 +86,7 @@ const PERMISSION_SEEDS = [
   { resource: "customer", action: "delete" },
 ];
 export async function seedRoles(): Promise<void> {
-  console.log("Seeding RBAC roles and permissions...");
+  logger.info("Seeding RBAC roles and permissions...");
 
   for (const permission of PERMISSION_SEEDS) {
     await prisma.permission.upsert({
@@ -129,5 +130,5 @@ export async function seedRoles(): Promise<void> {
     }
   }
 
-  console.log("RBAC roles and permissions seeded successfully");
+  logger.info("RBAC roles and permissions seeded successfully");
 }

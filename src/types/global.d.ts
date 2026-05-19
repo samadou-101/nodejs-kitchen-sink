@@ -9,10 +9,14 @@ namespace NodeJS {
   }
 }
 
+import type { Logger } from "pino"
+
 declare global {
   namespace Express {
     interface Request {
       auth?: AuthContext;
+      id: string;
+      log: Logger;
     }
   }
 }

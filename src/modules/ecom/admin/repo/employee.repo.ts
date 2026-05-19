@@ -5,10 +5,11 @@ import type {
   PayrollInput,
   PayrollRunInput,
 } from "../admin.types";
+import { logger } from "@/modules/ecom/shared/logger";
 
 // Employee Auth
 export async function insertPendingList(email: string) {
-  console.log(email, "from repo");
+  logger.debug({ email }, "Checking pending list from repo");
   return await prisma.pendingEmployee.create({
     data: {
       email: email,

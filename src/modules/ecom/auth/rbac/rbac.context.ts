@@ -3,6 +3,7 @@ import type { AuthContext } from "./rbac.types";
 import { resolveAuthContext } from "./rbac.service";
 import { getUseSessionFromDB } from "@/api/auth/password/session.service";
 import { redisClient } from "@/config/redis.config";
+import { logger } from "@/modules/ecom/shared/logger";
 
 const EXTEND_THRESHOLD_MS = 3 * 24 * 60 * 60 * 1000;
 const EXTENSION_MS = 7 * 24 * 60 * 60 * 1000;
@@ -31,7 +32,7 @@ export async function authenticate(
 
     next();
   } catch (error) {
-    console.error("Authentication error:", error);
+    logger.error({ err: error }, "Authentication error");
     res.status(500).json({ error: "Authentication failed" });
   }
 }
