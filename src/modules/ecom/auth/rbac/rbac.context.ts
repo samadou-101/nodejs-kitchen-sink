@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import type { AuthContext } from "./rbac.types";
 import { resolveAuthContext } from "./rbac.service";
-import { getUseSessionFromDB } from "@/api/auth/password/session.service";
+import { getUseSessionFromDB } from "../session/session.service";
 import { redisClient } from "@/config/redis.config";
 import { logger } from "@/modules/ecom/shared/logger";
 

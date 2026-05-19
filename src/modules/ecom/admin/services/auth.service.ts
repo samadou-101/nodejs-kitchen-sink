@@ -1,4 +1,4 @@
-import { hashPassword, verifyPassword } from "@/api/auth/auth.utils";
+import { hashPassword, verifyPassword } from "@/modules/ecom/auth/utils/password.utils";
 import type { AdminData, AdminLoginData } from "../admin.types";
 import {
   findAdminByEmail,
@@ -10,7 +10,7 @@ import { prisma } from "@/config/db.config";
 import {
   cacheUserSession,
   createSession,
-} from "@/api/auth/password/session.service";
+} from "@/modules/ecom/auth/session/session.service";
 import { logger } from "@/modules/ecom/shared/logger";
 
 export async function registerAdmin(adminData: AdminData) {

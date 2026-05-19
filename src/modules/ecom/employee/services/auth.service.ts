@@ -1,11 +1,11 @@
-import { hashPassword, verifyPassword } from "@/api/auth/auth.utils";
+import { hashPassword, verifyPassword } from "@/modules/ecom/auth/utils/password.utils";
 import type { EmployeeData, EmployeeLoginData, EmployeeRequestData } from "../employee.types";
 import { bind } from "../repo/auth.repo";
 import { prisma } from "@/config/db.config";
 import {
   cacheUserSession,
   createSession,
-} from "@/api/auth/password/session.service";
+} from "@/modules/ecom/auth/session/session.service";
 
 export async function registerEmployee(data: EmployeeRequestData) {
   const hashedPass = await hashPassword(data.password);
