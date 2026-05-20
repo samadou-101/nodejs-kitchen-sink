@@ -46,6 +46,7 @@ export async function insertProduct(data: ProductData) {
         name: data.name,
         price: data.price,
         description: data.description || null,
+        imageUrl: data.imageUrl || null,
         category: { connect: { categoryId: data.categoryId } },
       },
     });
@@ -72,6 +73,7 @@ export async function updateProduct(data: ProductData) {
       name: data.name,
       price: data.price,
       description: data.description || null,
+      imageUrl: data.imageUrl || null,
       categoryId: data.categoryId,
     },
   });

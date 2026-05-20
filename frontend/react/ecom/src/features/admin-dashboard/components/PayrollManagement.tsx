@@ -1,38 +1,34 @@
 import { useState } from "react";
 import {
-  usePreviewPayroll,
+  usePayrollRuns,
   useCreatePayroll,
   useConfirmPayroll,
   useMarkPayrollPaid,
-  usePayrollRuns,
-  usePayrollRunDetail,
 } from "../api/use-admin-payroll";
 import { getErrorMessage } from "#shared/lib/error-map";
+import { Field } from "#shared/components/Field";
+import { Input } from "#components/components/ui/input";
+import { Button } from "#components/components/ui/button";
+import { Badge } from "#components/components/ui/badge";
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "#components/components/ui/table";
+
+const statusBadge: Record<string, "amber" | "emerald" | "default"> = {
+  DRAFT: "amber",
+  CONFIRMED: "emerald",
+  PAID: "default",
+};
 
 export function PayrollManagement() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [selectedId, setSelectedId] = useState<number | undefined>(undefined);
   const [error, setError] = useState("");
-
-  const preview = usePreviewPayroll();
+  const { data: payrollRuns } = usePayrollRuns();
   const create = useCreatePayroll();
   const confirm = useConfirmPayroll();
   const markPaid = useMarkPayrollPaid();
-  const { data: runs } = usePayrollRuns();
-  const { data: detail } = usePayrollRunDetail(selectedId ?? 0);
 
-  const handlePreview = async () => {
-    try {
-      const result = await preview.mutateAsync({ startDate, endDate });
-      alert(`Preview result: ${JSON.stringify(result)}`);
-    } catch (err: unknown) {
-      if (err instanceof Error)
-        setError(getErrorMessage((err as { code?: string }).code ?? "", err.message));
-    }
-  };
-
-  const handleCreate = async () => {
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError("");
     try {
       await create.mutateAsync({ startDate, endDate });
@@ -48,99 +44,94 @@ export function PayrollManagement() {
     <div>
       <h2 className="text-xl font-bold">Payroll Management</h2>
 
-      <div className="mt-4 space-y-3 rounded-lg border p-4">
-        <h3 className="font-semibold">Payroll Run</h3>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <div className="flex gap-2">
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            required
-            className="rounded border p-2"
-          />
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            required
-            className="rounded border p-2"
-          />
-          <button
-            onClick={handlePreview}
-            disabled={preview.isPending || !startDate || !endDate}
-            className="rounded border px-3 py-2"
-          >
-            Preview
-          </button>
-          <button
-            onClick={handleCreate}
-            disabled={create.isPending || !startDate || !endDate}
-            className="rounded bg-primary px-3 py-2 text-primary-foreground"
-          >
-            Create Draft
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-6">
-        <h3 className="font-semibold">Payroll Runs</h3>
-        <div className="mt-2 space-y-2">
-          {runs?.map((run) => (
-            <div
-              key={run.id}
-              className="flex items-center justify-between rounded border p-3"
-            >
-              <div>
-                <p className="font-medium">
-                  {run.startDate} &mdash; {run.endDate}
-                </p>
-                <p className="text-sm text-muted-foreground">Status: {run.status}</p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSelectedId(run.id)}
-                  className="text-sm text-primary underline"
-                >
-                  View
-                </button>
-                {run.status === "DRAFT" && (
-                  <button
-                    onClick={() => confirm.mutate(run.id)}
-                    className="text-sm text-green-600 underline"
-                  >
-                    Confirm
-                  </button>
-                )}
-                {run.status === "CONFIRMED" && (
-                  <button
-                    onClick={() => markPaid.mutate(run.id)}
-                    className="text-sm text-blue-600 underline"
-                  >
-                    Mark Paid
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {detail && (
-        <div className="mt-6 rounded-lg border p-4">
-          <h3 className="font-semibold">Run Details</h3>
-          <div className="mt-2 space-y-1 text-sm">
-            {detail.items?.map((item) => (
-              <div key={item.id} className="flex justify-between">
-                <span>{item.employeeName}</span>
-                <span>
-                  {item.amount.toFixed(2)} DZD ({item.calcStatus}, {item.payStatus})
-                </span>
-              </div>
-            ))}
+      <form onSubmit={handleCreate} className="mt-4 space-y-4 rounded-lg border p-4">
+        <h3 className="font-semibold">Create Payroll Run</h3>
+        {error && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+            {error}
           </div>
+        )}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Start Date" error={null}>
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              required
+            />
+          </Field>
+          <Field label="End Date" error={null}>
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              required
+            />
+          </Field>
         </div>
-      )}
+        <Button type="submit" disabled={create.isPending}>
+          {create.isPending ? "Creating..." : "Create Payroll Run"}
+        </Button>
+      </form>
+
+      <div className="mt-6 overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Period</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Total</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {payrollRuns?.map((run) => (
+              <TableRow key={run.id}>
+                <TableCell className="font-medium">#{run.id}</TableCell>
+                <TableCell>
+                  {new Date(run.startDate).toLocaleDateString()} -{" "}
+                  {new Date(run.endDate).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  <Badge variant={statusBadge[run.status] ?? "default"}>
+                    {run.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {run.totalAmount ? `${run.totalAmount.toFixed(2)} DZD` : "-"}
+                </TableCell>
+                <TableCell>
+                  <div className="flex gap-1">
+                    {run.status === "DRAFT" && (
+                      <Button
+                        size="xs"
+                        onClick={() => confirm.mutate(run.id)}
+                        disabled={confirm.isPending}
+                      >
+                        Confirm
+                      </Button>
+                    )}
+                    {run.status === "CONFIRMED" && (
+                      <Button
+                        size="xs"
+                        variant="outline"
+                        onClick={() => markPaid.mutate(run.id)}
+                        disabled={markPaid.isPending}
+                      >
+                        Mark Paid
+                      </Button>
+                    )}
+                    {run.status === "PAID" && (
+                      <Badge variant="emerald">Paid</Badge>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

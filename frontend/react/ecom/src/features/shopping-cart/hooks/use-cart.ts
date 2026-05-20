@@ -5,6 +5,7 @@ interface CartItem {
   name: string;
   price: number;
   quantity: number;
+  imageUrl?: string;
 }
 
 const STORAGE_KEY = "ecom-cart";
@@ -30,7 +31,7 @@ export function useCart() {
   }, [items]);
 
   const addItem = useCallback(
-    (product: { id?: number; name: string; price: number; quantity?: number }) => {
+    (product: { id?: number; name: string; price: number; imageUrl?: string; quantity?: number }) => {
       setItems((prev) => {
         const existing = prev.find((i) => i.productId === product.id);
         if (existing) {
@@ -46,6 +47,7 @@ export function useCart() {
             productId: product.id!,
             name: product.name,
             price: product.price,
+            imageUrl: product.imageUrl,
             quantity: product.quantity ?? 1,
           },
         ];

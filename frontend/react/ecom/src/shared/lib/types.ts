@@ -4,6 +4,7 @@ export interface Product {
   description?: string;
   price: number;
   categoryId: number;
+  imageUrl?: string;
   initialStock?: number;
 }
 
@@ -77,6 +78,7 @@ export interface PayrollRun {
   status: PayrollRunStatus;
   startDate: string;
   endDate: string;
+  totalAmount?: number;
   items?: PayrollRunItem[];
 }
 

@@ -9,6 +9,7 @@ import { OrderDetail } from "#features/order-tracking/components/OrderDetail";
 import { AdminLayout } from "#features/admin-dashboard/components/AdminLayout";
 import { AuthGuard } from "#shared/components/AuthGuard";
 import { AssignedOrdersList } from "#features/employee-orders/components/AssignedOrdersList";
+import { AdminDashboardOverview } from "#features/admin-dashboard/components/AdminDashboardOverview";
 import { ProductManagement } from "#features/admin-dashboard/components/ProductManagement";
 import { CategoryManagement } from "#features/admin-dashboard/components/CategoryManagement";
 import { OrderManagement } from "#features/admin-dashboard/components/OrderManagement";
@@ -40,7 +41,7 @@ export const router = createBrowserRouter([
           </AuthGuard>
         ),
         children: [
-          { index: true, element: <ProductManagement /> },
+          { index: true, element: <AdminDashboardOverview /> },
           { path: "products", element: <ProductManagement /> },
           { path: "categories", element: <CategoryManagement /> },
           { path: "orders", element: <OrderManagement /> },

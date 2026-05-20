@@ -1,4 +1,9 @@
 import { useAssignedOrderDetail } from "../api/use-employee-orders";
+import type { OrderItem } from "#shared/lib/types";
+import { Dialog, DialogTrigger, DialogPopup, DialogTitle, DialogDescription } from "#components/components/ui/dialog";
+import { Button } from "#components/components/ui/button";
+import { ProductImage } from "#shared/components/ProductImage";
+import { Skeleton } from "#components/components/ui/skeleton";
 
 interface ConfirmDialogProps {
   orderId: number;
@@ -11,58 +16,79 @@ export function ConfirmDialog({ orderId, onConfirm, onCancel, isPending }: Confi
   const { data: order, isLoading } = useAssignedOrderDetail(orderId);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
-        <h3 className="text-lg font-bold">Confirm Order #{orderId}</h3>
+    <Dialog open onOpenChange={(open) => !open && onCancel()}>
+      <DialogTrigger />
+      <DialogPopup className="max-h-[90vh] overflow-y-auto">
+        <DialogTitle>Confirm Order #{orderId}</DialogTitle>
+        <DialogDescription>
+          Review the order details before confirming
+        </DialogDescription>
 
-        {isLoading ? (
-          <p className="py-4 text-sm text-muted-foreground">Loading order details...</p>
-        ) : order ? (
-          <div className="mt-4 space-y-2">
-            <p className="text-sm">
-              <strong>Customer:</strong> {order.customer.name} &mdash; {order.customer.phone}
-            </p>
-            <p className="text-sm">
-              <strong>Address:</strong> {order.customer.address}, {order.customer.email}
-            </p>
-            <div className="mt-2 border-t pt-2">
-              <p className="text-sm font-semibold">Items:</p>
-              {order.orderItems.map((item) => (
-                <div key={item.productId} className="flex justify-between text-sm">
-                  <span>
-                    Product #{item.productId} × {item.quantity}
-                  </span>
-                  <span>{(item.price * item.quantity).toFixed(2)} DZD</span>
-                </div>
-              ))}
-              <p className="mt-2 text-right font-bold">
-                Total:{" "}
-                {order.orderItems
-                  .reduce((s, i) => s + i.price * i.quantity, 0)
-                  .toFixed(2)}{" "}
-                DZD
-              </p>
+        <div className="mt-4">
+          {isLoading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-4 w-64" />
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-24 w-full" />
             </div>
-          </div>
-        ) : null}
+          ) : order ? (
+            <div className="space-y-3">
+              <div className="space-y-1 text-sm">
+                <p>
+                  <strong>Customer:</strong> {order.customer.name} &mdash;{" "}
+                  {order.customer.phone}
+                </p>
+                <p>
+                  <strong>Address:</strong> {order.customer.address},{" "}
+                  {order.customer.email}
+                </p>
+              </div>
+
+              <div className="border-t pt-3">
+                <p className="mb-2 text-sm font-semibold">Items:</p>
+                <div className="space-y-2">
+                  {order.orderItems.map((item) => (
+                    <div
+                      key={item.productId}
+                      className="flex items-center gap-3 text-sm"
+                    >
+                      <ProductImage
+                        src={(item as OrderItem & { imageUrl?: string }).imageUrl}
+                        alt={`Product #${item.productId}`}
+                        aspect="1:1"
+                        size="sm"
+                      />
+                      <div className="flex-1">
+                        <p>Product #{item.productId} × {item.quantity}</p>
+                      </div>
+                      <span className="font-medium">
+                        {(item.price * item.quantity).toFixed(2)} DZD
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-3 text-right font-bold">
+                  Total:{" "}
+                  {order.orderItems
+                    .reduce((s, i) => s + i.price * i.quantity, 0)
+                    .toFixed(2)}{" "}
+                  DZD
+                </p>
+              </div>
+            </div>
+          ) : null}
+        </div>
 
         <div className="mt-6 flex justify-end gap-2">
-          <button
-            onClick={onCancel}
-            disabled={isPending}
-            className="rounded border px-4 py-2"
-          >
+          <Button variant="outline" onClick={onCancel} disabled={isPending}>
             Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={isPending}
-            className="rounded bg-green-600 px-4 py-2 text-white disabled:opacity-50"
-          >
+          </Button>
+          <Button onClick={onConfirm} disabled={isPending}>
             {isPending ? "Confirming..." : "Confirm Order"}
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      </DialogPopup>
+    </Dialog>
   );
 }

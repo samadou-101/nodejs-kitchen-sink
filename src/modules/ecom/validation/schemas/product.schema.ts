@@ -14,6 +14,7 @@ export const ProductDataSchema = z.object({
   description: z.string().max(1000).optional(),
   price: z.number().positive("Price must be positive"),
   categoryId: z.number().int().positive("Category ID must be a positive integer"),
+  imageUrl: z.string().url("Must be a valid URL").optional(),
   initialStock: z.number().int().min(0).optional(),
 });
 

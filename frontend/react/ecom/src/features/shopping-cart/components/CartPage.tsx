@@ -12,24 +12,21 @@ export function CartPage() {
   return (
     <div className="mx-auto max-w-4xl py-8">
       <h1 className="text-2xl font-bold">Shopping Cart</h1>
-      <div className="mt-6">
-        {items.map((item) => (
-          <CartItemRow
-            key={item.productId}
-            {...item}
-            onUpdateQuantity={updateQuantity}
-            onRemove={removeItem}
-          />
-        ))}
-      </div>
-      <div className="mt-6 flex items-start justify-between">
-        <CartSummary totalItems={totalItems} totalPrice={totalPrice} />
-        <Link
-          to="/checkout"
-          className="rounded bg-primary px-6 py-3 text-primary-foreground"
-        >
-          Proceed to Checkout
-        </Link>
+      <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-start">
+        <div className="flex-1">
+          {items.map((item) => (
+            <CartItemRow
+              key={item.productId}
+              {...item}
+              onUpdateQuantity={updateQuantity}
+              onRemove={removeItem}
+            />
+          ))}
+        </div>
+        <div className="w-full lg:w-72">
+          <CartSummary totalItems={totalItems} totalPrice={totalPrice} />
+          <Link to="/checkout" className="mt-4 inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-md bg-primary px-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/80">Proceed to Checkout</Link>
+        </div>
       </div>
     </div>
   );

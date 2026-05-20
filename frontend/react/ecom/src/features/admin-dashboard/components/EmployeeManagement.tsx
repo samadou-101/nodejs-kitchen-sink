@@ -5,6 +5,11 @@ import {
   useAssignPaymentType,
 } from "../api/use-admin-employees";
 import { getErrorMessage } from "#shared/lib/error-map";
+import { Field } from "#shared/components/Field";
+import { Input } from "#components/components/ui/input";
+import { Select } from "#components/components/ui/select";
+import { Button } from "#components/components/ui/button";
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "#components/components/ui/table";
 
 export function EmployeeManagement() {
   const [email, setEmail] = useState("");
@@ -29,51 +34,60 @@ export function EmployeeManagement() {
     <div>
       <h2 className="text-xl font-bold">Employee Management</h2>
 
-      <form onSubmit={handleAdd} className="mt-4 space-y-3 rounded-lg border p-4">
+      <form onSubmit={handleAdd} className="mt-4 space-y-4 rounded-lg border p-4">
         <h3 className="font-semibold">Add Employee Email (Pending)</h3>
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="block w-full rounded border p-2"
-        />
-        <button
-          type="submit"
-          disabled={add.isPending}
-          className="rounded bg-primary px-4 py-2 text-primary-foreground"
-        >
+        {error && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+            {error}
+          </div>
+        )}
+        <Field label="Email" error={null}>
+          <Input
+            type="email"
+            placeholder="employee@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </Field>
+        <Button type="submit" disabled={add.isPending}>
           {add.isPending ? "Adding..." : "Add Email"}
-        </button>
+        </Button>
       </form>
 
-      <div className="mt-6 space-y-2">
-        {employees?.map((emp) => (
-          <div key={emp.userId} className="flex items-center justify-between rounded border p-3">
-            <div>
-              <p className="font-medium">{emp.name}</p>
-              <p className="text-sm text-muted-foreground">{emp.email}</p>
-            </div>
-            <select
-              onChange={(e) =>
-                assignPayment.mutate({
-                  employeeId: emp.userId,
-                  paymentType: e.target.value,
-                })
-              }
-              defaultValue=""
-              className="rounded border p-1 text-sm"
-            >
-              <option value="" disabled>
-                Payment type
-              </option>
-              <option value="salary">Salary</option>
-              <option value="per-order">Per Order</option>
-            </select>
-          </div>
-        ))}
+      <div className="mt-6 overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Payment Type</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {employees?.map((emp) => (
+              <TableRow key={emp.userId}>
+                <TableCell className="font-medium">{emp.name}</TableCell>
+                <TableCell className="text-muted-foreground">{emp.email}</TableCell>
+                <TableCell>
+                  <Select
+                    onChange={(e) =>
+                      assignPayment.mutate({
+                        employeeId: emp.userId,
+                        paymentType: e.target.value,
+                      })
+                    }
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Select type</option>
+                    <option value="salary">Salary</option>
+                    <option value="per-order">Per Order</option>
+                  </Select>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

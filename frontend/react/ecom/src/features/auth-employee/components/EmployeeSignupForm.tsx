@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useEmployeeSignup } from "../api/use-auth-employee";
 import { getErrorMessage } from "#shared/lib/error-map";
+import { Field } from "#shared/components/Field";
+import { Input } from "#components/components/ui/input";
+import { Button } from "#components/components/ui/button";
 
 interface EmployeeSignupFormProps {
   onSuccess: () => void;
@@ -31,55 +34,49 @@ export function EmployeeSignupForm({ onSuccess }: EmployeeSignupFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-bold">Employee Sign Up</h2>
-      {error && <p className="text-red-600 text-sm">{error}</p>}
-      <div>
-        <label className="block text-sm font-medium">Name</label>
-        <input
-          type="text"
+      {error && (
+        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+          {error}
+        </div>
+      )}
+      <Field label="Name" error={null}>
+        <Input
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="mt-1 block w-full rounded border p-2"
+          placeholder="Your name"
         />
-      </div>
-      <div>
-        <label className="block text-sm font-medium">Email</label>
-        <input
+      </Field>
+      <Field label="Email" error={null}>
+        <Input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="mt-1 block w-full rounded border p-2"
+          placeholder="employee@example.com"
         />
-      </div>
-      <div>
-        <label className="block text-sm font-medium">Phone Number</label>
-        <input
+      </Field>
+      <Field label="Phone Number" error={null}>
+        <Input
           type="tel"
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
           required
-          className="mt-1 block w-full rounded border p-2"
+          placeholder="Your phone number"
         />
-      </div>
-      <div>
-        <label className="block text-sm font-medium">Password</label>
-        <input
+      </Field>
+      <Field label="Password" error={null}>
+        <Input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="mt-1 block w-full rounded border p-2"
+          placeholder="Create a password"
         />
-      </div>
-      <button
-        type="submit"
-        disabled={signup.isPending}
-        className="rounded bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50"
-      >
+      </Field>
+      <Button type="submit" disabled={signup.isPending} className="w-full">
         {signup.isPending ? "Signing up..." : "Sign Up"}
-      </button>
+      </Button>
     </form>
   );
 }

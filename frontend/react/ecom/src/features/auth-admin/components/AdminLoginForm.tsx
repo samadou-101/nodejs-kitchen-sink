@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useAdminLogin } from "../api/use-auth-admin";
 import { getErrorMessage } from "#shared/lib/error-map";
+import { Field } from "#shared/components/Field";
+import { Input } from "#components/components/ui/input";
+import { Button } from "#components/components/ui/button";
 
 interface AdminLoginFormProps {
   onSuccess: () => void;
@@ -29,37 +32,32 @@ export function AdminLoginForm({ onSuccess }: AdminLoginFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-bold">Admin Login</h2>
-      {error && <p className="text-red-600 text-sm">{error}</p>}
-      <div>
-        <label htmlFor="admin-email" className="block text-sm font-medium">Email</label>
-        <input
-          id="admin-email"
+      {error && (
+        <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+          {error}
+        </div>
+      )}
+      <Field label="Email" error={null}>
+        <Input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="mt-1 block w-full rounded border p-2"
+          placeholder="admin@example.com"
         />
-      </div>
-      <div>
-        <label htmlFor="admin-password" className="block text-sm font-medium">Password</label>
-        <input
-          id="admin-password"
+      </Field>
+      <Field label="Password" error={null}>
+        <Input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="mt-1 block w-full rounded border p-2"
+          placeholder="Enter your password"
         />
-      </div>
-      <button
-        type="submit"
-        disabled={login.isPending}
-        className="rounded bg-primary px-4 py-2 text-primary-foreground disabled:opacity-50"
-      >
+      </Field>
+      <Button type="submit" disabled={login.isPending} className="w-full">
         {login.isPending ? "Logging in..." : "Login"}
-      </button>
+      </Button>
     </form>
   );
 }

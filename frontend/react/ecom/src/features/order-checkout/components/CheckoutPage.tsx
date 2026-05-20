@@ -10,7 +10,7 @@ export function CheckoutPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl py-8">
+    <div className="mx-auto max-w-lg py-8">
       <CheckoutForm onSuccess={(id) => setOrderId(id)} />
     </div>
   );

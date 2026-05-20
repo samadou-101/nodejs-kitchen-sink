@@ -1,3 +1,5 @@
+import { Card, CardContent, CardHeader, CardTitle } from "#components/components/ui/card";
+
 interface CartSummaryProps {
   totalItems: number;
   totalPrice: number;
@@ -5,12 +7,24 @@ interface CartSummaryProps {
 
 export function CartSummary({ totalItems, totalPrice }: CartSummaryProps) {
   return (
-    <div className="rounded-lg border p-4">
-      <h3 className="font-semibold">Cart Summary</h3>
-      <div className="mt-2 space-y-1 text-sm">
-        <p>Items: {totalItems}</p>
-        <p className="text-lg font-bold">Total: {totalPrice.toFixed(2)} DZD</p>
-      </div>
-    </div>
+    <Card size="sm">
+      <CardHeader>
+        <CardTitle>Cart Summary</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Items</span>
+          <span>{totalItems}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Subtotal</span>
+          <span>{totalPrice.toFixed(2)} DZD</span>
+        </div>
+        <div className="flex justify-between border-t pt-2 text-lg font-bold">
+          <span>Total</span>
+          <span>{totalPrice.toFixed(2)} DZD</span>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

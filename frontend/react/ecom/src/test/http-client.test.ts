@@ -36,8 +36,8 @@ describe("HTTP Client", () => {
       expect.unreachable("should have thrown");
     } catch (err) {
       expect(err).toBeInstanceOf(ApiError);
-      expect((err as ApiError).code).toBe("NOT_FOUND");
-      expect((err as ApiError).message).toBe("Product not found");
+      expect((err as { code: string; message: string }).code).toBe("NOT_FOUND");
+      expect((err as { code: string; message: string }).message).toBe("Product not found");
     }
   });
 

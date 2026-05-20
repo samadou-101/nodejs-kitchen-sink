@@ -11,6 +11,7 @@ export function useCreateProduct() {
       description?: string;
       price: number;
       categoryId: number;
+      imageUrl?: string;
       initialStock?: number;
     }) => api.post<Product>("/api/ecom/product/create", data),
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.products.all }),

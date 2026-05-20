@@ -1,4 +1,5 @@
 import { useCategories } from "../api/use-products";
+import { Select } from "#components/components/ui/select";
 
 interface CategoryFilterProps {
   value: number | undefined;
@@ -9,10 +10,9 @@ export function CategoryFilter({ value, onChange }: CategoryFilterProps) {
   const { data: categories } = useCategories();
 
   return (
-    <select
+    <Select
       value={value ?? ""}
       onChange={(e) => onChange(e.target.value ? Number(e.target.value) : undefined)}
-      className="rounded border p-2"
     >
       <option value="">All Categories</option>
       {categories?.map((cat) => (
@@ -20,6 +20,6 @@ export function CategoryFilter({ value, onChange }: CategoryFilterProps) {
           {cat.name}
         </option>
       ))}
-    </select>
+    </Select>
   );
 }

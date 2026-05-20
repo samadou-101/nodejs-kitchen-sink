@@ -10,6 +10,7 @@ export type ProductData = {
   description?: string;
   price: number;
   categoryId: number;
+  imageUrl?: string;
   initialStock?: number;
 };
 

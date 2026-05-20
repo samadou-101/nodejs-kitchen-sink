@@ -1,3 +1,5 @@
+import { Button } from "#components/components/ui/button";
+
 interface PaginationProps {
   page: number;
   total: number;
@@ -12,23 +14,25 @@ export function Pagination({ page, total, limit, onPageChange }: PaginationProps
 
   return (
     <div className="flex items-center justify-center gap-2 py-4">
-      <button
+      <Button
+        variant="outline"
+        size="sm"
         onClick={() => onPageChange(page - 1)}
         disabled={page <= 1}
-        className="rounded border px-3 py-1 disabled:opacity-50"
       >
         Previous
-      </button>
-      <span className="text-sm text-muted-foreground">
+      </Button>
+      <span className="px-3 text-sm text-muted-foreground">
         Page {page} of {totalPages} ({total} products)
       </span>
-      <button
+      <Button
+        variant="outline"
+        size="sm"
         onClick={() => onPageChange(page + 1)}
         disabled={page >= totalPages}
-        className="rounded border px-3 py-1 disabled:opacity-50"
       >
         Next
-      </button>
+      </Button>
     </div>
   );
 }
