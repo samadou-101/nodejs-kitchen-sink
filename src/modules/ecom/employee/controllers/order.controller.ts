@@ -21,13 +21,13 @@ export async function employeeOrderHandler(
   const method = req.method;
 
   if (path === "/employee/orders" && method === "GET") {
-    const employeeId = req.query.employeeId as string;
+    const employeeId = req.auth?.employeeId;
     if (!employeeId) {
       sendError(res, 400, "VALIDATION_ERROR", "employeeId is required");
       return;
     }
     try {
-      const orders = await getAssignedOrders(Number(employeeId), req.auth);
+      const orders = await getAssignedOrders(employeeId, req.auth);
       sendSuccess(res, orders);
     } catch (error: unknown) {
       next(error);
