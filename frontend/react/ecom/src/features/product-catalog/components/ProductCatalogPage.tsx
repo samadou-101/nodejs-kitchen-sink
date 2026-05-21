@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
-import { useProducts } from "../api/use-products";
+import { useProducts, useCategories } from "../api/use-products";
 import { useCatalogFilters } from "../hooks/use-catalog-filters";
+import { CatalogHero } from "./CatalogHero";
+import { CategoryPills } from "./CategoryPills";
+import { ActiveFilters } from "./ActiveFilters";
+import { EmptyCatalogState } from "./EmptyCatalogState";
 import { ProductGrid } from "./ProductGrid";
-import { SearchBar } from "./SearchBar";
-import { CategoryFilter } from "./CategoryFilter";
 import { Pagination } from "./Pagination";
 
 export function ProductCatalogPage() {
-  const { page, setPage, search, setSearch, categoryId, setCategoryId } =
+  const { page, setPage, search, setSearch, categoryId, setCategoryId, resetFilters } =
     useCatalogFilters();
   const [debouncedSearch, setDebouncedSearch] = useState(search);
+  const { data: categories } = useCategories();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -19,32 +22,78 @@ export function ProductCatalogPage() {
     return () => clearTimeout(timer);
   }, [search, setPage]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [categoryId, setPage]);
+
   const params: Record<string, unknown> = { page, limit: 20 };
   if (debouncedSearch) params.search = debouncedSearch;
   if (categoryId) params.categoryId = categoryId;
 
-  const { data, isLoading } = useProducts(params);
+  const { data, isLoading, isFetching } = useProducts(params);
+
+  const categoryName = categories?.find(
+    (c) => c.categoryId === categoryId,
+  )?.name;
+
+  const showEmptyState = !isLoading && data?.data && data.data.length === 0;
+  const showProductGrid = data?.data && data.data.length > 0;
 
   return (
     <div className="mx-auto max-w-7xl py-8">
-      <h1 className="text-2xl font-bold">Products</h1>
-      <div className="mt-4 flex gap-4">
-        <div className="flex-1">
-          <SearchBar value={search} onChange={setSearch} />
-        </div>
-        <CategoryFilter value={categoryId} onChange={setCategoryId} />
-      </div>
-      <div className="mt-6">
-        <ProductGrid products={data?.data} isLoading={isLoading} />
-      </div>
-      {data?.meta && (
-        <Pagination
-          page={page}
-          total={data.meta.total}
-          limit={20}
-          onPageChange={setPage}
+      <CatalogHero
+        search={search}
+        onSearchChange={setSearch}
+        categoryId={categoryId}
+        onCategoryChange={setCategoryId}
+      />
+
+      <div className="mt-6 space-y-4 px-4">
+        <CategoryPills
+          categoryId={categoryId}
+          onCategoryChange={setCategoryId}
         />
-      )}
+
+        <ActiveFilters
+          search={search}
+          categoryId={categoryId}
+          categoryName={categoryName}
+          onClearSearch={() => setSearch("")}
+          onClearCategory={() => setCategoryId(undefined)}
+          onClearAll={resetFilters}
+        />
+
+        {!isLoading && !showEmptyState && (
+          <p className="text-sm text-muted-foreground">
+            {data?.meta?.total ?? 0} products
+          </p>
+        )}
+
+        {showProductGrid && (
+          <ProductGrid
+            products={data.data}
+            isLoading={isLoading}
+            isFetching={isFetching}
+          />
+        )}
+
+        {showEmptyState && (
+          <EmptyCatalogState
+            search={search}
+            categoryName={categoryName}
+            onClearAll={resetFilters}
+          />
+        )}
+
+        {data?.meta && showProductGrid && (
+          <Pagination
+            page={page}
+            total={data.meta.total}
+            limit={20}
+            onPageChange={setPage}
+          />
+        )}
+      </div>
     </div>
   );
 }
