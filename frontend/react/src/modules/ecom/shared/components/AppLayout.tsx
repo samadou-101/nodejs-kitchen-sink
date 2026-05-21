@@ -1,0 +1,207 @@
+import { useState, type ReactNode } from "react";
+import { Outlet, Link, useLocation } from "react-router-dom";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ShoppingBag03Icon, Menu01Icon } from "@hugeicons/core-free-icons";
+import { useAuth } from "#ecom/shared/api/auth-provider";
+import { useCart } from "#ecom/features/shopping-cart/hooks/use-cart";
+import { cn } from "#components/lib/utils";
+import { buttonVariants } from "#components/lib/button-variants";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "#components/ui/sheet";
+
+const navLinkDefs = [
+  { to: "/", label: "Products" },
+  { to: "/cart", label: "Cart" },
+  { to: "/track", label: "Track Order" },
+];
+
+function NavItems({ children }: { children?: ReactNode }) {
+  const { isAuthenticated, isAdmin, isEmployee, isLoading } = useAuth();
+  const { totalItems } = useCart();
+  const location = useLocation();
+
+  function isActive(to: string) {
+    return to === "/"
+      ? location.pathname === "/"
+      : location.pathname.startsWith(to);
+  }
+
+  return (
+    <>
+      {navLinkDefs.map((link) => {
+        const active = isActive(link.to);
+        return (
+          <Link
+            key={link.to}
+            to={link.to}
+            className={cn(
+              "relative flex items-center gap-2 text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+              active
+                ? "text-foreground font-semibold"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {link.label}
+            {link.to === "/cart" && totalItems > 0 && (
+              <span className="bg-primary text-primary-foreground flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold">
+                {totalItems}
+              </span>
+            )}
+            {active && (
+              <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-foreground" />
+            )}
+          </Link>
+        );
+      })}
+      {children}
+      {isLoading ? null : isAuthenticated ? (
+        (isAdmin || isEmployee) && (
+          <>
+            <span className="hidden h-4 w-px bg-border md:block" aria-hidden="true" />
+            <hr className="border-border md:hidden" aria-hidden="true" />
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className={cn(
+                  "relative text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                  isActive("/admin")
+                    ? "text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                Dashboard
+                {isActive("/admin") && (
+                  <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-foreground" />
+                )}
+              </Link>
+            )}
+            {isEmployee && (
+              <Link
+                to="/employee"
+                className={cn(
+                  "relative text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                  isActive("/employee")
+                    ? "text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                My Orders
+                {isActive("/employee") && (
+                  <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-foreground" />
+                )}
+              </Link>
+            )}
+          </>
+        )
+      ) : (
+        <>
+          <span className="hidden h-4 w-px bg-border md:block" aria-hidden="true" />
+          <hr className="border-border md:hidden" aria-hidden="true" />
+          <Link
+            to="/admin/login"
+            className={cn(
+              "text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+              isActive("/admin/login")
+                ? "text-foreground font-semibold"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Admin Login
+          </Link>
+          <Link
+            to="/employee/login"
+            className={cn(
+              "text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+              isActive("/employee/login")
+                ? "text-foreground font-semibold"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Employee Login
+          </Link>
+        </>
+      )}
+    </>
+  );
+}
+
+export function AppLayout() {
+  const { totalItems } = useCart();
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  return (
+    <div className="min-h-screen">
+      <nav className="bg-background/95 sticky top-0 z-40 border-b backdrop-blur-sm shadow-xs">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
+          <div className="flex items-center gap-6">
+            <Link
+              to="/"
+              className="flex items-center gap-2 text-lg font-bold tracking-tight focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 rounded-sm"
+            >
+              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-foreground">
+                <span className="block h-2 w-2 rotate-45 bg-background" />
+              </span>
+              E-Com Store
+            </Link>
+            <div className="hidden items-center gap-4 md:flex">
+              <NavItems />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 md:hidden">
+            <Link
+              to="/cart"
+              className={cn(
+                buttonVariants({ variant: "ghost", size: "icon" }),
+                "relative",
+              )}
+            >
+              <HugeiconsIcon icon={ShoppingBag03Icon} size={20} />
+              {totalItems > 0 && (
+                <span className="bg-primary text-primary-foreground absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-bold">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+            <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+              <SheetTrigger
+                className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}
+              >
+                <HugeiconsIcon icon={Menu01Icon} size={20} />
+              </SheetTrigger>
+              <SheetContent side="right">
+                <div className="flex flex-col gap-5">
+                  <div className="flex items-center gap-2 border-b pb-3">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-md bg-foreground shrink-0">
+                      <span className="block h-2.5 w-2.5 rotate-45 bg-background" />
+                    </span>
+                    <span className="text-base font-bold tracking-tight">E-Com Store</span>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <NavItems>
+                      <button
+                        onClick={() => setSheetOpen(false)}
+                        className={cn(
+                          buttonVariants({ variant: "ghost", size: "sm" }),
+                          "self-end",
+                        )}
+                      >
+                        Close
+                      </button>
+                    </NavItems>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div>
+      </nav>
+      <main className="mx-auto max-w-7xl px-4 py-6 lg:py-8">
+        <Outlet />
+      </main>
+    </div>
+  );
+}
