@@ -7,12 +7,17 @@ import { orderHandler } from "@/modules/ecom/order/order.controller";
 import { productHandler } from "@/modules/ecom/product/product.controller";
 import { customerHandler } from "@/modules/ecom/customer/customer.controller";
 import { authenticate, requireRole } from "@/modules/ecom/auth";
+import { sessionController } from "@/modules/ecom/auth/session.controller";
+import { logoutController } from "@/modules/ecom/auth/logout.controller";
 import express, { type Router, type RequestHandler } from "express";
 
 const ecomRouter: Router = express.Router();
 
 const adminAuth: RequestHandler[] = [authenticate, requireRole("ADMIN")];
 const employeeAuth: RequestHandler[] = [authenticate, requireRole("EMPLOYEE")];
+
+ecomRouter.get("/auth/me", authenticate, sessionController);
+ecomRouter.post("/logout", logoutController);
 
 ecomRouter.post("/product/create", ...adminAuth, productHandler);
 ecomRouter.post("/product/update", ...adminAuth, productHandler);
@@ -41,6 +46,7 @@ ecomRouter.post("/admin/login", adminAuthController);
 ecomRouter.post("/admin/employee/add", ...adminAuth, employeeAdminHandler);
 ecomRouter.post("/admin/employees/:id/payment-type", ...adminAuth, employeeAdminHandler);
 ecomRouter.post("/admin/employees/:id/payments", ...adminAuth, employeeAdminHandler);
+ecomRouter.get("/admin/employees", ...adminAuth, employeeAdminHandler);
 ecomRouter.get("/admin/employees/:id/performance", ...adminAuth, employeeAdminHandler);
 ecomRouter.post("/admin/payroll/preview", ...adminAuth, employeeAdminHandler);
 ecomRouter.post("/admin/payroll", ...adminAuth, employeeAdminHandler);

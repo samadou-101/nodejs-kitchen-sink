@@ -1,3 +1,5 @@
+const BASE_URL = typeof import.meta !== "undefined" ? (import.meta as any).env?.VITE_API_URL ?? "" : "";
+
 export class ApiError extends Error {
   code: string;
   constructor(code: string, message: string) {
@@ -40,7 +42,7 @@ export interface PaginatedResult<T, M = PaginatedMeta> {
 }
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
+  const res = await fetch(`${BASE_URL}${url}`, {
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     ...options,
@@ -59,7 +61,7 @@ async function requestWithMeta<T, M = PaginatedMeta>(
   url: string,
   options?: RequestInit,
 ): Promise<PaginatedResult<T, M>> {
-  const res = await fetch(url, {
+  const res = await fetch(`${BASE_URL}${url}`, {
     credentials: "include",
     headers: { "Content-Type": "application/json" },
     ...options,

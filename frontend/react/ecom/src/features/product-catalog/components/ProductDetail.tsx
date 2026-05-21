@@ -45,7 +45,7 @@ export function ProductDetail() {
   }
 
   const handleAddToCart = () => {
-    addItem({ id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl });
+    addItem({ id: product.productId, name: product.name, price: product.price, imageUrl: product.imageUrl });
     toast.success(`${product.name} added to cart`);
   };
 

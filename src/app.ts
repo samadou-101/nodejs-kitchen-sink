@@ -1,4 +1,5 @@
 import express, { type Express } from "express";
+import cors from "cors";
 import { initDB } from "./config/db.config";
 import { initRedis } from "./config/redis.config";
 import apiRouter from "./api/auth/auth.routes";
@@ -15,6 +16,10 @@ export const app: Express = express();
 initDB();
 initRedis();
 
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
 app.use(cookieParser());
 app.use(express.json());
 

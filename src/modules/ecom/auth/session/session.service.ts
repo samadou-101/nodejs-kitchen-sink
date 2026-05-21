@@ -113,8 +113,8 @@ export async function createSession(
     const sessionData: SessionData = {
       sessionId: session.id,
       userId,
-      expires_at: session.expiresAt.toISOString(),
-      createdAT: session.expiresAt.toISOString(),
+      expiresAt: session.expiresAt.toISOString(),
+      createdAt: session.expiresAt.toISOString(),
       lastSeenAt: new Date().toISOString(),
     };
 
@@ -170,22 +170,22 @@ export async function checkCachedSession(sid: string): Promise<boolean> {
 
   const now = Date.now();
 
-  if (isExpired(session.expires_at)) {
+  if (isExpired(session.expiresAt)) {
     await revokeSession(sid);
     return false;
   }
 
   session.lastSeenAt = new Date().toISOString();
 
-  const expiresAtMs = new Date(session.expires_at).getTime();
+  const expiresAtMs = new Date(session.expiresAt).getTime();
 
   if (expiresAtMs - now <= EXTEND_THRESHOLD_MS) {
-    session.expires_at = new Date(now + EXTENSION_MS).toISOString();
+    session.expiresAt = new Date(now + EXTENSION_MS).toISOString();
   }
 
   const newTtlSeconds = Math.max(
     1,
-    Math.floor((new Date(session.expires_at).getTime() - Date.now()) / 1000),
+    Math.floor((new Date(session.expiresAt).getTime() - Date.now()) / 1000),
   );
   try {
     await redisClient.set(key, JSON.stringify(session));

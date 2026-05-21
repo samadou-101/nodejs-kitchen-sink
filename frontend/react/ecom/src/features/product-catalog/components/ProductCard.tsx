@@ -15,13 +15,13 @@ export function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem({ id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl });
+    addItem({ id: product.productId, name: product.name, price: product.price, imageUrl: product.imageUrl });
     toast.success(`${product.name} added to cart`);
   };
 
   return (
     <Link
-      to={`/product/${product.id}`}
+      to={`/product/${product.productId}`}
       className="group/card block overflow-hidden rounded-xl border bg-card shadow-xs transition-all duration-200 hover:shadow-md"
     >
       <div className="relative overflow-hidden">

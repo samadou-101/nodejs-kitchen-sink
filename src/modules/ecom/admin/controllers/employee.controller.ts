@@ -14,6 +14,7 @@ import {
   markPayrollRunAsPaid,
   runPayrollPreview,
   getEmployeePerformanceService,
+  listEmployees,
 } from "../services/employee.service";
 import type { PayrollRunInput } from "../admin.types";
 import {
@@ -57,6 +58,8 @@ export async function employeeAdminHandler(
   const PAYROLL_ITEM_GET_PATH = /^\/admin\/payroll\/(\d+)\/items\/(\d+)$/;
   const PAYROLL_ITEM_CONFIRM_PATH = /^\/admin\/payroll\/(\d+)\/items\/(\d+)\/confirm$/;
   const PAYROLL_ITEM_PAID_PATH = /^\/admin\/payroll\/(\d+)\/items\/(\d+)\/paid$/;
+
+  const EMPLOYEE_LIST_PATH = "/admin/employees";
 
   const EMPLOYEE_PERF_PATH = /^\/admin\/employees\/(\d+)\/performance$/;
 
@@ -239,6 +242,17 @@ export async function employeeAdminHandler(
       const payrollRunItemId = validatePayrollRunItemId(payrollItemPaidMatch[2]);
       const result = await payPayrollItem(payrollRunItemId, req.auth);
       sendSuccess(res, result);
+    } catch (error) {
+      next(error);
+      return;
+    }
+  }
+
+  if (path === EMPLOYEE_LIST_PATH && method === GET_METHOD) {
+    try {
+      const employees = await listEmployees(req.auth);
+      sendSuccess(res, employees);
+      return;
     } catch (error) {
       next(error);
       return;

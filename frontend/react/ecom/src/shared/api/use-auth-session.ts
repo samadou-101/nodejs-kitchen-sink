@@ -16,7 +16,11 @@ export function useLogout() {
   const queryClient = useQueryClient();
 
   return async () => {
-    await api.post("/api/ecom/logout");
+    try {
+      await api.post("/api/ecom/logout");
+    } catch {
+      // Clear local auth state even if server-side revocation fails
+    }
     queryClient.setQueryData(queryKeys.auth.session(), null);
     queryClient.clear();
   };

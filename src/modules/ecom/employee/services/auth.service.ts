@@ -1,3 +1,4 @@
+import { assignRoleToUser } from "@/modules/ecom/auth/rbac/rbac.repo";
 import { hashPassword, verifyPassword } from "@/modules/ecom/auth/utils/password.utils";
 import type { EmployeeData, EmployeeLoginData, EmployeeRequestData } from "../employee.types";
 import { bind } from "../repo/auth.repo";
@@ -35,6 +36,8 @@ export async function registerEmployee(data: EmployeeRequestData) {
     };
 
     const employee = await repo.insertEmployee(employeeData);
+
+    await assignRoleToUser(tx, user.id, "EMPLOYEE");
 
     // atomic update (prevents double activation race condition)
     const updated = await repo.updatePendingIfActive(data.email);

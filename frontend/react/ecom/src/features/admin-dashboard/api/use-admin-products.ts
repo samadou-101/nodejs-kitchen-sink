@@ -22,7 +22,7 @@ export function useUpdateProduct() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: {
-      id: number;
+      productId: number;
       name?: string;
       description?: string;
       price?: number;

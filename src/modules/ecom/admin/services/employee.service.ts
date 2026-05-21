@@ -23,6 +23,7 @@ import {
   updateEmployeeStatus,
   updatePayrollRunStatus,
   getEmployeePerformance,
+  getAllEmployees,
 } from "../repo/employee.repo";
 import type {
   CreateContractData,
@@ -541,6 +542,12 @@ export async function payPayrollItem(
 
   await markPayrollRunItemPaid(payrollRunItemId);
   return { success: true, payrollRunItemId, amount: item.amount };
+}
+
+export async function listEmployees(auth: unknown) {
+  assertAuth(auth);
+  authorize(auth, EmployeePolicies.view({ employeeId: 0, userId: 0, isActive: false }));
+  return await getAllEmployees();
 }
 
 export async function getEmployeePerformanceService(

@@ -6,7 +6,6 @@ import {
 } from "../api/use-admin-products";
 import { useCategories } from "../../product-catalog/api/use-products";
 import { getErrorMessage } from "#shared/lib/error-map";
-import type { Product } from "#shared/lib/types";
 import { Field } from "#shared/components/Field";
 import { Input } from "#components/components/ui/input";
 import { Textarea } from "#components/components/ui/textarea";
@@ -142,20 +141,20 @@ export function ProductManagement() {
           </TableHeader>
           <TableBody>
             {products?.map((p) => (
-              <TableRow key={p.id}>
+              <TableRow key={p.productId}>
                 <TableCell>
                   <ProductImage src={p.imageUrl} alt={p.name} aspect="1:1" size="sm" />
                 </TableCell>
                 <TableCell className="font-medium">{p.name}</TableCell>
                 <TableCell>{p.price.toFixed(2)} DZD</TableCell>
                 <TableCell className="text-muted-foreground">
-                  {(p as Product & { category?: { name: string } }).category?.name ?? "-"}
+                  {p.category?.name ?? "-"}
                 </TableCell>
                 <TableCell>
                   <Button
                     variant="destructive"
                     size="xs"
-                    onClick={() => del.mutate(p.id!)}
+                    onClick={() => del.mutate(p.productId)}
                   >
                     Delete
                   </Button>

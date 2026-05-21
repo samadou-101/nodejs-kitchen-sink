@@ -1,7 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useOrderDetail } from "../api/use-order-tracking";
 import { getStatusLabel } from "#shared/lib/status-labels";
-import type { OrderItem } from "#shared/lib/types";
 import { Badge } from "#components/components/ui/badge";
 import { Skeleton } from "#components/components/ui/skeleton";
 import { ProductImage } from "#shared/components/ProductImage";
@@ -59,9 +58,9 @@ export function OrderDetail() {
           <CardTitle>Customer Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-1 text-sm">
-          <p>{order.customer.name} &mdash; {order.customer.phone}</p>
+          <p>{order.customer?.name} &mdash; {order.customer?.phone}</p>
           <p className="text-muted-foreground">
-            {order.customer.address}, {order.customer.email}
+            {order.customer?.address}, {order.customer?.email}
           </p>
         </CardContent>
       </Card>
@@ -77,8 +76,8 @@ export function OrderDetail() {
               className="flex items-center gap-3 border-b pb-3 last:border-0 last:pb-0"
             >
               <ProductImage
-                src={(item as OrderItem & { imageUrl?: string }).imageUrl}
-                alt={`Product #${item.productId}`}
+                src={item.product?.imageUrl}
+                alt={item.product?.name ?? `Product #${item.productId}`}
                 aspect="1:1"
                 size="sm"
               />

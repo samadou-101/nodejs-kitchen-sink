@@ -286,6 +286,25 @@ export async function updatePayrollRunItemPaymentStatus(
   });
 }
 
+export async function getAllEmployees() {
+  return await prisma.employee.findMany({
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          phoneNumber: true,
+        },
+      },
+      paymentType: true,
+      contracts: {
+        where: { isActive: true },
+      },
+    },
+  });
+}
+
 export async function getEmployeePerformance(employeeId: number, days = 30) {
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);

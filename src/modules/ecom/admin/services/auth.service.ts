@@ -1,3 +1,4 @@
+import { assignRoleToUser } from "@/modules/ecom/auth/rbac/rbac.repo";
 import { hashPassword, verifyPassword } from "@/modules/ecom/auth/utils/password.utils";
 import type { AdminData, AdminLoginData } from "../admin.types";
 import {
@@ -25,6 +26,7 @@ export async function registerAdmin(adminData: AdminData) {
 
   const hashedPass = await hashPassword(adminData.password);
   const admin = await insertAdmin({ ...adminData, password: hashedPass });
+  await assignRoleToUser(prisma, admin.id, "ADMIN");
   const sessionData = await createSession(admin.id);
   if (sessionData !== null) {
     await cacheUserSession(sessionData);

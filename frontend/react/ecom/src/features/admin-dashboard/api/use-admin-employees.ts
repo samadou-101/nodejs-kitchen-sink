@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "#shared/api/http-client";
 import { queryKeys } from "#shared/lib/query-keys";
-import type { EmployeePerformance } from "#shared/lib/types";
+import type { EmployeePerformance, Employee } from "#shared/lib/types";
 
 export function useAddEmployeeEmail() {
   const qc = useQueryClient();
@@ -39,6 +39,6 @@ export function useEmployeePerformance(id: number) {
 export function useListEmployees() {
   return useQuery({
     queryKey: queryKeys.admin.employees.list(),
-    queryFn: () => api.get<{ userId: number; name: string; email: string }[]>("/api/ecom/admin/employees"),
+    queryFn: () => api.get<Employee[]>("/api/ecom/admin/employees"),
   });
 }

@@ -1,15 +1,38 @@
+export interface Customer {
+  name: string;
+  phone: string;
+  address: string;
+  email: string;
+}
+
+export interface OrderStatus {
+  orderStatusId: number;
+  name: string;
+  description?: string;
+}
+
 export interface Product {
-  id?: number;
+  productId: number;
   name: string;
   description?: string;
   price: number;
   categoryId: number;
   imageUrl?: string;
-  initialStock?: number;
+  inventory?: {
+    inventoryId: number;
+    productId: number;
+    quantityAvailable: number;
+    lastUpdated: string;
+  };
+  category?: {
+    categoryId: number;
+    name: string;
+    description?: string;
+  };
 }
 
 export interface Category {
-  categoryId?: number;
+  categoryId: number;
   name: string;
   description?: string;
 }
@@ -28,34 +51,58 @@ export interface CheckoutData {
   items: CartItem[];
 }
 
-export interface Order {
-  orderId?: number;
-  customer: {
+export interface OrderItem {
+  orderItemId: number;
+  orderId: number;
+  productId: number;
+  quantity: number;
+  price: number;
+  product?: {
+    productId: number;
     name: string;
-    phone: string;
-    address: string;
-    email: string;
+    imageUrl?: string;
+    price: number;
   };
-  orderItems: OrderItem[];
+}
+
+export interface Order {
+  orderId: number;
+  customerId: number;
   orderDate: string;
   orderStatusId: number;
   employeeId?: number | null;
   notes?: string | null;
-}
-
-export interface OrderItem {
-  productId: number;
-  price: number;
-  quantity: number;
-  orderItemId?: number;
+  customer?: Customer;
+  status?: OrderStatus;
+  employee?: { employeeId: number; user: { name: string } } | null;
+  orderItems?: OrderItem[];
 }
 
 export interface Employee {
+  employeeId: number;
   userId: number;
-  name: string;
-  email: string;
-  phoneNumber: string | null;
-  password: string;
+  isActive: boolean;
+  paymentTypeId?: number;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    phoneNumber: string | null;
+  };
+  paymentType?: {
+    paymentTypeId: number;
+    name: string;
+  } | null;
+  contracts?: {
+    contractId: number;
+    employeeId: number;
+    paymentTypeId: number;
+    salaryAmount: number | null;
+    perOrderRate: number | null;
+    effectiveFrom: string;
+    effectiveTo: string | null;
+    isActive: boolean;
+  }[];
 }
 
 export interface Inventory {

@@ -66,14 +66,14 @@ export function EmployeeManagement() {
           </TableHeader>
           <TableBody>
             {employees?.map((emp) => (
-              <TableRow key={emp.userId}>
-                <TableCell className="font-medium">{emp.name}</TableCell>
-                <TableCell className="text-muted-foreground">{emp.email}</TableCell>
+              <TableRow key={emp.employeeId}>
+                <TableCell className="font-medium">{emp.user.name}</TableCell>
+                <TableCell className="text-muted-foreground">{emp.user.email}</TableCell>
                 <TableCell>
                   <Select
                     onChange={(e) =>
                       assignPayment.mutate({
-                        employeeId: emp.userId,
+                        employeeId: emp.employeeId,
                         paymentType: e.target.value,
                       })
                     }

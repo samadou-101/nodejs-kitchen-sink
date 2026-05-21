@@ -44,7 +44,7 @@ async function checkCachedSession(sid: string): Promise<Record<string, any> | nu
 
   try {
     const session = JSON.parse(rawSession);
-    const expiresAt = new Date(session.expires_at);
+    const expiresAt = new Date(session.expiresAt);
     if (expiresAt < new Date()) {
       await redisClient.del(key);
       return null;
@@ -53,7 +53,7 @@ async function checkCachedSession(sid: string): Promise<Record<string, any> | nu
     const now = Date.now();
     if (expiresAt.getTime() - now <= EXTEND_THRESHOLD_MS) {
       const newExpiresAt = new Date(now + EXTENSION_MS).toISOString();
-      session.expires_at = newExpiresAt;
+      session.expiresAt = newExpiresAt;
       session.lastSeenAt = new Date().toISOString();
 
       const newTtl = Math.floor((new Date(newExpiresAt).getTime() - now) / 1000);

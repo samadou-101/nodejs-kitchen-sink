@@ -1,5 +1,4 @@
 import { useAssignedOrderDetail } from "../api/use-employee-orders";
-import type { OrderItem } from "#shared/lib/types";
 import { Dialog, DialogTrigger, DialogPopup, DialogTitle, DialogDescription } from "#components/components/ui/dialog";
 import { Button } from "#components/components/ui/button";
 import { ProductImage } from "#shared/components/ProductImage";
@@ -35,14 +34,14 @@ export function ConfirmDialog({ orderId, onConfirm, onCancel, isPending }: Confi
           ) : order ? (
             <div className="space-y-3">
               <div className="space-y-1 text-sm">
-                <p>
-                  <strong>Customer:</strong> {order.customer.name} &mdash;{" "}
-                  {order.customer.phone}
-                </p>
-                <p>
-                  <strong>Address:</strong> {order.customer.address},{" "}
-                  {order.customer.email}
-                </p>
+                  <p>
+                    <strong>Customer:</strong> {order.customer?.name} &mdash;{" "}
+                    {order.customer?.phone}
+                  </p>
+                  <p>
+                    <strong>Address:</strong> {order.customer?.address},{" "}
+                    {order.customer?.email}
+                  </p>
               </div>
 
               <div className="border-t pt-3">
@@ -54,8 +53,8 @@ export function ConfirmDialog({ orderId, onConfirm, onCancel, isPending }: Confi
                       className="flex items-center gap-3 text-sm"
                     >
                       <ProductImage
-                        src={(item as OrderItem & { imageUrl?: string }).imageUrl}
-                        alt={`Product #${item.productId}`}
+                        src={item.product?.imageUrl}
+                        alt={item.product?.name ?? `Product #${item.productId}`}
                         aspect="1:1"
                         size="sm"
                       />
