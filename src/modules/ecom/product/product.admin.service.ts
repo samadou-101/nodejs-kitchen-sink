@@ -44,7 +44,7 @@ export async function removeProduct(id: number, auth: unknown) {
   return await prisma.$transaction(async (tx) => {
     try {
       return await deleteProductRepo(id);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error("Failed to remove product", { cause: error });
     }
   });
