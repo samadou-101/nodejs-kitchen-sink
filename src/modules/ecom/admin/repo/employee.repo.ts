@@ -299,7 +299,7 @@ export async function getAllEmployees() {
         },
       },
       paymentType: true,
-      contracts: {
+      employeePaymentContracts: {
         where: { isActive: true },
       },
     },
