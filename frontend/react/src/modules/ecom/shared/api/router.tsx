@@ -1,3 +1,4 @@
+import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import { AuthProvider } from "#ecom/shared/api/auth-provider";
 import { ProductCatalogPage } from "#ecom/features/product-catalog/components/ProductCatalogPage";
@@ -19,11 +20,22 @@ import { PayrollManagement } from "#ecom/features/admin-dashboard/components/Pay
 import { AppLayout } from "#ecom/shared/components/AppLayout";
 import { LoginPage } from "#ecom/shared/components/LoginPage";
 
+const AboutPage = lazy(() =>
+  import("#ecom/shared/components/AboutPage").then((m) => ({
+    default: m.AboutPage,
+  })),
+);
+
 export const router = createBrowserRouter([
   {
-    element: <AuthProvider><AppLayout /></AuthProvider>,
+    element: (
+      <AuthProvider>
+        <AppLayout />
+      </AuthProvider>
+    ),
     children: [
       { path: "/", element: <ProductCatalogPage /> },
+      { path: "/about", element: <AboutPage /> },
       { path: "/product/:id", element: <ProductDetail /> },
       { path: "/cart", element: <CartPage /> },
       { path: "/checkout", element: <CheckoutPage /> },
