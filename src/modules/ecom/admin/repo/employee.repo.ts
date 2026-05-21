@@ -33,7 +33,9 @@ export async function findEmployeeById(employeeId: number) {
   });
 }
 
-export async function getUserIdByEmployeeId(employeeId: number): Promise<number | null> {
+export async function getUserIdByEmployeeId(
+  employeeId: number,
+): Promise<number | null> {
   const employee = await prisma.employee.findUnique({
     where: { employeeId },
     select: { userId: true },
@@ -180,14 +182,17 @@ export async function createPayrollRun(input: PayrollRunInput) {
   });
 }
 
-export async function addPayrollRunItems(payrollRunId: number, items: Array<{
-  employeeId: number;
-  contractId: number | null;
-  amount: number;
-  calculationStatus: string;
-  paymentStatus?: string;
-  warning: string | null;
-}>) {
+export async function addPayrollRunItems(
+  payrollRunId: number,
+  items: Array<{
+    employeeId: number;
+    contractId: number | null;
+    amount: number;
+    calculationStatus: string;
+    paymentStatus?: string;
+    warning: string | null;
+  }>,
+) {
   return await prisma.payrollRunItem.createMany({
     data: items.map((item) => ({
       payrollRunId,
@@ -291,7 +296,6 @@ export async function getAllEmployees() {
           id: true,
           name: true,
           email: true,
-          phoneNumber: true,
         },
       },
       paymentType: true,
