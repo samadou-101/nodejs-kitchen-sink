@@ -58,42 +58,48 @@ function NavItems({ children }: { children?: ReactNode }) {
       })}
       {children}
       {isLoading ? null : isAuthenticated ? (
-        <>
-          {isAdmin && (
-            <Link
-              to="/admin"
-              className={cn(
-                "relative text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-                isActive("/admin")
-                  ? "text-foreground font-semibold"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              Dashboard
-              {isActive("/admin") && (
-                <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-foreground" />
-              )}
-            </Link>
-          )}
-          {isEmployee && (
-            <Link
-              to="/employee"
-              className={cn(
-                "relative text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-                isActive("/employee")
-                  ? "text-foreground font-semibold"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              My Orders
-              {isActive("/employee") && (
-                <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-foreground" />
-              )}
-            </Link>
-          )}
-        </>
+        (isAdmin || isEmployee) && (
+          <>
+            <span className="hidden h-4 w-px bg-border md:block" aria-hidden="true" />
+            <hr className="border-border md:hidden" aria-hidden="true" />
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className={cn(
+                  "relative text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                  isActive("/admin")
+                    ? "text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                Dashboard
+                {isActive("/admin") && (
+                  <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-foreground" />
+                )}
+              </Link>
+            )}
+            {isEmployee && (
+              <Link
+                to="/employee"
+                className={cn(
+                  "relative text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                  isActive("/employee")
+                    ? "text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                My Orders
+                {isActive("/employee") && (
+                  <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-foreground" />
+                )}
+              </Link>
+            )}
+          </>
+        )
       ) : (
         <>
+          <span className="hidden h-4 w-px bg-border md:block" aria-hidden="true" />
+          <hr className="border-border md:hidden" aria-hidden="true" />
           <Link
             to="/admin/login"
             className={cn(
@@ -167,14 +173,14 @@ export function AppLayout() {
                 <HugeiconsIcon icon={Menu01Icon} size={20} />
               </SheetTrigger>
               <SheetContent side="right">
-                <div className="flex flex-col gap-6">
-                  <div className="flex items-center gap-2 border-b pb-4">
+                <div className="flex flex-col gap-5">
+                  <div className="flex items-center gap-2 border-b pb-3">
                     <span className="flex h-6 w-6 items-center justify-center rounded-md bg-foreground shrink-0">
                       <span className="block h-2.5 w-2.5 rotate-45 bg-background" />
                     </span>
                     <span className="text-base font-bold tracking-tight">E-Com Store</span>
                   </div>
-                  <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-3">
                     <NavItems>
                       <button
                         onClick={() => setSheetOpen(false)}
@@ -193,7 +199,7 @@ export function AppLayout() {
           </div>
         </div>
       </nav>
-      <main className="mx-auto max-w-7xl px-4">
+      <main className="mx-auto max-w-7xl px-4 py-6 lg:py-8">
         <Outlet />
       </main>
     </div>
