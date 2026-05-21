@@ -28,6 +28,13 @@ export function errorMiddleware(
     }
   }
 
-  (req.log ?? logger).error({ err }, "Unhandled error");
+  (req.log ?? logger).error(
+    {
+      errMsg: err.message,
+      errName: err.name,
+      ...(process.env.LOG_LEVEL === "debug" && { err }),
+    },
+    "Unhandled error",
+  );
   sendError(res, 500, "INTERNAL_ERROR", "Internal server error");
 }

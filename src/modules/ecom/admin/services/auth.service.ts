@@ -12,11 +12,8 @@ import {
   cacheUserSession,
   createSession,
 } from "@/modules/ecom/auth/session/session.service";
-import { logger } from "@/modules/ecom/shared/logger";
-
 export async function registerAdmin(adminData: AdminData) {
   const inPendingList = await findPendingAdminByEmail(adminData.email);
-  logger.debug({ inPendingList }, "Pending admin check");
   if (!inPendingList) {
     throw new Error("Email not activated");
   }

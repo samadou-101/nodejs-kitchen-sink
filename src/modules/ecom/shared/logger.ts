@@ -1,9 +1,9 @@
-import pino from "pino"
+import pino from "pino";
 
-const isDev = process.env.NODE_ENV !== "production"
+const isDev = process.env.NODE_ENV !== "production";
 
 export const logger = pino({
-  level: process.env.LOG_LEVEL ?? (isDev ? "debug" : "info"),
+  level: process.env.LOG_LEVEL ?? "warn",
   ...(isDev && {
     transport: {
       target: "pino-pretty",
@@ -14,4 +14,4 @@ export const logger = pino({
     paths: ["password", "token", "secret", "authorization", "cookie"],
     censor: "[REDACTED]",
   },
-})
+});

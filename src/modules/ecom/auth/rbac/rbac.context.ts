@@ -32,7 +32,13 @@ export async function authenticate(
 
     next();
   } catch (error) {
-    logger.error({ err: error }, "Authentication error");
+    (req.log ?? logger).error(
+      {
+        errMsg: (error as Error).message,
+        ...(process.env.LOG_LEVEL === "debug" && { err: error }),
+      },
+      "Authentication failed",
+    );
     res.status(500).json({ error: "Authentication failed" });
   }
 }

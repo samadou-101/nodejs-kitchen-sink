@@ -31,6 +31,10 @@ app.use(
     autoLogging: {
       ignore: (req) => req.url === "/api/health",
     },
+    customLogLevel: (req, res, err) => {
+      if (res.statusCode && res.statusCode >= 500) return "error";
+      return "silent";
+    },
   }),
 );
 

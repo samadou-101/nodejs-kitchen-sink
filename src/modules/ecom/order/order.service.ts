@@ -10,7 +10,6 @@ import { authorize } from "@/modules/ecom/auth";
 import { OrderPolicies, ProductPolicies } from "@/modules/ecom/auth/policies";
 import type { OrderContext } from "@/modules/ecom/auth/policies";
 import { assertAuth } from "@/modules/ecom/auth/errors";
-import { logger } from "@/modules/ecom/shared/logger";
 
 function toOrderContext(order: { orderId: number; employeeId: number | null; customerId: number }): OrderContext {
   return {
@@ -194,53 +193,48 @@ export async function updateOrderStatus(
 ) {
   assertAuth(auth);
 
-  try {
-    return await prisma.$transaction(async (tx) => {
-      const db = bind(tx);
+  return await prisma.$transaction(async (tx) => {
+    const db = bind(tx);
 
-      const order = await db.findOrderById(orderId);
-      if (!order) {
-        throw new OrderNotFoundError(orderId);
+    const order = await db.findOrderById(orderId);
+    if (!order) {
+      throw new OrderNotFoundError(orderId);
+    }
+
+    authorize(auth, OrderPolicies.confirm(toOrderContext(order)));
+
+    const previousStatusId = order.orderStatusId;
+    const isConfirming = previousStatusId !== 2 && statusId === 2;
+    const isCancellingConfirmed = previousStatusId === 2 && statusId === 3;
+
+    if (isConfirming) {
+      const orderItems = await db.findOrderItemsByOrderId(orderId);
+      if (orderItems.length > 0) {
+        await checkAndDecrementInventory(
+          orderItems.map((i) => ({
+            productId: i.productId,
+            quantity: i.quantity,
+            price: 0,
+          })),
+          db,
+        );
       }
+    }
 
-      authorize(auth, OrderPolicies.confirm(toOrderContext(order)));
-
-      const previousStatusId = order.orderStatusId;
-      const isConfirming = previousStatusId !== 2 && statusId === 2;
-      const isCancellingConfirmed = previousStatusId === 2 && statusId === 3;
-
-      if (isConfirming) {
-        const orderItems = await db.findOrderItemsByOrderId(orderId);
-        if (orderItems.length > 0) {
-          await checkAndDecrementInventory(
-            orderItems.map((i) => ({
-              productId: i.productId,
-              quantity: i.quantity,
-              price: 0,
-            })),
-            db,
-          );
-        }
+    if (isCancellingConfirmed) {
+      const orderItems = await db.findOrderItemsByOrderId(orderId);
+      if (orderItems.length > 0) {
+        await db.incrementInventoryBatch(
+          orderItems.map((i) => ({
+            productId: i.productId,
+            quantity: i.quantity,
+          })),
+        );
       }
+    }
 
-      if (isCancellingConfirmed) {
-        const orderItems = await db.findOrderItemsByOrderId(orderId);
-        if (orderItems.length > 0) {
-          await db.incrementInventoryBatch(
-            orderItems.map((i) => ({
-              productId: i.productId,
-              quantity: i.quantity,
-            })),
-          );
-        }
-      }
-
-      return db.setOrderStatus(orderId, statusId);
-    });
-  } catch (error) {
-    logger.error({ err: error, orderId }, "[updateOrderStatus] Error");
-    throw error;
-  }
+    return db.setOrderStatus(orderId, statusId);
+  });
 }
 
 export async function updateInventory(

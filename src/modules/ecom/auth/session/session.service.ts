@@ -4,13 +4,13 @@ import { prisma } from "@/config/db.config";
 import { Prisma } from "@/generated/prisma/client";
 import type { SessionData } from "./session.types";
 import { redisClient } from "@/config/redis.config";
+import { logger } from "@/modules/ecom/shared/logger";
 
 export async function checkAuthSession(
   req: Request,
   res: Response,
   next: NextFunction,
 ) {
-  console.log("testing session");
   try {
     const sid = req.cookies.sid ?? null;
     if (!sid) {
@@ -95,7 +95,7 @@ export async function loginUserSession(req: Request, res: Response) {
       .status(200)
       .send({ name: existingUser.name, email: existingUser.email });
   } catch (error) {
-    console.log(error);
+    logger.error({ err: error }, "Login failed");
     res.status(500).send("Something went wrong");
   }
 }
@@ -120,7 +120,7 @@ export async function createSession(
 
     return sessionData;
   } catch (error: any) {
-    console.log("Error creation the session", error.message);
+    logger.error({ err: error }, "Failed to create session");
     return null;
   }
 }
@@ -132,7 +132,7 @@ export async function cacheUserSession(sessionData: SessionData) {
       expiration: { type: "EX", value: 60 * 60 * 24 * 7 },
     });
   } catch (error: any) {
-    console.log("Failed to cache session", error.meessage);
+    logger.error({ err: error }, "Failed to cache session");
   }
 }
 
@@ -192,7 +192,7 @@ export async function checkCachedSession(sid: string): Promise<boolean> {
     await redisClient.expire(key, newTtlSeconds);
     return true;
   } catch (error: any) {
-    console.log("Error Updating the session", error.message);
+    logger.error({ err: error }, "Failed to update session in cache");
     return false;
   }
 }
@@ -206,6 +206,6 @@ export async function getUseSessionFromDB(sid: string) {
     });
     return session;
   } catch (error) {
-    console.log("Error fetching the user session");
+    logger.error("Failed to fetch user session from database");
   }
 }
