@@ -6,11 +6,7 @@ import { useAuth } from "#ecom/shared/api/auth-provider";
 import { useCart } from "#ecom/features/shopping-cart/hooks/use-cart";
 import { cn } from "#components/lib/utils";
 import { buttonVariants } from "#components/lib/button-variants";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "#components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "#components/ui/sheet";
 
 const navLinkDefs = [
   { to: "/", label: "Products" },
@@ -38,7 +34,7 @@ function NavItems({ children }: { children?: ReactNode }) {
             key={link.to}
             to={link.to}
             className={cn(
-              "relative flex items-center gap-2 text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+              "focus-visible:ring-ring/50 relative flex items-center gap-2 rounded-sm text-sm font-medium transition-colors focus-visible:ring-3 focus-visible:outline-none",
               active
                 ? "text-foreground font-semibold"
                 : "text-muted-foreground hover:text-foreground",
@@ -51,7 +47,7 @@ function NavItems({ children }: { children?: ReactNode }) {
               </span>
             )}
             {active && (
-              <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-foreground" />
+              <span className="bg-foreground absolute -bottom-1 left-0 h-0.5 w-full rounded-full" />
             )}
           </Link>
         );
@@ -60,13 +56,16 @@ function NavItems({ children }: { children?: ReactNode }) {
       {isLoading ? null : isAuthenticated ? (
         (isAdmin || isEmployee) && (
           <>
-            <span className="hidden h-4 w-px bg-border md:block" aria-hidden="true" />
+            <span
+              className="bg-border hidden h-4 w-px md:block"
+              aria-hidden="true"
+            />
             <hr className="border-border md:hidden" aria-hidden="true" />
             {isAdmin && (
               <Link
                 to="/admin"
                 className={cn(
-                  "relative text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                  "focus-visible:ring-ring/50 relative rounded-sm text-sm font-medium transition-colors focus-visible:ring-3 focus-visible:outline-none",
                   isActive("/admin")
                     ? "text-foreground font-semibold"
                     : "text-muted-foreground hover:text-foreground",
@@ -74,7 +73,7 @@ function NavItems({ children }: { children?: ReactNode }) {
               >
                 Dashboard
                 {isActive("/admin") && (
-                  <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-foreground" />
+                  <span className="bg-foreground absolute -bottom-1 left-0 h-0.5 w-full rounded-full" />
                 )}
               </Link>
             )}
@@ -82,7 +81,7 @@ function NavItems({ children }: { children?: ReactNode }) {
               <Link
                 to="/employee"
                 className={cn(
-                  "relative text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                  "focus-visible:ring-ring/50 relative rounded-sm text-sm font-medium transition-colors focus-visible:ring-3 focus-visible:outline-none",
                   isActive("/employee")
                     ? "text-foreground font-semibold"
                     : "text-muted-foreground hover:text-foreground",
@@ -90,7 +89,7 @@ function NavItems({ children }: { children?: ReactNode }) {
               >
                 My Orders
                 {isActive("/employee") && (
-                  <span className="absolute -bottom-1 left-0 h-0.5 w-full rounded-full bg-foreground" />
+                  <span className="bg-foreground absolute -bottom-1 left-0 h-0.5 w-full rounded-full" />
                 )}
               </Link>
             )}
@@ -98,12 +97,15 @@ function NavItems({ children }: { children?: ReactNode }) {
         )
       ) : (
         <>
-          <span className="hidden h-4 w-px bg-border md:block" aria-hidden="true" />
+          <span
+            className="bg-border hidden h-4 w-px md:block"
+            aria-hidden="true"
+          />
           <hr className="border-border md:hidden" aria-hidden="true" />
           <Link
             to="/admin/login"
             className={cn(
-              "text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+              "focus-visible:ring-ring/50 rounded-sm text-sm font-medium transition-colors focus-visible:ring-3 focus-visible:outline-none",
               isActive("/admin/login")
                 ? "text-foreground font-semibold"
                 : "text-muted-foreground hover:text-foreground",
@@ -114,7 +116,7 @@ function NavItems({ children }: { children?: ReactNode }) {
           <Link
             to="/employee/login"
             className={cn(
-              "text-sm font-medium transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+              "focus-visible:ring-ring/50 rounded-sm text-sm font-medium transition-colors focus-visible:ring-3 focus-visible:outline-none",
               isActive("/employee/login")
                 ? "text-foreground font-semibold"
                 : "text-muted-foreground hover:text-foreground",
@@ -134,15 +136,15 @@ export function AppLayout() {
 
   return (
     <div className="min-h-screen">
-      <nav className="bg-background/95 sticky top-0 z-40 border-b backdrop-blur-sm shadow-xs">
+      <nav className="bg-background/95 sticky top-0 z-40 border-b shadow-xs backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
           <div className="flex items-center gap-6">
             <Link
               to="/"
-              className="flex items-center gap-2 text-lg font-bold tracking-tight focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 rounded-sm"
+              className="focus-visible:ring-ring/50 flex items-center gap-2 rounded-sm text-lg font-bold tracking-tight focus-visible:ring-3 focus-visible:outline-none"
             >
-              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-foreground">
-                <span className="block h-2 w-2 rotate-45 bg-background" />
+              <span className="bg-foreground flex h-5 w-5 items-center justify-center rounded-md">
+                <span className="bg-background block h-2 w-2 rotate-45" />
               </span>
               E-Com Store
             </Link>
@@ -168,17 +170,21 @@ export function AppLayout() {
             </Link>
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
               <SheetTrigger
-                className={cn(buttonVariants({ variant: "ghost", size: "icon" }))}
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "icon" }),
+                )}
               >
                 <HugeiconsIcon icon={Menu01Icon} size={20} />
               </SheetTrigger>
               <SheetContent side="right">
                 <div className="flex flex-col gap-5">
                   <div className="flex items-center gap-2 border-b pb-3">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-md bg-foreground shrink-0">
-                      <span className="block h-2.5 w-2.5 rotate-45 bg-background" />
+                    <span className="bg-foreground flex h-6 w-6 shrink-0 items-center justify-center rounded-md">
+                      <span className="bg-background block h-2.5 w-2.5 rotate-45" />
                     </span>
-                    <span className="text-base font-bold tracking-tight">E-Com Store</span>
+                    <span className="text-base font-bold tracking-tight">
+                      E-Com Store
+                    </span>
                   </div>
                   <div className="flex flex-col gap-3">
                     <NavItems>
@@ -199,7 +205,7 @@ export function AppLayout() {
           </div>
         </div>
       </nav>
-      <main className="mx-auto max-w-7xl px-4 py-6 lg:py-8">
+      <main className="max-w-8xl mx-auto px-4 py-6 lg:py-8">
         <Outlet />
       </main>
     </div>
