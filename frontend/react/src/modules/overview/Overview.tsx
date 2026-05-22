@@ -1,5 +1,7 @@
+import DebouncingEx from "./features/Debouncing";
+
 const Overview = () => {
-  return <div>test</div>;
+  return <DebouncingEx />;
 };
 
 export default Overview;
