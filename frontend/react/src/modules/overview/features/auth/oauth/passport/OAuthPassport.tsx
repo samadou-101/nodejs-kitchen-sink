@@ -6,8 +6,6 @@ type GoogleProfile = {
   avatar: string;
 };
 
-type OAuthMethod = "custom" | "passport";
-
 function parseJwtPayload(token: string): GoogleProfile | null {
   try {
     const payload = token.split(".")[1];
@@ -27,43 +25,25 @@ function getInitialState() {
   window.history.replaceState({}, "", window.location.pathname);
 
   if (errMsg) {
-    return {
-      profile: null,
-      error: errMsg,
-    };
+    return { profile: null, error: errMsg };
   }
 
   if (token) {
     const decoded = parseJwtPayload(token);
-
-    return {
-      profile: decoded,
-      error: decoded ? null : "Invalid token",
-    };
+    return { profile: decoded, error: decoded ? null : "Invalid token" };
   }
 
-  return {
-    profile: null,
-    error: null,
-  };
+  return { profile: null, error: null };
 }
 
-function OAuth() {
+function OAuthPassport() {
   const initial = getInitialState();
 
   const [profile, setProfile] = useState<GoogleProfile | null>(initial.profile);
   const [error, setError] = useState<string | null>(initial.error);
-  const [method, setMethod] = useState<OAuthMethod>("custom");
 
-  const handleLogin = async () => {
-    if (method === "passport") {
-      window.location.href =
-        "http://localhost:3000/api/auth/oauth/passport/google/url";
-      return;
-    }
-    const res = await fetch("http://localhost:3000/api/auth/oauth/google/url");
-    const data = (await res.json()) as { url: string };
-    window.location.href = data.url;
+  const handleLogin = () => {
+    window.location.href = "http://localhost:3000/api/auth/oauth/passport/google/url";
   };
 
   const handleLogout = () => {
@@ -111,28 +91,14 @@ function OAuth() {
 
   return (
     <div className="mx-auto my-8 max-w-md rounded-lg border p-6 text-center">
-      <div className="mb-4">
-        <label htmlFor="oauth-method" className="mr-2 text-sm text-gray-600">
-          OAuth Method:
-        </label>
-        <select
-          id="oauth-method"
-          value={method}
-          onChange={(e) => setMethod(e.target.value as OAuthMethod)}
-          className="rounded border px-3 py-1.5 text-sm"
-        >
-          <option value="custom">Custom</option>
-          <option value="passport">Passport</option>
-        </select>
-      </div>
       <button
         onClick={handleLogin}
         className="rounded bg-blue-500 px-6 py-3 text-white hover:bg-blue-600"
       >
-        Login with Google
+        Login with Google (Passport)
       </button>
     </div>
   );
 }
 
-export default OAuth;
+export default OAuthPassport;
