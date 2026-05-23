@@ -132,3 +132,8 @@ export type PayrollRun = Prisma.PayrollRunModel
  * 
  */
 export type PayrollRunItem = Prisma.PayrollRunItemModel
+/**
+ * Model OAuthAccount
+ * 
+ */
+export type OAuthAccount = Prisma.OAuthAccountModel

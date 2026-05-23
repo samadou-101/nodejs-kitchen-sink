@@ -6,14 +6,13 @@ export const redisClient: RedisClientType = createClient({
 });
 
 export async function initRedis() {
-  redisClient.on("error", (err) => console.log("Redis Client Error", err));
-
   try {
     await redisClient.connect();
     console.log("Redis Server Connected Successfully");
   } catch (error: any) {
-    console.log("Error connecting to Redis", error.message);
+    console.log("Error connecting to Redis");
   }
+  // redisClient.on("error", (err) => console.log("Redis Client Error"));
 }
 
 // import Redis from "ioredis";
